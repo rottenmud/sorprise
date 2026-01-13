@@ -8,21 +8,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-/* --- 1. RESET --- */
+/* --- 1. RESET & BASIC --- */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
     margin: 0; padding: 0;
-    width: 100%;
-    min-height: 100vh;
+    width: 100%; min-height: 100vh;
     background: radial-gradient(circle at center, #fff0f5, #ffc3d9);
     font-family: 'Quicksand', sans-serif;
     overflow-x: hidden;
 }
 
-/* --- 2. BACKGROUND & AUDIO --- */
-#canvas-bg {
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-}
+/* --- 2. BACKGROUND CANVAS --- */
+#canvas-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+/* --- 3. UI ELEMENTS --- */
 #start-screen {
     position: fixed; inset: 0;
     background: #fff0f5;
@@ -53,7 +52,41 @@ body {
 }
 @keyframes pulse { 50% { transform: rotate(45deg) scale(1.1); } }
 
-/* --- 3. MAIN LAYOUT --- */
+/* --- 4. WATERING CAN UI --- */
+#water-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none; /* Hidden initially */
+    flex-direction: column;
+    align-items: center;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 1s;
+}
+.water-btn {
+    font-size: 40px;
+    background: #fff;
+    border: 2px solid #81d4fa;
+    border-radius: 50%;
+    width: 70px; height: 70px;
+    cursor: pointer;
+    display: flex; justify-content: center; align-items: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    animation: bounce 2s infinite;
+}
+.instruction {
+    margin-top: 10px;
+    color: #555;
+    font-weight: bold;
+    background: rgba(255,255,255,0.8);
+    padding: 5px 10px;
+    border-radius: 10px;
+}
+@keyframes bounce { 0%, 100% {transform: translateY(0);} 50% {transform: translateY(-10px);} }
+
+/* --- 5. MAIN LAYOUT --- */
 .main-grid {
     position: relative; z-index: 10;
     display: flex; flex-direction: column;
@@ -63,13 +96,9 @@ body {
     padding-bottom: 50px;
 }
 
-/* --- 4. HEADER (TEXT) --- */
 .header-wrapper {
-    margin-top: 40px;
-    margin-bottom: 30px; 
-    text-align: center;
-    position: relative;
-    z-index: 50; /* Ensure text is ON TOP of flower */
+    margin-top: 40px; margin-bottom: 30px; 
+    text-align: center; position: relative; z-index: 50;
 }
 .header-title h1 {
     font-family: 'Dancing Script', cursive;
@@ -77,72 +106,70 @@ body {
     background: linear-gradient(45deg, #ff5f9e, #ff9966);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 2px rgba(255,255,255,0.8));
 }
 .header-title h2 {
     margin: 5px 0 0 0; font-size: 16px; 
     letter-spacing: 3px; color: #ff8fba; text-transform: uppercase;
 }
 
-/* --- 5. FLOWER GEOMETRY (THE FIX) --- */
+/* --- 6. FLOWER AREA --- */
 .flower-area {
     position: relative;
     width: 100%;
     display: flex; justify-content: center;
-    height: 320px; /* Fixed height to keep spacing stable */
+    height: 320px;
     margin-bottom: 20px;
     z-index: 1;
 }
 
 .stem {
-    position: absolute;
-    bottom: 0;
-    width: 8px; height: 0;
+    position: absolute; bottom: 0;
+    width: 8px; height: 0; /* Starts at 0 */
     background: #66bb6a;
     border-radius: 4px;
-    transition: height 2s ease-in-out;
+    transition: height 2.5s ease-in-out;
 }
 .stem.grow { height: 220px; }
 
-/* The container for the head */
+/* Flower Head Container (Center Point) */
 .flower-head {
-    position: absolute;
-    bottom: 100%; /* Sits exactly on top of stem */
-    left: 50%;    /* Horizontally centered */
-    width: 0; height: 0; /* No size, just a coordinate point */
-    
-    transform: scale(0); 
+    position: absolute; bottom: 100%; left: 50%;
+    width: 0; height: 0;
+    transform: scale(0);
     transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer; /* Indicates clickability */
 }
 .flower-head.bloom { transform: scale(1); }
+.flower-head:active { transform: scale(0.9); } /* Click effect */
 
-/* The Yellow Dot - PERFECTLY CENTERED */
+/* Shake Animation for clicking */
+.shake { animation: shake 0.5s ease-in-out; }
+@keyframes shake {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(-10deg); }
+    75% { transform: scale(1.1) rotate(10deg); }
+}
+
+/* Yellow Dot */
 .center-dot {
-    position: absolute;
-    top: 0; left: 0; /* At the coordinate point */
+    position: absolute; top: 0; left: 0;
     width: 40px; height: 40px;
-    background: #ffeb3b; 
-    border-radius: 50%; 
-    z-index: 10;
-    transform: translate(-50%, -50%); /* Centers the dot itself on the point */
+    background: #ffeb3b; border-radius: 50%; z-index: 10;
+    transform: translate(-50%, -50%);
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
 }
 
-/* The Petals - FANNING OUT FROM CENTER */
+/* Petals */
 .petal {
-    position: absolute; 
-    bottom: 0; left: 0; /* Pivot point is the coordinate center */
+    position: absolute; bottom: 0; left: 0;
     width: 50px; height: 90px;
     background: linear-gradient(to top, #ffc3d9, #ff4081);
     border-radius: 50px;
-    transform-origin: bottom center; /* Rotate around the bottom */
-    margin-left: -25px; /* Center the petal width (50px/2) on the axis */
+    transform-origin: bottom center;
+    margin-left: -25px;
     box-shadow: 0 4px 5px rgba(0,0,0,0.1);
     z-index: 1;
 }
-
-/* Move petals slightly out (translateY) to make a flower shape, 
-   but they all share the same origin point now. */
 .p1 { transform: rotate(0deg) translateY(-15px); }
 .p2 { transform: rotate(60deg) translateY(-15px); }
 .p3 { transform: rotate(120deg) translateY(-15px); }
@@ -150,7 +177,7 @@ body {
 .p5 { transform: rotate(240deg) translateY(-15px); }
 .p6 { transform: rotate(300deg) translateY(-15px); }
 
-/* --- 6. CARD --- */
+/* --- 7. CARD --- */
 .card-box {
     background: rgba(255, 255, 255, 0.9);
     padding: 30px; border-radius: 20px;
@@ -164,15 +191,22 @@ body {
 }
 .show-card { opacity: 1; transform: translateY(0); }
 
-/* Sway Animation wrapper */
-.sway-wrapper { 
-    width: 0; height: 0; position: absolute; left: 50%; bottom: 100%;
-}
+/* Sway Wrapper */
+.sway-wrapper { width: 0; height: 0; position: absolute; left: 50%; bottom: 100%; }
 .swaying { animation: swaying 4s ease-in-out infinite alternate; }
-
 @keyframes swaying { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
 
-/* --- DESKTOP --- */
+/* Click Hint */
+.click-hint {
+    position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+    background: #fff; padding: 5px 10px; border-radius: 10px;
+    font-size: 12px; white-space: nowrap; opacity: 0; transition: opacity 1s;
+    pointer-events: none;
+}
+.show-hint { opacity: 1; animation: floatUp 2s infinite; }
+@keyframes floatUp { 0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,-5px)} }
+
+/* --- 8. DESKTOP TWEAKS --- */
 @media (min-width: 768px) {
     .main-grid { flex-direction: row; justify-content: center; }
     .header-wrapper { position: absolute; top: 8%; width: 100%; }
@@ -201,10 +235,16 @@ body {
         </div>
     </div>
 
+    <div id="water-controls">
+        <div class="water-btn" id="waterBtn">🚿</div>
+        <div class="instruction">Tap to Water</div>
+    </div>
+
     <div class="flower-area">
         <div class="stem" id="stem">
             <div class="sway-wrapper" id="swayWrapper">
                 <div class="flower-head" id="head">
+                    <div class="click-hint" id="clickHint">Click me!</div>
                     <div class="petal p1"></div><div class="petal p2"></div>
                     <div class="petal p3"></div><div class="petal p4"></div>
                     <div class="petal p5"></div><div class="petal p6"></div>
@@ -219,6 +259,7 @@ body {
 </div>
 
 <script>
+// Elements
 const startScreen = document.getElementById("start-screen");
 const startBtn = document.getElementById("startBtn");
 const main = document.getElementById("main");
@@ -227,7 +268,11 @@ const stem = document.getElementById("stem");
 const head = document.getElementById("head");
 const swayWrapper = document.getElementById("swayWrapper");
 const card = document.getElementById("card");
+const waterControls = document.getElementById("water-controls");
+const waterBtn = document.getElementById("waterBtn");
+const clickHint = document.getElementById("clickHint");
 
+// Data
 const msg = `Happy Birthday Bun!
 
 Alam mo, kahit anong mangyari, I will always "carrot" (care at) love you.
@@ -240,68 +285,154 @@ Happy Birthday!
 
 From Plu 🥕🐰`;
 
+// --- PHASE 1: START ---
 startBtn.onclick = () => {
     bgMusic.volume = 0.4;
     bgMusic.play().catch(e => console.log(e));
-
+    
     startScreen.style.opacity = 0;
     setTimeout(() => startScreen.remove(), 800);
-
+    
     main.style.opacity = 1;
 
+    // Show Watering Can after a brief delay
     setTimeout(() => {
-        stem.classList.add("grow");
-        setTimeout(() => {
-            head.classList.add("bloom");
-            swayWrapper.classList.add("swaying");
-        }, 2000);
-    }, 500);
-
-    setTimeout(() => {
-        card.classList.add("show-card");
-        typeWriter();
-    }, 2500);
+        waterControls.style.display = "flex";
+        setTimeout(() => waterControls.style.opacity = 1, 100);
+    }, 1000);
 
     initParticles();
 };
 
-let i = 0;
+// --- PHASE 2: WATERING ---
+waterBtn.onclick = () => {
+    // Hide controls
+    waterControls.style.opacity = 0;
+    setTimeout(() => waterControls.style.display = "none", 500);
+
+    // Grow Stem
+    stem.classList.add("grow");
+
+    // Bloom Head
+    setTimeout(() => {
+        head.classList.add("bloom");
+        swayWrapper.classList.add("swaying");
+        clickHint.classList.add("show-hint");
+    }, 2500);
+
+    // Show Card
+    setTimeout(() => {
+        card.classList.add("show-card");
+        typeWriter();
+    }, 3000);
+};
+
+// --- PHASE 3: CLICK INTERACTION ---
+head.onclick = (e) => {
+    // 1. Shake animation
+    head.classList.remove("shake"); 
+    void head.offsetWidth; // Trigger reflow
+    head.classList.add("shake");
+
+    // 2. Hide Hint
+    clickHint.classList.remove("show-hint");
+
+    // 3. Explode Hearts at click position
+    spawnExplosion(e.clientX, e.clientY);
+};
+
+// --- UTILS ---
+let typeIndex = 0;
 function typeWriter() {
-    if (i < msg.length) {
-        card.textContent += msg.charAt(i);
-        i++;
-        setTimeout(typeWriter, 50); 
+    if (typeIndex < msg.length) {
+        card.textContent += msg.charAt(typeIndex);
+        typeIndex++;
+        setTimeout(typeWriter, 40); 
     }
 }
 
+// Particle System
+let particles = [];
+const canvas = document.getElementById("canvas-bg");
+const ctx = canvas.getContext("2d");
+
 function initParticles() {
-    const canvas = document.getElementById("canvas-bg");
-    const ctx = canvas.getContext("2d");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     
-    let particles = [];
-    for(let k=0; k<30; k++) particles.push({
-        x: Math.random()*canvas.width,
-        y: Math.random()*canvas.height - canvas.height,
-        s: Math.random()*8+4,
-        v: Math.random()*2+1
-    });
+    // Background rain
+    for(let k=0; k<40; k++) particles.push(createParticle());
+    
+    draw();
+}
 
-    function draw() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        particles.forEach(p => {
+function createParticle() {
+    return {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        s: Math.random() * 5 + 2,
+        v: Math.random() * 2 + 1,
+        type: 'rain'
+    };
+}
+
+// Explosion Logic
+function spawnExplosion(x, y) {
+    for(let i=0; i<20; i++) {
+        particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 10,
+            vy: (Math.random() - 1) * 10,
+            s: Math.random() * 8 + 5,
+            v: 0,
+            life: 1, // fading out
+            type: 'heart',
+            color: `hsl(${Math.random()*60 + 330}, 100%, 70%)` // Pink/Red hues
+        });
+    }
+}
+
+function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    
+    for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+
+        if (p.type === 'rain') {
             p.y += p.v;
             if(p.y > canvas.height) p.y = -20;
-            ctx.fillStyle = "rgba(255,255,255,0.7)";
+            ctx.fillStyle = "rgba(255,255,255,0.6)";
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.s, 0, Math.PI*2);
             ctx.fill();
-        });
-        requestAnimationFrame(draw);
+        } 
+        else if (p.type === 'heart') {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.2; // gravity
+            p.life -= 0.02;
+
+            if (p.life <= 0) {
+                particles.splice(i, 1);
+                continue;
+            }
+
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.life;
+            ctx.font = p.s + "px Arial";
+            ctx.fillText("❤", p.x, p.y);
+            ctx.globalAlpha = 1;
+        }
     }
-    draw();
+    requestAnimationFrame(draw);
 }
+
+// Resize handler
+window.onresize = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+};
 </script>
 
 </body>

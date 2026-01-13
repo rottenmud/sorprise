@@ -10,7 +10,6 @@
         --primary: #ff5f9e;
         --secondary: #ff8fba;
         --bg-deep: #2c001e;
-        --bg-light: #590032;
         --gold: #ffd700;
     }
 
@@ -22,10 +21,11 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background: radial-gradient(circle at center, #ffeff7 0%, #ffc3d9 100%);
+        background: radial-gradient(circle at center, #ffe6f2 0%, #ffc3d9 100%); /* Soft Pink Gradient */
         font-family: 'Quicksand', sans-serif;
     }
 
+    /* --- Floating Particles Background --- */
     #canvas-bg {
         position: absolute;
         top: 0;
@@ -36,6 +36,7 @@
         pointer-events: none;
     }
 
+    /* --- Start Screen (Heart Button) --- */
     #start-screen {
         position: fixed;
         top: 0;
@@ -48,7 +49,7 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        transition: opacity 1.2s ease-out;
+        transition: opacity 1s ease-out;
     }
 
     .heart-btn {
@@ -60,8 +61,10 @@
         box-shadow: 0 10px 40px rgba(255, 95, 158, 0.5);
         cursor: pointer;
         animation: heartBeat 1.2s infinite;
-        transition: all 0.3s ease;
+        transition: transform 0.3s;
     }
+    
+    .heart-btn:hover { transform: rotate(45deg) scale(1.1); }
 
     .heart-btn::before, .heart-btn::after {
         content: "";
@@ -80,203 +83,227 @@
         font-family: 'Dancing Script', cursive;
         font-size: 2rem;
         color: var(--primary);
-        opacity: 0.8;
     }
 
     @keyframes heartBeat {
         0% { transform: rotate(45deg) scale(1); }
         15% { transform: rotate(45deg) scale(1.15); }
-        30% { transform: rotate(45deg) scale(1); }
-        45% { transform: rotate(45deg) scale(1.15); }
         100% { transform: rotate(45deg) scale(1); }
     }
 
-    .main-stage {
+    /* --- Main Layout --- */
+    .container {
         position: relative;
-        width: 100%;
+        width: 90%;
+        max-width: 1200px;
         height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        margin: 0 auto;
+        display: flex; /* Side by Side Layout */
+        flex-direction: row; 
         align-items: center;
+        justify-content: center;
         z-index: 10;
-        opacity: 0; 
+        opacity: 0; /* Hidden initially */
         transition: opacity 2s ease;
     }
 
-    .header-text {
-        position: absolute;
-        top: 8%;
-        text-align: center;
-        z-index: 20;
+    /* Mobile Layout Adjustment */
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column-reverse; /* Letter bottom, Flower top */
+            justify-content: center;
+            gap: 20px;
+        }
+        .flower-section { margin-bottom: 20px; }
+        .card-section { width: 95% !important; }
+        h1 { font-size: 3rem !important; }
     }
 
-    h1 {
-        font-family: 'Dancing Script', cursive;
-        font-size: 4rem;
-        margin: 0;
-        background: linear-gradient(to right, #ff5f9e, #ff9966);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        filter: drop-shadow(2px 2px 0px rgba(255,255,255,0.5));
-    }
-
-    h2 {
-        font-size: 1.2rem;
-        color: var(--secondary);
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        margin-top: 5px;
-    }
-
-    .flower-wrapper {
-        position: relative;
-        width: 200px;
-        height: 200px;
-        margin-bottom: 250px; 
-    }
-
-    .poppy {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        transform: translate(-50%, -50%);
-        transition: all 1.5s ease-out;
-    }
-
-    .petal-layer {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 0; 
-        height: 0;
-        transition: all 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .bloom .petal-layer {
-        width: 200px;
-        height: 200px;
-    }
-
-    .petal {
-        position: absolute;
-        left: 50%;
-        bottom: 50%;
-        width: 40%;
-        height: 55%;
-        background: radial-gradient(circle at 30% 30%, #ff8fba, #ff2e63);
-        border-radius: 50% 50% 10% 10%;
-        transform-origin: bottom center;
-        box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
-        opacity: 0.9;
-    }
-
-    .layer-inner .petal {
-        height: 45%;
-        background: radial-gradient(circle at 30% 30%, #ff5f9e, #d60045);
-        filter: brightness(0.9);
-    }
-
-    .p1 { transform: translateX(-50%) rotate(0deg); }
-    .p2 { transform: translateX(-50%) rotate(60deg); }
-    .p3 { transform: translateX(-50%) rotate(120deg); }
-    .p4 { transform: translateX(-50%) rotate(180deg); }
-    .p5 { transform: translateX(-50%) rotate(240deg); }
-    .p6 { transform: translateX(-50%) rotate(300deg); }
-
-    .flower-center {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0);
-        width: 45px;
-        height: 45px;
-        background: radial-gradient(circle, #ffeb3b, #fbc02d);
-        border-radius: 50%;
-        z-index: 50;
-        box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
-        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.8s;
-    }
-
-    .bloom .flower-center {
-        transform: translate(-50%, -50%) scale(1);
-    }
-
-    .stem {
-        position: absolute;
-        bottom: 50%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 6px;
-        height: 0;
-        background: linear-gradient(to top, #1b5e20, #4caf50);
-        z-index: -1;
-        transition: height 1.5s ease-in-out;
-        border-radius: 4px;
-    }
-
-    .grow .stem {
-        height: 200px;
+    /* --- Left Side: Letter --- */
+    .card-section {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
     }
 
     .letter-card {
-        position: absolute;
-        bottom: 5%;
-        width: 85%;
-        max-width: 500px;
-        min-height: 200px;
-        background: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-        transform: translateY(50px);
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        border-radius: 25px;
+        padding: 40px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        width: 100%;
+        max-width: 550px;
+        min-height: 300px;
+        transform: translateX(-50px);
         opacity: 0;
-        transition: all 1s ease 2.5s;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        transition: all 1s ease 1s; /* Delays appearance */
     }
 
-    .reveal-card {
-        transform: translateY(0);
+    .show-card {
+        transform: translateX(0);
         opacity: 1;
     }
 
+    /* Typewriter Styles */
     #typewriter {
-        font-size: 1.1rem;
-        color: #4a4a4a;
-        line-height: 1.6;
-        white-space: pre-wrap;
+        font-size: 1.15rem;
+        color: #555;
+        line-height: 1.8;
+        font-weight: 500;
+        white-space: pre-wrap; /* Preserves spacing */
+    }
+
+    .highlight {
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 1.2rem;
     }
 
     .cursor {
         display: inline-block;
         width: 2px;
-        height: 1.1rem;
+        height: 1.2em;
         background-color: var(--primary);
+        margin-left: 2px;
         animation: blink 1s infinite;
-        vertical-align: middle;
+        vertical-align: bottom;
     }
 
-    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-    .highlight { color: var(--primary); font-weight: 700; }
+    /* --- Right Side: Flower --- */
+    .flower-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        min-height: 400px;
+    }
 
-    #controls {
+    .header-text {
+        text-align: center;
+        margin-bottom: 40px; /* Space above flower */
         position: absolute;
-        top: 20px;
-        right: 20px;
-        z-index: 100;
-        opacity: 0;
-        transition: opacity 1s;
+        top: 0;
+        width: 100%;
     }
+
+    h1 {
+        font-family: 'Dancing Script', cursive;
+        font-size: 5rem;
+        margin: 0;
+        background: linear-gradient(to right, #ff5f9e, #ff9966);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(2px 2px 0px white);
+    }
+
+    h2 {
+        font-size: 1.2rem;
+        color: var(--secondary);
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        margin-top: -10px;
+        font-weight: 700;
+    }
+
+    /* Flower Animation */
+    .flower-wrapper {
+        position: relative;
+        width: 250px;
+        height: 250px;
+        margin-top: 100px;
+    }
+
+    .stem {
+        position: absolute;
+        bottom: 50%; /* Starts at middle */
+        left: 50%;
+        width: 8px;
+        height: 0;
+        background: #4caf50;
+        transform: translateX(-50%);
+        border-radius: 4px;
+        transition: height 1.5s ease-in-out;
+        z-index: 1;
+    }
+
+    .grow-stem { height: 250px; }
+
+    .bloom-container {
+        position: absolute;
+        top: 50%; /* Top of stem */
+        left: 50%;
+        width: 0;
+        height: 0;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        transition: all 1s ease 1.2s; /* Delayed until stem grows */
+    }
+
+    .bloom-active { width: 200px; height: 200px; }
+
+    /* Petals */
+    .petal {
+        position: absolute;
+        width: 100px;
+        height: 120px;
+        background: radial-gradient(circle at 30% 30%, #ff8fba, #ff2e63);
+        border-radius: 50% 50% 10% 10%;
+        transform-origin: bottom center;
+        bottom: 50%;
+        left: 50%;
+        margin-left: -50px;
+        opacity: 0;
+        transform: scale(0);
+        transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 1s;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .bloom-active .petal { opacity: 1; }
+
+    /* Rotations for 6 petals */
+    .bloom-active .p1 { transform: rotate(0deg) scale(1); }
+    .bloom-active .p2 { transform: rotate(60deg) scale(1); }
+    .bloom-active .p3 { transform: rotate(120deg) scale(1); }
+    .bloom-active .p4 { transform: rotate(180deg) scale(1); }
+    .bloom-active .p5 { transform: rotate(240deg) scale(1); }
+    .bloom-active .p6 { transform: rotate(300deg) scale(1); }
+
+    /* Inner Layer for depth */
+    .inner-petals .petal {
+        height: 90px;
+        width: 80px;
+        margin-left: -40px;
+        background: radial-gradient(circle at 30% 30%, #ff5f9e, #e91e63);
+        z-index: 11;
+        transition-delay: 0.2s;
+    }
+
+    /* The Center (Gold Orb - No Black Dot!) */
+    .center-core {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 45px;
+        height: 45px;
+        background: radial-gradient(circle at 30% 30%, #fff59d, #fbc02d);
+        border-radius: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        z-index: 20;
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 2s;
+    }
+
+    .bloom-active .center-core { transform: translate(-50%, -50%) scale(1); }
+
 </style>
 </head>
 <body>
@@ -292,184 +319,210 @@
 
     <canvas id="canvas-bg"></canvas>
 
-    <div class="main-stage" id="stage">
+    <div class="container" id="mainContainer">
         
-        <div class="header-text">
-            <h1>Bun</h1>
-            <h2>Happy Birthday</h2>
-        </div>
-
-        <div class="flower-wrapper">
-            <div class="stem" id="stem"></div>
-            <div class="poppy" id="flower">
-                <div class="petal-layer" style="transform: translate(-50%, -50%) rotate(30deg); opacity: 0.8;">
-                    <div class="petal p1"></div>
-                    <div class="petal p2"></div>
-                    <div class="petal p3"></div>
-                    <div class="petal p4"></div>
-                    <div class="petal p5"></div>
-                    <div class="petal p6"></div>
-                </div>
-                <div class="petal-layer layer-inner">
-                    <div class="petal p1"></div>
-                    <div class="petal p2"></div>
-                    <div class="petal p3"></div>
-                    <div class="petal p4"></div>
-                    <div class="petal p5"></div>
-                    <div class="petal p6"></div>
-                </div>
-                <div class="flower-center"></div>
+        <div class="card-section">
+            <div class="letter-card" id="letterCard">
+                <div id="typewriter"></div><span class="cursor"></span>
             </div>
         </div>
 
-        <div class="letter-card" id="card">
-            <div id="typewriter"></div>
+        <div class="flower-section">
+            <div class="header-text">
+                <h1>Bun</h1>
+                <h2>Happy Birthday</h2>
+            </div>
+
+            <div class="flower-wrapper">
+                <div class="stem" id="stem"></div>
+                
+                <div class="bloom-container" id="bloom">
+                    <div class="petal p1"></div>
+                    <div class="petal p2"></div>
+                    <div class="petal p3"></div>
+                    <div class="petal p4"></div>
+                    <div class="petal p5"></div>
+                    <div class="petal p6"></div>
+                    
+                    <div class="inner-petals">
+                        <div class="petal p1"></div>
+                        <div class="petal p2"></div>
+                        <div class="petal p3"></div>
+                        <div class="petal p4"></div>
+                        <div class="petal p5"></div>
+                        <div class="petal p6"></div>
+                    </div>
+
+                    <div class="center-core"></div>
+                </div>
+            </div>
         </div>
+
     </div>
 
 <script>
-    const startScreen = document.getElementById('start-screen');
+    // --- Configuration ---
     const startBtn = document.getElementById('startBtn');
-    const stage = document.getElementById('stage');
+    const startScreen = document.getElementById('start-screen');
+    const container = document.getElementById('mainContainer');
     const music = document.getElementById('bgMusic');
-    const flower = document.getElementById('flower');
     const stem = document.getElementById('stem');
-    const card = document.getElementById('card');
-    const typeWriterElement = document.getElementById('typewriter');
+    const bloom = document.getElementById('bloom');
+    const letterCard = document.getElementById('letterCard');
+    const typeWriterEl = document.getElementById('typewriter');
+    
+    // Using Unicode for Emojis to prevent diamond ?? errors
+    const carrotEmoji = '\uD83E\uDD55'; // 🥕
+    const bunnyEmoji = '\uD83D\uDC30';  // 🐰
 
-    const message = `Alam mo, kahit anong mangyari, I will always "carrot" (care at) love you forever.
+    // Message segments (bold text separated)
+    const textSegments = [
+        { text: "Alam mo, kahit anong mangyari, I will always ", isBold: false },
+        { text: '"carrot" (care at)', isBold: true },
+        { text: " love you forever.\n\n", isBold: false },
+        { text: "Pero seryoso, enjoy your day today kasi deserve mo lahat ng treats at happiness sa mundo.\n\n", isBold: false },
+        { text: "Sana maging kasing-saya mo yung celebration mo. Stay cute as always and have a great dayyy.\n\n", isBold: false },
+        { text: `See you later. ${carrotEmoji} ${bunnyEmoji}`, isBold: false }
+    ];
 
-Pero seryoso, enjoy your day today kasi deserve mo lahat ng treats at happiness sa mundo.
+    let hasStarted = false;
 
-Sana maging kasing-saya mo yung celebration mo. Stay cute as always and have a great dayyy.
-
-See you later. 🥕🐰`;
-
+    // --- Start Event ---
     startBtn.addEventListener('click', () => {
+        if(hasStarted) return;
+        hasStarted = true;
+
+        // Fade out start screen
         startScreen.style.opacity = '0';
+        
+        // Play Music
+        music.volume = 0.5;
+        music.play().catch(e => console.log("Audio requires interaction"));
+
         setTimeout(() => {
             startScreen.style.display = 'none';
-            stage.style.opacity = '1';
+            container.style.opacity = '1';
             
-            music.volume = 0.5;
-            music.play().catch(e => console.log("Audio needed user gesture"));
-
+            // Start Canvas
             initCanvas();
-            animateSurprise();
+            
+            // Start Animation Sequence
+            runAnimation();
         }, 1000);
     });
 
-    function animateSurprise() {
+    // --- Animation Sequence ---
+    function runAnimation() {
+        // 1. Grow Stem
         setTimeout(() => {
-            stem.classList.add('grow');
+            stem.classList.add('grow-stem');
         }, 500);
 
+        // 2. Bloom Flower
         setTimeout(() => {
-            flower.classList.add('bloom');
+            bloom.classList.add('bloom-active');
         }, 1500);
 
+        // 3. Show Card & Start Typing
         setTimeout(() => {
-            card.classList.add('reveal-card');
-            setTimeout(startTyping, 1000);
-        }, 2500);
+            letterCard.classList.add('show-card');
+            setTimeout(typeMessage, 1000);
+        }, 3000);
     }
 
-    function startTyping() {
-        let i = 0;
-        const speed = 50; 
+    // --- Improved Typewriter Engine (Fixes Pink Lines) ---
+    function typeMessage() {
+        let segmentIndex = 0;
+        let charIndex = 0;
         
-        // Add cursor
-        const cursor = document.createElement('span');
-        cursor.className = 'cursor';
-        typeWriterElement.appendChild(cursor);
-
-        function type() {
-            if (i < message.length) {
-                let char = message.charAt(i);
+        function typeChar() {
+            if (segmentIndex < textSegments.length) {
+                const segment = textSegments[segmentIndex];
                 
-                // Handle newlines
-                if (char === '\n') {
-                    char = '<br>';
+                // If this is the start of a segment
+                if (charIndex === 0) {
+                    // Create a span for this segment
+                    const span = document.createElement('span');
+                    if (segment.isBold) span.className = 'highlight';
+                    typeWriterEl.appendChild(span);
                 }
 
-                // Insert before cursor
-                cursor.insertAdjacentHTML('beforebegin', char);
+                const currentSpan = typeWriterEl.lastElementChild;
+                const char = segment.text.charAt(charIndex);
                 
-                // Highlight logic for specific words
-                const currentText = typeWriterElement.innerHTML;
-                if(currentText.includes('"carrot" (care at)')) {
-                    typeWriterElement.innerHTML = typeWriterElement.innerHTML.replace(
-                        '"carrot" (care at)', 
-                        '<span class="highlight">"carrot" (care at)</span>'
-                    );
-                    // Re-append cursor as replace removes it
-                    if(!typeWriterElement.contains(cursor)) typeWriterElement.appendChild(cursor);
+                // Add character
+                currentSpan.innerText += char;
+                
+                charIndex++;
+
+                // If segment finished, move to next
+                if (charIndex >= segment.text.length) {
+                    segmentIndex++;
+                    charIndex = 0;
                 }
 
-                i++;
-                setTimeout(type, speed + (Math.random() * 50)); 
-            } else {
-                cursor.style.display = 'none'; 
+                // Random typing speed for realism
+                setTimeout(typeChar, 30 + Math.random() * 50);
             }
         }
-        type();
+        typeChar();
     }
 
-    /* --- Canvas Magic Particles --- */
+    // --- Particle Background Logic ---
     function initCanvas() {
         const canvas = document.getElementById('canvas-bg');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
 
-        let particles = [];
+        const particles = [];
         
         class Particle {
             constructor() {
+                this.reset();
+            }
+            reset() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 3 + 1;
-                this.speedX = Math.random() * 1 - 0.5;
-                this.speedY = Math.random() * 1 - 0.5;
-                this.color = `rgba(255, ${150 + Math.random() * 100}, ${150 + Math.random() * 100}, ${Math.random() * 0.5})`;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.alpha = Math.random();
             }
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
-                if (this.size > 0.2) this.size -= 0.01;
-                if (this.size <= 0.2) {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.size = Math.random() * 3 + 1;
-                }
+                this.alpha -= 0.005;
+                if(this.alpha <= 0) this.reset();
             }
             draw() {
-                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = '#ff5f9e';
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
 
-        for (let i = 0; i < 100; i++) {
-            particles.push(new Particle());
-        }
+        for(let i=0; i<80; i++) particles.push(new Particle());
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
-            }
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
             requestAnimationFrame(animate);
         }
         animate();
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
     }
+
 </script>
 </body>
 </html>
+

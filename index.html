@@ -2,115 +2,101 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Happy Birthday</title>
+<title>Happy Birthday Bun</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
+  margin:0;padding:0;width:100%;height:100%;
+  background:linear-gradient(#ffe6f0,#fff);
   overflow:hidden;
-  background:linear-gradient(120deg,#ffd8ea,#fff0f7,#ffe6f2);
-  background-size:400% 400%;
-  animation:bg 20s ease infinite;
   font-family:'Poppins',sans-serif;
 }
 
-@keyframes bg{
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
-}
-
-#musicBtn{
-  position:absolute;
-  top:20px;
-  right:20px;
-  background:white;
-  border:none;
-  padding:10px 18px;
-  border-radius:30px;
-  font-size:14px;
-  cursor:pointer;
-  box-shadow:0 5px 15px rgba(0,0,0,.1);
-}
 
 #title{
-  position:absolute;
-  top:8%;
-  width:100%;
   text-align:center;
   font-family:'Pacifico',cursive;
   font-size:52px;
-  color:#ff5f9e;
+  color:#ff3b6a;
+  margin-top:20px;
 }
 
-#subtitle{
+
+.bunny, .carrot{
   position:absolute;
-  top:16%;
+  font-size:60px;
+  opacity:.4;
+}
+.bunny{bottom:20px}
+#b1{left:20px} #b2{right:20px}
+#c1{top:100px;left:20px}
+#c2{top:120px;right:20px}
+
+
+#garden{
+  position:absolute;
+  top:100px;
+  left:50%;
+  transform:translateX(-50%);
   width:100%;
-  text-align:center;
-  font-size:24px;
-  color:#ff8fba;
+  height:400px;
+  pointer-events:none;
 }
 
-#card{
+
+.poppy{
   position:absolute;
-  bottom:60px;
-  left:50%;
-  transform:translateX(-50%);
-  background:white;
-  padding:40px;
-  width:75%;
-  max-width:700px;
-  border-radius:30px;
-  box-shadow:0 30px 60px rgba(255,120,170,.35);
-  text-align:center;
-  line-height:1.8;
-  font-size:18px;
+  width:140px;
+  height:140px;
 }
-
-#flower{
-  position:absolute;
-  bottom:220px;
-  left:50%;
-  transform:translateX(-50%);
-  width:260px;
-  height:260px;
-}
-
 .petal{
   position:absolute;
   inset:0;
   margin:auto;
-  width:130px;
-  height:180px;
-  background:radial-gradient(circle at 30% 30%,#ffd0e2,#ff6fa3);
-  border-radius:60% 60% 30% 30%;
-  transform-origin:50% 90%;
-  filter:drop-shadow(0 0 15px rgba(255,120,180,.8));
+  width:70px;
+  height:100px;
+  background:radial-gradient(circle at 30% 30%,#ffb3c1,#ff1744);
+  border-radius:60% 60% 20% 20%;
+  filter:drop-shadow(0 0 10px rgba(255,50,100,.7));
 }
+
 
 .center{
   position:absolute;
   inset:0;
   margin:auto;
-  width:50px;
-  height:50px;
-  background:radial-gradient(circle,#fff,#ffb7d5);
+  width:30px;
+  height:30px;
+  background:radial-gradient(circle,#fff,#ffd1dc,#ff9bb8);
   border-radius:50%;
-  box-shadow:0 0 20px #ff9ac8;
+  box-shadow:0 0 20px rgba(255,150,180,.9);
 }
+
+
+#card{
+  position:absolute;
+  bottom:40px;
+  left:50%;
+  transform:translateX(-50%);
+  width:80%;
+  max-width:700px;
+  background:white;
+  border-radius:25px;
+  padding:35px;
+  box-shadow:0 20px 40px rgba(255,100,150,.3);
+  text-align:center;
+  line-height:1.8;
+}
+
 
 .fall{
   position:absolute;
   width:12px;
   height:18px;
   background:#ff9bb8;
-  border-radius:60% 60% 30% 30%;
+  border-radius:60% 60% 20% 20%;
   opacity:.8;
 }
 </style>
@@ -118,12 +104,14 @@ html,body{
 
 <body>
 
-<button id="musicBtn">Play Music</button>
+<div id="title">Happy Birthday, Bun</div>
 
-<div id="title">Bun</div>
-<div id="subtitle">Happy Birthday</div>
+<div id="b1" class="bunny">🐰</div>
+<div id="b2" class="bunny">🐰</div>
+<div id="c1" class="carrot">🥕</div>
+<div id="c2" class="carrot">🥕</div>
 
-<div id="flower"></div>
+<div id="garden"></div>
 
 <div id="card">
 Alam mo, kahit anong mangyari, I will always <strong>“carrot” (care at)</strong> love you forever.
@@ -135,23 +123,31 @@ Sana maging kasing-saya mo yung celebration mo. Stay cute as always and have a g
 See you later. 🥕🐰
 </div>
 
-<audio id="music" loop>
-  <source src="https://cdn.pixabay.com/audio/2023/03/27/audio_9c1f1e7a94.mp3">
-</audio>
-
 <script>
-const flower=document.getElementById("flower");
-for(let i=0;i<6;i++){
-  const p=document.createElement("div");
-  p.className="petal";
-  p.style.transform=`rotate(${i*60}deg)`;
-  flower.appendChild(p);
-}
-const c=document.createElement("div");
-c.className="center";
-flower.appendChild(c);
+const garden=document.getElementById("garden");
 
-function fallPetal(){
+
+for(let i=0;i<10;i++){
+  const f=document.createElement("div");
+  f.className="poppy";
+  f.style.left=Math.random()*90+"%";
+  f.style.top=Math.random()*250+"px";
+
+  for(let p=0;p<6;p++){
+    const pet=document.createElement("div");
+    pet.className="petal";
+    pet.style.transform=`rotate(${p*60}deg) translateY(-20px)`;
+    f.appendChild(pet);
+  }
+  const c=document.createElement("div");
+  c.className="center";
+  f.appendChild(c);
+
+  garden.appendChild(f);
+}
+
+
+function fall(){
   const p=document.createElement("div");
   p.className="fall";
   p.style.left=Math.random()*100+"%";
@@ -165,19 +161,7 @@ function fallPetal(){
     if(y>window.innerHeight){p.remove();clearInterval(i);}
   },16);
 }
-setInterval(fallPetal,350);
-
-const music=document.getElementById("music");
-const btn=document.getElementById("musicBtn");
-btn.onclick=()=>{
-  if(music.paused){
-    music.play();
-    btn.innerText="Pause Music";
-  }else{
-    music.pause();
-    btn.innerText="Play Music";
-  }
-};
+setInterval(fall,300);
 </script>
 
 </body>

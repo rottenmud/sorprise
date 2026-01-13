@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Happy Birthday Bun</title>
-<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
 <style>
     :root {
         --primary: #ff5f9e;
         --secondary: #ff8fba;
-        --bg-deep: #2c001e;
-        --gold: #ffd700;
+        --bg-start: #fff0f5;
+        --bg-end: #ffc3d9;
     }
 
     * { box-sizing: border-box; }
@@ -21,22 +21,10 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background: radial-gradient(circle at center, #ffe6f2 0%, #ffc3d9 100%); /* Soft Pink Gradient */
+        background: radial-gradient(circle at center, var(--bg-start) 0%, var(--bg-end) 100%);
         font-family: 'Quicksand', sans-serif;
     }
 
-    /* --- Floating Particles Background --- */
-    #canvas-bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-        pointer-events: none;
-    }
-
-    /* --- Start Screen (Heart Button) --- */
     #start-screen {
         position: fixed;
         top: 0;
@@ -49,261 +37,207 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        transition: opacity 1s ease-out;
+        transition: opacity 0.8s ease;
     }
 
     .heart-btn {
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
         background: var(--primary);
         position: relative;
         transform: rotate(45deg);
-        box-shadow: 0 10px 40px rgba(255, 95, 158, 0.5);
+        box-shadow: 0 10px 20px rgba(255, 95, 158, 0.4);
         cursor: pointer;
-        animation: heartBeat 1.2s infinite;
-        transition: transform 0.3s;
+        animation: pulseHeart 1.5s infinite;
     }
-    
-    .heart-btn:hover { transform: rotate(45deg) scale(1.1); }
 
     .heart-btn::before, .heart-btn::after {
         content: "";
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
         position: absolute;
         border-radius: 50%;
         background: var(--primary);
     }
-
-    .heart-btn::before { left: -50px; }
-    .heart-btn::after { top: -50px; }
+    .heart-btn::before { left: -40px; }
+    .heart-btn::after { top: -40px; }
 
     .start-text {
         margin-top: 60px;
         font-family: 'Dancing Script', cursive;
-        font-size: 2rem;
+        font-size: 24px;
         color: var(--primary);
     }
 
-    @keyframes heartBeat {
+    @keyframes pulseHeart {
         0% { transform: rotate(45deg) scale(1); }
-        15% { transform: rotate(45deg) scale(1.15); }
+        50% { transform: rotate(45deg) scale(1.1); }
         100% { transform: rotate(45deg) scale(1); }
     }
 
-    /* --- Main Layout --- */
-    .container {
-        position: relative;
-        width: 90%;
-        max-width: 1200px;
+    .main-container {
+        display: flex;
+        width: 100%;
         height: 100%;
-        margin: 0 auto;
-        display: flex; /* Side by Side Layout */
-        flex-direction: row; 
-        align-items: center;
-        justify-content: center;
-        z-index: 10;
-        opacity: 0; /* Hidden initially */
-        transition: opacity 2s ease;
-    }
-
-    /* Mobile Layout Adjustment */
-    @media (max-width: 768px) {
-        .container {
-            flex-direction: column-reverse; /* Letter bottom, Flower top */
-            justify-content: center;
-            gap: 20px;
-        }
-        .flower-section { margin-bottom: 20px; }
-        .card-section { width: 95% !important; }
-        h1 { font-size: 3rem !important; }
-    }
-
-    /* --- Left Side: Letter --- */
-    .card-section {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-    }
-
-    .letter-card {
-        background: rgba(255, 255, 255, 0.65);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 2px solid rgba(255, 255, 255, 0.8);
-        border-radius: 25px;
-        padding: 40px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-        width: 100%;
-        max-width: 550px;
-        min-height: 300px;
-        transform: translateX(-50px);
         opacity: 0;
-        transition: all 1s ease 1s; /* Delays appearance */
-    }
-
-    .show-card {
-        transform: translateX(0);
-        opacity: 1;
-    }
-
-    /* Typewriter Styles */
-    #typewriter {
-        font-size: 1.15rem;
-        color: #555;
-        line-height: 1.8;
-        font-weight: 500;
-        white-space: pre-wrap; /* Preserves spacing */
-    }
-
-    .highlight {
-        color: var(--primary);
-        font-weight: 700;
-        font-size: 1.2rem;
-    }
-
-    .cursor {
-        display: inline-block;
-        width: 2px;
-        height: 1.2em;
-        background-color: var(--primary);
-        margin-left: 2px;
-        animation: blink 1s infinite;
-        vertical-align: bottom;
-    }
-
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-    /* --- Right Side: Flower --- */
-    .flower-section {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        transition: opacity 1.5s ease;
         position: relative;
-        min-height: 400px;
+        z-index: 10;
     }
 
-    .header-text {
-        text-align: center;
-        margin-bottom: 40px; /* Space above flower */
-        position: absolute;
-        top: 0;
-        width: 100%;
+    .text-area {
+        flex: 1;
+        order: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
     }
 
-    h1 {
-        font-family: 'Dancing Script', cursive;
-        font-size: 5rem;
-        margin: 0;
-        background: linear-gradient(to right, #ff5f9e, #ff9966);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        filter: drop-shadow(2px 2px 0px white);
+    .flower-area {
+        flex: 1;
+        order: 2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        position: relative;
     }
 
-    h2 {
-        font-size: 1.2rem;
-        color: var(--secondary);
-        letter-spacing: 4px;
-        text-transform: uppercase;
-        margin-top: -10px;
-        font-weight: 700;
+    @media (max-width: 768px) {
+        .main-container {
+            flex-direction: column;
+        }
+        .text-area {
+            order: 2;
+            padding: 20px;
+            align-items: flex-start;
+        }
+        .flower-area {
+            order: 1;
+            flex: 0.8;
+            justify-content: flex-end;
+            padding-bottom: 20px;
+        }
+        .header-title h1 { font-size: 3.5rem !important; }
     }
 
-    /* Flower Animation */
     .flower-wrapper {
         position: relative;
-        width: 250px;
+        width: 200px;
         height: 250px;
-        margin-top: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
     }
 
     .stem {
-        position: absolute;
-        bottom: 50%; /* Starts at middle */
-        left: 50%;
         width: 8px;
         height: 0;
-        background: #4caf50;
-        transform: translateX(-50%);
+        background: linear-gradient(to top, #2e7d32, #4caf50);
         border-radius: 4px;
         transition: height 1.5s ease-in-out;
-        z-index: 1;
     }
 
-    .grow-stem { height: 250px; }
-
-    .bloom-container {
+    .flower-head {
         position: absolute;
-        top: 50%; /* Top of stem */
+        bottom: 0;
         left: 50%;
-        width: 0;
-        height: 0;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-        transition: all 1s ease 1.2s; /* Delayed until stem grows */
+        transform: translateX(-50%) scale(0);
+        width: 180px;
+        height: 180px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.2s, bottom 1.5s ease-in-out;
     }
 
-    .bloom-active { width: 200px; height: 200px; }
+    .grow-stem { height: 200px; }
+    .lift-head { bottom: 200px; transform: translateX(-50%) scale(1); }
 
-    /* Petals */
     .petal {
         position: absolute;
-        width: 100px;
-        height: 120px;
+        width: 90px;
+        height: 110px;
         background: radial-gradient(circle at 30% 30%, #ff8fba, #ff2e63);
         border-radius: 50% 50% 10% 10%;
         transform-origin: bottom center;
-        bottom: 50%;
-        left: 50%;
-        margin-left: -50px;
-        opacity: 0;
-        transform: scale(0);
-        transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 1s;
-        box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
     }
 
-    .bloom-active .petal { opacity: 1; }
+    .p1 { transform: rotate(0deg) translateY(-10px); }
+    .p2 { transform: rotate(60deg) translateY(-10px); }
+    .p3 { transform: rotate(120deg) translateY(-10px); }
+    .p4 { transform: rotate(180deg) translateY(-10px); }
+    .p5 { transform: rotate(240deg) translateY(-10px); }
+    .p6 { transform: rotate(300deg) translateY(-10px); }
 
-    /* Rotations for 6 petals */
-    .bloom-active .p1 { transform: rotate(0deg) scale(1); }
-    .bloom-active .p2 { transform: rotate(60deg) scale(1); }
-    .bloom-active .p3 { transform: rotate(120deg) scale(1); }
-    .bloom-active .p4 { transform: rotate(180deg) scale(1); }
-    .bloom-active .p5 { transform: rotate(240deg) scale(1); }
-    .bloom-active .p6 { transform: rotate(300deg) scale(1); }
-
-    /* Inner Layer for depth */
-    .inner-petals .petal {
-        height: 90px;
-        width: 80px;
-        margin-left: -40px;
-        background: radial-gradient(circle at 30% 30%, #ff5f9e, #e91e63);
-        z-index: 11;
-        transition-delay: 0.2s;
-    }
-
-    /* The Center (Gold Orb - No Black Dot!) */
     .center-core {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 45px;
-        height: 45px;
-        background: radial-gradient(circle at 30% 30%, #fff59d, #fbc02d);
+        width: 40px;
+        height: 40px;
+        background: radial-gradient(circle, #fff59d, #fbc02d);
         border-radius: 50%;
-        transform: translate(-50%, -50%) scale(0);
-        z-index: 20;
-        box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
-        transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 2s;
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+        z-index: 10;
     }
 
-    .bloom-active .center-core { transform: translate(-50%, -50%) scale(1); }
+    .card-box {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 30px;
+        border-radius: 20px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.5);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 1s ease 2.5s;
+    }
 
+    .card-visible { opacity: 1; transform: translateY(0); }
+
+    .header-title {
+        position: absolute;
+        top: 10%;
+        width: 100%;
+        text-align: center;
+        z-index: 5;
+    }
+
+    .header-title h1 {
+        font-family: 'Dancing Script', cursive;
+        font-size: 5rem;
+        margin: 0;
+        color: var(--primary);
+        text-shadow: 2px 2px 0 white;
+    }
+
+    .header-title h2 {
+        font-size: 1.2rem;
+        color: var(--secondary);
+        letter-spacing: 4px;
+        margin-top: -10px;
+        text-transform: uppercase;
+    }
+
+    #typewriter {
+        font-size: 1.1rem;
+        color: #444;
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+    #typewriter::after {
+        content: "|";
+        color: var(--primary);
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    
+    .highlight { color: var(--primary); font-weight: bold; }
 </style>
 </head>
 <body>
@@ -314,215 +248,89 @@
 
     <div id="start-screen">
         <div class="heart-btn" id="startBtn"></div>
-        <div class="start-text">Tap the heart</div>
+        <div class="start-text">Tap Me</div>
     </div>
 
-    <canvas id="canvas-bg"></canvas>
-
-    <div class="container" id="mainContainer">
+    <div class="main-container" id="mainLayout">
         
-        <div class="card-section">
-            <div class="letter-card" id="letterCard">
-                <div id="typewriter"></div><span class="cursor"></span>
+        <div class="text-area">
+            <div class="card-box" id="letterCard">
+                <div id="typewriter"></div>
             </div>
         </div>
 
-        <div class="flower-section">
-            <div class="header-text">
+        <div class="flower-area">
+            <div class="header-title">
                 <h1>Bun</h1>
                 <h2>Happy Birthday</h2>
             </div>
 
             <div class="flower-wrapper">
                 <div class="stem" id="stem"></div>
-                
-                <div class="bloom-container" id="bloom">
+                <div class="flower-head" id="flowerHead">
                     <div class="petal p1"></div>
                     <div class="petal p2"></div>
                     <div class="petal p3"></div>
                     <div class="petal p4"></div>
                     <div class="petal p5"></div>
                     <div class="petal p6"></div>
-                    
-                    <div class="inner-petals">
-                        <div class="petal p1"></div>
-                        <div class="petal p2"></div>
-                        <div class="petal p3"></div>
-                        <div class="petal p4"></div>
-                        <div class="petal p5"></div>
-                        <div class="petal p6"></div>
-                    </div>
-
                     <div class="center-core"></div>
                 </div>
             </div>
         </div>
-
     </div>
 
 <script>
-    // --- Configuration ---
     const startBtn = document.getElementById('startBtn');
     const startScreen = document.getElementById('start-screen');
-    const container = document.getElementById('mainContainer');
+    const mainLayout = document.getElementById('mainLayout');
     const music = document.getElementById('bgMusic');
-    const stem = document.getElementById('stem');
-    const bloom = document.getElementById('bloom');
-    const letterCard = document.getElementById('letterCard');
-    const typeWriterEl = document.getElementById('typewriter');
     
-    // Using Unicode for Emojis to prevent diamond ?? errors
-    const carrotEmoji = '\uD83E\uDD55'; // 🥕
-    const bunnyEmoji = '\uD83D\uDC30';  // 🐰
+    const stem = document.getElementById('stem');
+    const flowerHead = document.getElementById('flowerHead');
+    const letterCard = document.getElementById('letterCard');
+    const typewriter = document.getElementById('typewriter');
 
-    // Message segments (bold text separated)
-    const textSegments = [
-        { text: "Alam mo, kahit anong mangyari, I will always ", isBold: false },
-        { text: '"carrot" (care at)', isBold: true },
-        { text: " love you forever.\n\n", isBold: false },
-        { text: "Pero seryoso, enjoy your day today kasi deserve mo lahat ng treats at happiness sa mundo.\n\n", isBold: false },
-        { text: "Sana maging kasing-saya mo yung celebration mo. Stay cute as always and have a great dayyy.\n\n", isBold: false },
-        { text: `See you later. ${carrotEmoji} ${bunnyEmoji}`, isBold: false }
-    ];
+    const msg = "Alam mo, kahit anong mangyari, I will always \"carrot\" (care at) love you forever.\n\nPero seryoso, enjoy your day today kasi deserve mo lahat ng treats at happiness sa mundo.\n\nSana maging kasing-saya mo yung celebration mo. Stay cute as always and have a great dayyy.\n\nSee you later. \uD83E\uDD55\uD83D\uDC30";
 
-    let hasStarted = false;
-
-    // --- Start Event ---
     startBtn.addEventListener('click', () => {
-        if(hasStarted) return;
-        hasStarted = true;
-
-        // Fade out start screen
         startScreen.style.opacity = '0';
+        setTimeout(() => { startScreen.style.display = 'none'; }, 800);
+
+        mainLayout.style.opacity = '1';
         
-        // Play Music
         music.volume = 0.5;
-        music.play().catch(e => console.log("Audio requires interaction"));
+        music.play().catch(e => console.log("User interaction needed"));
 
-        setTimeout(() => {
-            startScreen.style.display = 'none';
-            container.style.opacity = '1';
-            
-            // Start Canvas
-            initCanvas();
-            
-            // Start Animation Sequence
-            runAnimation();
-        }, 1000);
-    });
-
-    // --- Animation Sequence ---
-    function runAnimation() {
-        // 1. Grow Stem
         setTimeout(() => {
             stem.classList.add('grow-stem');
+            flowerHead.classList.add('lift-head');
         }, 500);
 
-        // 2. Bloom Flower
         setTimeout(() => {
-            bloom.classList.add('bloom-active');
-        }, 1500);
+            letterCard.classList.add('card-visible');
+            setTimeout(startTyping, 1000);
+        }, 2500);
+    });
 
-        // 3. Show Card & Start Typing
-        setTimeout(() => {
-            letterCard.classList.add('show-card');
-            setTimeout(typeMessage, 1000);
-        }, 3000);
-    }
-
-    // --- Improved Typewriter Engine (Fixes Pink Lines) ---
-    function typeMessage() {
-        let segmentIndex = 0;
-        let charIndex = 0;
+    function startTyping() {
+        let i = 0;
+        typewriter.innerHTML = "";
         
-        function typeChar() {
-            if (segmentIndex < textSegments.length) {
-                const segment = textSegments[segmentIndex];
-                
-                // If this is the start of a segment
-                if (charIndex === 0) {
-                    // Create a span for this segment
-                    const span = document.createElement('span');
-                    if (segment.isBold) span.className = 'highlight';
-                    typeWriterEl.appendChild(span);
-                }
-
-                const currentSpan = typeWriterEl.lastElementChild;
-                const char = segment.text.charAt(charIndex);
-                
-                // Add character
-                currentSpan.innerText += char;
-                
-                charIndex++;
-
-                // If segment finished, move to next
-                if (charIndex >= segment.text.length) {
-                    segmentIndex++;
-                    charIndex = 0;
-                }
-
-                // Random typing speed for realism
-                setTimeout(typeChar, 30 + Math.random() * 50);
+        function type() {
+            if (i < msg.length) {
+                let char = msg.charAt(i);
+                typewriter.textContent += char;
+                i++;
+                setTimeout(type, 50); 
+            } else {
+                let finalHTML = typewriter.innerHTML;
+                finalHTML = finalHTML.replace('"carrot" (care at)', '<span class="highlight">"carrot" (care at)</span>');
+                typewriter.innerHTML = finalHTML;
             }
         }
-        typeChar();
+        type();
     }
-
-    // --- Particle Background Logic ---
-    function initCanvas() {
-        const canvas = document.getElementById('canvas-bg');
-        const ctx = canvas.getContext('2d');
-        
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        const particles = [];
-        
-        class Particle {
-            constructor() {
-                this.reset();
-            }
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.speedX = (Math.random() - 0.5) * 0.5;
-                this.speedY = (Math.random() - 0.5) * 0.5;
-                this.alpha = Math.random();
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                this.alpha -= 0.005;
-                if(this.alpha <= 0) this.reset();
-            }
-            draw() {
-                ctx.globalAlpha = this.alpha;
-                ctx.fillStyle = '#ff5f9e';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        for(let i=0; i<80; i++) particles.push(new Particle());
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-            requestAnimationFrame(animate);
-        }
-        animate();
-    }
-
 </script>
 </body>
 </html>
-

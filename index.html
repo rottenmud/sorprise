@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Surprise For You</title>
+    <style>
+        /* --- General Styling --- */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #ffe2e2, #ffffff);
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        /* --- The Start Button --- */
+        #start-btn {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.4);
+            transition: transform 0.2s;
+            z-index: 10;
+        }
+
+        #start-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* --- The Poppy Flower Container --- */
+        .flower-container {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            display: none; /* Hidden initially */
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Stem */
+        .stem {
+            position: absolute;
+            bottom: 0;
+            width: 8px;
+            height: 0; /* Starts at 0 height */
+            background: #4caf50;
+            border-radius: 4px;
+            transition: height 1.5s ease-in-out;
+        }
+
+        /* Petals */
+        .flower-head {
+            position: absolute;
+            top: 50px; /* Adjust based on stem height */
+            width: 0;
+            height: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: all 1s ease 1.2s; /* Delays until stem grows */
+        }
+
+        .petal {
+            position: absolute;
+            background: #ff2e2e;
+            width: 100px;
+            height: 120px;
+            border-radius: 50% 50% 10% 10%;
+            opacity: 0.9;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        /* Petal rotation to make it look like a poppy */
+        .p1 { transform: rotate(0deg) translateY(-20px); }
+        .p2 { transform: rotate(90deg) translateY(-20px); }
+        .p3 { transform: rotate(180deg) translateY(-20px); }
+        .p4 { transform: rotate(270deg) translateY(-20px); }
+        
+        /* The Center of the Poppy */
+        .center {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #222;
+            border-radius: 50%;
+            z-index: 5;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        /* --- Animations classes --- */
+        .grow-stem {
+            height: 250px;
+        }
+
+        .bloom-head {
+            width: 200px;
+            height: 200px;
+            opacity: 1;
+            animation: breathe 3s infinite ease-in-out;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* --- Text and Letter --- */
+        .birthday-text {
+            margin-top: 20px;
+            font-size: 2.5rem;
+            color: #d32f2f;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease;
+            font-family: 'Brush Script MT', cursive;
+        }
+
+        .letter-card {
+            margin-top: 20px;
+            background: white;
+            padding: 25px;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease;
+            text-align: center;
+            line-height: 1.6;
+            color: #555;
+            display: none; /* Hidden initially */
+        }
+
+        /* Helper classes for visibility */
+        .show-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .show-letter {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    </style>
+</head>
+<body>
+
+    <button id="start-btn" onclick="startSurprise()">Tap to Open</button>
+
+    <div class="flower-container" id="flower">
+        <div class="stem" id="stem"></div>
+        <div class="flower-head" id="head">
+            <div class="petal p1"></div>
+            <div class="petal p2"></div>
+            <div class="petal p3"></div>
+            <div class="petal p4"></div>
+            <div class="center"></div>
+        </div>
+    </div>
+
+    <h1 class="birthday-text" id="bday-text">Happy Birthday, My Love!</h1>
+
+    <div class="letter-card" id="letter">
+        <p>
+            I wanted to give you something that lasts forever, just like my love for you. 
+            Poppies symbolize peace and dreams, and you are the dream I never want to wake up from.
+            <br><br>
+            I hope your day is as beautiful as you are.
+            <br><br>
+            Love,<br>
+            [Your Name]
+        </p>
+    </div>
+
+    <script>
+        function startSurprise() {
+            // Hide button
+            document.getElementById('start-btn').style.display = 'none';
+            
+            // Show flower container
+            const flower = document.getElementById('flower');
+            flower.style.display = 'flex';
+
+            // Trigger Stem Growth
+            setTimeout(() => {
+                document.getElementById('stem').classList.add('grow-stem');
+            }, 100);
+
+            // Trigger Flower Bloom
+            setTimeout(() => {
+                document.getElementById('head').classList.add('bloom-head');
+            }, 1500); // Happens after stem grows
+
+            // Trigger Birthday Text
+            setTimeout(() => {
+                document.getElementById('bday-text').classList.add('show-text');
+            }, 2500);
+
+            // Trigger Letter
+            setTimeout(() => {
+                const letter = document.getElementById('letter');
+                letter.style.display = 'block';
+                // Small delay to allow display:block to apply before opacity transition
+                setTimeout(() => {
+                    letter.classList.add('show-letter');
+                }, 100);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

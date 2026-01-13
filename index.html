@@ -1,268 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday Bun</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Bun</title>
 
-    <style>
-        /* --- RESET & BASIC SETUP --- */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-        html, body {
-            margin: 0; padding: 0;
-            width: 100%; height: 100vh;
-            overflow: hidden;
-            background: radial-gradient(circle at center, #fff0f5, #ffc3d9);
-            font-family: 'Quicksand', sans-serif;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
 
-        /* --- BACKGROUND CANVAS --- */
-        #canvas-bg {
-            position: fixed; inset: 0;
-            z-index: 1; pointer-events: none;
-        }
+<style>
+/* --- 1. RESET --- */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+    margin: 0; padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    background: radial-gradient(circle at center, #fff0f5, #ffc3d9);
+    font-family: 'Quicksand', sans-serif;
+    overflow-x: hidden;
+}
 
-        /* --- START SCREEN --- */
-        #start-screen {
-            position: fixed; inset: 0;
-            background: #fff0f5;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            z-index: 999;
-            transition: opacity 0.8s ease;
-        }
-        .heart-btn {
-            width: 80px; height: 80px;
-            background: #ff5f9e;
-            transform: rotate(45deg);
-            animation: pulse 1.2s infinite;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(255, 95, 158, 0.6);
-        }
-        .heart-btn::before, .heart-btn::after {
-            content: ""; width: 80px; height: 80px;
-            background: #ff5f9e;
-            border-radius: 50%;
-            position: absolute;
-        }
-        .heart-btn::before { left: -40px; }
-        .heart-btn::after { top: -40px; }
-        
-        .start-text {
-            margin-top: 60px;
-            font-size: 24px;
-            color: #ff5f9e;
-            font-family: 'Dancing Script', cursive;
-            letter-spacing: 2px;
-        }
-        @keyframes pulse { 0%, 100% { transform: rotate(45deg) scale(1); } 50% { transform: rotate(45deg) scale(1.1); } }
+/* --- 2. BACKGROUND & AUDIO --- */
+#canvas-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+}
+#start-screen {
+    position: fixed; inset: 0;
+    background: #fff0f5;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    z-index: 1000;
+    transition: opacity 0.8s ease;
+}
+.heart-btn {
+    width: 80px; height: 80px;
+    background: #ff5f9e;
+    transform: rotate(45deg);
+    animation: pulse 1.2s infinite;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255, 95, 158, 0.6);
+}
+.heart-btn::before, .heart-btn::after {
+    content: ""; width: 80px; height: 80px;
+    background: #ff5f9e;
+    border-radius: 50%;
+    position: absolute;
+}
+.heart-btn::before { left: -40px; }
+.heart-btn::after { top: -40px; }
+.start-text {
+    margin-top: 60px; font-size: 24px; color: #ff5f9e;
+    font-family: 'Dancing Script', cursive;
+}
+@keyframes pulse { 50% { transform: rotate(45deg) scale(1.1); } }
 
-        /* --- MAIN LAYOUT --- */
-        .main-container {
-            position: relative;
-            width: 100%; height: 100%;
-            display: flex;
-            opacity: 0;
-            z-index: 10;
-            transition: opacity 1s ease;
-        }
+/* --- 3. MAIN LAYOUT --- */
+.main-grid {
+    position: relative; z-index: 10;
+    display: flex; flex-direction: column;
+    align-items: center;
+    width: 100%; min-height: 100vh;
+    opacity: 0; transition: opacity 1s ease;
+    padding-bottom: 50px;
+}
 
-        /* Left/Top Area (Card) & Right/Bottom Area (Flower) */
-        .area {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
+/* --- 4. HEADER (TEXT) --- */
+.header-wrapper {
+    margin-top: 40px;
+    margin-bottom: 30px; 
+    text-align: center;
+    position: relative;
+    z-index: 50; /* Ensure text is ON TOP of flower */
+}
+.header-title h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 50px; margin: 0;
+    background: linear-gradient(45deg, #ff5f9e, #ff9966);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 2px rgba(255,255,255,0.8));
+}
+.header-title h2 {
+    margin: 5px 0 0 0; font-size: 16px; 
+    letter-spacing: 3px; color: #ff8fba; text-transform: uppercase;
+}
 
-        /* --- THE CARD --- */
-        .card-box {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 25px;
-            border-radius: 20px;
-            width: 85%;
-            max-width: 450px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transform: translateY(30px);
-            opacity: 0;
-            transition: all 1s ease;
-            white-space: pre-wrap; /* Preserves line breaks in the JS string */
-            font-size: 16px;
-            line-height: 1.6;
-            color: #555;
-            border: 2px solid rgba(255,255,255,0.8);
-        }
+/* --- 5. FLOWER GEOMETRY (THE FIX) --- */
+.flower-area {
+    position: relative;
+    width: 100%;
+    display: flex; justify-content: center;
+    height: 320px; /* Fixed height to keep spacing stable */
+    margin-bottom: 20px;
+    z-index: 1;
+}
 
-        /* --- HEADER & FLOWER WRAPPER --- */
-        .flower-container-wrapper {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-        }
+.stem {
+    position: absolute;
+    bottom: 0;
+    width: 8px; height: 0;
+    background: #66bb6a;
+    border-radius: 4px;
+    transition: height 2s ease-in-out;
+}
+.stem.grow { height: 220px; }
 
-        .header-title {
-            text-align: center;
-            margin-bottom: 20px;
-            z-index: 20;
-        }
-        .header-title h1 {
-            font-family: 'Dancing Script', cursive;
-            font-size: 50px;
-            margin: 0;
-            background: linear-gradient(45deg, #ff5f9e, #ff9966);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 2px 4px rgba(255, 95, 158, 0.3));
-        }
-        .header-title h2 {
-            margin: 5px 0 0 0;
-            font-size: 18px;
-            letter-spacing: 4px;
-            color: #ff8fba;
-            text-transform: uppercase;
-        }
+/* The container for the head */
+.flower-head {
+    position: absolute;
+    bottom: 100%; /* Sits exactly on top of stem */
+    left: 50%;    /* Horizontally centered */
+    width: 0; height: 0; /* No size, just a coordinate point */
+    
+    transform: scale(0); 
+    transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.flower-head.bloom { transform: scale(1); }
 
-        /* --- THE FLOWER ANIMATION --- */
-        .flower-wrapper {
-            position: relative;
-            width: 200px; 
-            height: 300px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-        }
+/* The Yellow Dot - PERFECTLY CENTERED */
+.center-dot {
+    position: absolute;
+    top: 0; left: 0; /* At the coordinate point */
+    width: 40px; height: 40px;
+    background: #ffeb3b; 
+    border-radius: 50%; 
+    z-index: 10;
+    transform: translate(-50%, -50%); /* Centers the dot itself on the point */
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
 
-        .stem {
-            width: 8px; height: 0;
-            background: linear-gradient(to top, #2e7d32, #66bb6a);
-            border-radius: 4px;
-            transition: height 2s ease-in-out;
-        }
+/* The Petals - FANNING OUT FROM CENTER */
+.petal {
+    position: absolute; 
+    bottom: 0; left: 0; /* Pivot point is the coordinate center */
+    width: 50px; height: 90px;
+    background: linear-gradient(to top, #ffc3d9, #ff4081);
+    border-radius: 50px;
+    transform-origin: bottom center; /* Rotate around the bottom */
+    margin-left: -25px; /* Center the petal width (50px/2) on the axis */
+    box-shadow: 0 4px 5px rgba(0,0,0,0.1);
+    z-index: 1;
+}
 
-        .flower-head {
-            position: absolute;
-            bottom: 100%; /* Sits on top of stem */
-            width: 150px; height: 150px;
-            display: flex; justify-content: center; align-items: center;
-            transform: scale(0);
-            transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-origin: bottom center;
-        }
+/* Move petals slightly out (translateY) to make a flower shape, 
+   but they all share the same origin point now. */
+.p1 { transform: rotate(0deg) translateY(-15px); }
+.p2 { transform: rotate(60deg) translateY(-15px); }
+.p3 { transform: rotate(120deg) translateY(-15px); }
+.p4 { transform: rotate(180deg) translateY(-15px); }
+.p5 { transform: rotate(240deg) translateY(-15px); }
+.p6 { transform: rotate(300deg) translateY(-15px); }
 
-        .petal {
-            position: absolute;
-            width: 60px; height: 100px;
-            background: linear-gradient(to top, #ffc3d9, #ff4081);
-            border-radius: 50px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transform-origin: bottom center;
-        }
-        
-        /* Petal Rotation */
-        .p1 { transform: rotate(0deg) translateY(-30px); }
-        .p2 { transform: rotate(60deg) translateY(-30px); }
-        .p3 { transform: rotate(120deg) translateY(-30px); }
-        .p4 { transform: rotate(180deg) translateY(-30px); }
-        .p5 { transform: rotate(240deg) translateY(-30px); }
-        .p6 { transform: rotate(300deg) translateY(-30px); }
+/* --- 6. CARD --- */
+.card-box {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px; border-radius: 20px;
+    width: 90%; max-width: 500px;
+    box-shadow: 0 10px 30px rgba(255,95,158,0.2);
+    white-space: pre-wrap; 
+    font-size: 16px; line-height: 1.6; color: #555;
+    transform: translateY(20px); opacity: 0;
+    transition: all 1s ease;
+    border: 1px solid #fff;
+}
+.show-card { opacity: 1; transform: translateY(0); }
 
-        .center-dot {
-            position: absolute;
-            width: 40px; height: 40px;
-            background: #ffeb3b;
-            border-radius: 50%;
-            box-shadow: 0 0 10px rgba(255, 235, 59, 0.6);
-            z-index: 5;
-        }
+/* Sway Animation wrapper */
+.sway-wrapper { 
+    width: 0; height: 0; position: absolute; left: 50%; bottom: 100%;
+}
+.swaying { animation: swaying 4s ease-in-out infinite alternate; }
 
-        /* Animation States */
-        .grow { height: 220px; }
-        .bloom { transform: scale(1); }
-        .sway { animation: swaying 5s ease-in-out infinite alternate; }
-        
-        @keyframes swaying {
-            0% { transform: rotate(-3deg); }
-            100% { transform: rotate(3deg); }
-        }
+@keyframes swaying { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
 
-        .show-card { opacity: 1; transform: translateY(0); }
-
-        /* --- RESPONSIVE DESIGN (FIXES OVERLAP) --- */
-        /* Desktop: Row (Text Left, Flower Right) */
-        @media (min-width: 768px) {
-            .main-container { flex-direction: row; }
-        }
-        /* Mobile: Column (Flower Top, Text Bottom) */
-        @media (max-width: 767px) {
-            .main-container { flex-direction: column-reverse; }
-            .flower-wrapper { height: 250px; }
-            .stem.grow { height: 180px; }
-            .card-box { width: 90%; margin-bottom: 20px; padding: 20px; }
-            .header-title h1 { font-size: 40px; }
-        }
-    </style>
+/* --- DESKTOP --- */
+@media (min-width: 768px) {
+    .main-grid { flex-direction: row; justify-content: center; }
+    .header-wrapper { position: absolute; top: 8%; width: 100%; }
+    .flower-area { width: auto; margin-right: 60px; height: 400px; align-items: flex-end; }
+    .card-box { margin-left: 60px; }
+    .stem.grow { height: 280px; }
+}
+</style>
 </head>
 <body>
 
-    <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_27565e6650.mp3"></audio>
+<audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_27565e6650.mp3"></audio>
+<canvas id="canvas-bg"></canvas>
 
-    <canvas id="canvas-bg"></canvas>
+<div id="start-screen">
+    <div class="heart-btn" id="startBtn"></div>
+    <div class="start-text">Tap to Open</div>
+</div>
 
-    <div id="start-screen">
-        <div class="heart-btn" id="startBtn"></div>
-        <div class="start-text">Tap for a surprise</div>
+<div class="main-grid" id="main">
+
+    <div class="header-wrapper">
+        <div class="header-title">
+            <h1>Bun</h1>
+            <h2>Happy Birthday</h2>
+        </div>
     </div>
 
-    <div class="main-container" id="main">
-        
-        <div class="area">
-            <div class="card-box" id="card"></div>
-        </div>
-
-        <div class="area">
-            <div class="flower-container-wrapper">
-                <div class="header-title">
-                    <h1>Bun</h1>
-                    <h2>Happy Birthday</h2>
-                </div>
-                
-                <div class="flower-wrapper" id="flowerWrapper">
-                    <div class="stem" id="stem">
-                        <div class="flower-head" id="head">
-                            <div class="petal p1"></div>
-                            <div class="petal p2"></div>
-                            <div class="petal p3"></div>
-                            <div class="petal p4"></div>
-                            <div class="petal p5"></div>
-                            <div class="petal p6"></div>
-                            <div class="center-dot"></div>
-                        </div>
-                    </div>
+    <div class="flower-area">
+        <div class="stem" id="stem">
+            <div class="sway-wrapper" id="swayWrapper">
+                <div class="flower-head" id="head">
+                    <div class="petal p1"></div><div class="petal p2"></div>
+                    <div class="petal p3"></div><div class="petal p4"></div>
+                    <div class="petal p5"></div><div class="petal p6"></div>
+                    <div class="center-dot"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // --- ELEMENTS ---
-        const startScreen = document.getElementById("start-screen");
-        const startBtn = document.getElementById("startBtn");
-        const main = document.getElementById("main");
-        const bgMusic = document.getElementById("bgMusic");
-        const stem = document.getElementById("stem");
-        const head = document.getElementById("head");
-        const flowerWrapper = document.getElementById("flowerWrapper");
-        const card = document.getElementById("card");
+    <div class="card-box" id="card"></div>
 
-        // --- THE MESSAGE (Backticks allow multi-line text) ---
-        const msg = `Happy Birthday Bun!
+</div>
+
+<script>
+const startScreen = document.getElementById("start-screen");
+const startBtn = document.getElementById("startBtn");
+const main = document.getElementById("main");
+const bgMusic = document.getElementById("bgMusic");
+const stem = document.getElementById("stem");
+const head = document.getElementById("head");
+const swayWrapper = document.getElementById("swayWrapper");
+const card = document.getElementById("card");
+
+const msg = `Happy Birthday Bun!
 
 Alam mo, kahit anong mangyari, I will always "carrot" (care at) love you.
 
@@ -274,135 +240,69 @@ Happy Birthday!
 
 From Plu 🥕🐰`;
 
-        // --- START SEQUENCE ---
-        startBtn.onclick = () => {
-            // 1. Play Music
-            bgMusic.volume = 0.4;
-            bgMusic.play().catch(e => console.log("Audio prevented: " + e));
-            
-            // 2. Vibrate (Mobile only)
-            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+startBtn.onclick = () => {
+    bgMusic.volume = 0.4;
+    bgMusic.play().catch(e => console.log(e));
 
-            // 3. Fade out start screen
-            startScreen.style.opacity = 0;
-            setTimeout(() => { startScreen.remove(); }, 800);
+    startScreen.style.opacity = 0;
+    setTimeout(() => startScreen.remove(), 800);
 
-            // 4. Fade in Main & Animate Flower
-            main.style.opacity = 1;
-            setTimeout(() => {
-                stem.classList.add("grow");
-                // Wait for stem to grow, then bloom
-                setTimeout(() => {
-                    head.classList.add("bloom");
-                    flowerWrapper.classList.add("sway"); // Start swaying after bloom
-                }, 2000);
-            }, 500);
+    main.style.opacity = 1;
 
-            // 5. Show Card & Type Text
-            setTimeout(() => {
-                card.classList.add("show-card");
-                typeWriter();
-            }, 3000); // Waits for flower to finish mostly
+    setTimeout(() => {
+        stem.classList.add("grow");
+        setTimeout(() => {
+            head.classList.add("bloom");
+            swayWrapper.classList.add("swaying");
+        }, 2000);
+    }, 500);
 
-            // 6. Start Falling Particles
-            initParticles();
-        };
+    setTimeout(() => {
+        card.classList.add("show-card");
+        typeWriter();
+    }, 2500);
 
-        // --- TYPEWRITER EFFECT ---
-        let i = 0;
-        function typeWriter() {
-            if (i < msg.length) {
-                card.textContent += msg.charAt(i);
-                i++;
-                // Add slight randomness to typing speed for realism
-                setTimeout(typeWriter, Math.random() * 30 + 30); 
-            }
-        }
+    initParticles();
+};
 
-        // --- PARTICLE BACKGROUND (Falling Hearts) ---
-        function initParticles() {
-            const canvas = document.getElementById("canvas-bg");
-            const ctx = canvas.getContext("2d");
-            
-            // Set canvas size
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
+let i = 0;
+function typeWriter() {
+    if (i < msg.length) {
+        card.textContent += msg.charAt(i);
+        i++;
+        setTimeout(typeWriter, 50); 
+    }
+}
 
-            let hearts = [];
-            
-            // Create 40 hearts
-            for(let i=0; i<40; i++) {
-                hearts.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 15 + 10, // Size between 10 and 25
-                    speed: Math.random() * 1 + 0.5,
-                    angle: Math.random() * 6 // For swaying
-                });
-            }
+function initParticles() {
+    const canvas = document.getElementById("canvas-bg");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    let particles = [];
+    for(let k=0; k<30; k++) particles.push({
+        x: Math.random()*canvas.width,
+        y: Math.random()*canvas.height - canvas.height,
+        s: Math.random()*8+4,
+        v: Math.random()*2+1
+    });
 
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                hearts.forEach(h => {
-                    // Update position
-                    h.y += h.speed;
-                    h.x += Math.sin(h.angle) * 0.5; // Sway side to side
-                    h.angle += 0.02;
+    function draw() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        particles.forEach(p => {
+            p.y += p.v;
+            if(p.y > canvas.height) p.y = -20;
+            ctx.fillStyle = "rgba(255,255,255,0.7)";
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.s, 0, Math.PI*2);
+            ctx.fill();
+        });
+        requestAnimationFrame(draw);
+    }
+    draw();
+}
+</script>
 
-                    // Reset if goes off screen
-                    if(h.y > canvas.height + 20) {
-                        h.y = -20;
-                        h.x = Math.random() * canvas.width;
-                    }
-
-                    // Draw Heart
-                    drawHeart(ctx, h.x, h.y, h.size);
-                });
-
-                requestAnimationFrame(draw);
-            }
-
-            function drawHeart(c, x, y, s) {
-                c.fillStyle = "rgba(255, 182, 193, 0.6)"; // Light Pink
-                c.beginPath();
-                // Heart shape logic using Bezier curves
-                let topCurveHeight = s * 0.3;
-                c.moveTo(x, y + topCurveHeight);
-                // Top left curve
-                c.bezierCurveTo(
-                    x, y, 
-                    x - s / 2, y, 
-                    x - s / 2, y + topCurveHeight
-                );
-                // Bottom left curve
-                c.bezierCurveTo(
-                    x - s / 2, y + (s + topCurveHeight) / 2, 
-                    x, y + (s + topCurveHeight) / 2, 
-                    x, y + s
-                );
-                // Bottom right curve
-                c.bezierCurveTo(
-                    x, y + (s + topCurveHeight) / 2, 
-                    x + s / 2, y + (s + topCurveHeight) / 2, 
-                    x + s / 2, y + topCurveHeight
-                );
-                // Top right curve
-                c.bezierCurveTo(
-                    x + s / 2, y, 
-                    x, y, 
-                    x, y + topCurveHeight
-                );
-                c.fill();
-            }
-
-            draw(); // Start loop
-        }
-    </script>
 </body>
 </html>

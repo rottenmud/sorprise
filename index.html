@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>For You</title>
+<title>Happy Birthday</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 html,body{
@@ -11,144 +13,102 @@ html,body{
   width:100%;
   height:100%;
   overflow:hidden;
-  background:linear-gradient(#0a1a3a,#102a55);
-  transition:background 5s ease;
-  font-family:'Georgia',serif;
+  background:linear-gradient(120deg,#ffd8ea,#fff0f7,#ffe6f2);
+  background-size:400% 400%;
+  animation:bg 20s ease infinite;
+  font-family:'Poppins',sans-serif;
 }
 
-#sky{
-  position:absolute;
-  inset:0;
-  background:radial-gradient(circle at center,#ff9ecf,transparent 70%);
-  opacity:0;
-  transition:opacity 5s;
+@keyframes bg{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
 }
 
-/* Bunny silhouettes */
-.bunny{
-  position:absolute;
-  bottom:-20px;
-  width:160px;
-  height:220px;
-  background:rgba(255,200,230,.15);
-  border-radius:60% 60% 40% 40%;
-  filter:blur(8px);
-}
-#bunnyL{left:5%}
-#bunnyR{right:5%}
-
-/* Music Button */
 #musicBtn{
   position:absolute;
   top:20px;
   right:20px;
-  background:rgba(255,255,255,.8);
+  background:white;
   border:none;
-  padding:12px 18px;
-  border-radius:25px;
+  padding:10px 18px;
+  border-radius:30px;
+  font-size:14px;
   cursor:pointer;
-  z-index:10;
+  box-shadow:0 5px 15px rgba(0,0,0,.1);
 }
 
-/* Title & Name */
-#name{
-  position:absolute;
-  top:6%;
-  width:100%;
-  text-align:center;
-  font-size:60px;
-  color:#ffd0e8;
-  font-family:cursive;
-  opacity:0;
-  transition:opacity 3s;
-}
 #title{
   position:absolute;
-  top:14%;
+  top:8%;
   width:100%;
   text-align:center;
-  font-size:36px;
-  color:#ff8dbd;
-  opacity:0;
-  transition:opacity 3s;
+  font-family:'Pacifico',cursive;
+  font-size:52px;
+  color:#ff5f9e;
 }
 
-/* Card */
+#subtitle{
+  position:absolute;
+  top:16%;
+  width:100%;
+  text-align:center;
+  font-size:24px;
+  color:#ff8fba;
+}
+
 #card{
   position:absolute;
-  bottom:50px;
+  bottom:60px;
   left:50%;
   transform:translateX(-50%);
-  width:75%;
-  max-width:750px;
-  background:rgba(255,255,255,.92);
-  backdrop-filter:blur(10px);
+  background:white;
   padding:40px;
-  border-radius:25px;
-  box-shadow:0 25px 70px rgba(0,0,0,.2);
+  width:75%;
+  max-width:700px;
+  border-radius:30px;
+  box-shadow:0 30px 60px rgba(255,120,170,.35);
   text-align:center;
-  line-height:1.9;
-  opacity:0;
-  transition:opacity 3s;
+  line-height:1.8;
+  font-size:18px;
 }
 
-/* Flower */
-#stem{
-  position:absolute;
-  bottom:0;
-  left:50%;
-  width:10px;
-  height:0;
-  background:linear-gradient(to top,#2e7d32,#66bb6a);
-  border-radius:10px;
-  transform-origin:bottom;
-}
 #flower{
   position:absolute;
-  bottom:260px;
+  bottom:220px;
   left:50%;
-  width:300px;
-  height:300px;
   transform:translateX(-50%);
+  width:260px;
+  height:260px;
 }
+
 .petal{
   position:absolute;
   inset:0;
   margin:auto;
-  width:150px;
-  height:220px;
-  background:radial-gradient(circle at 30% 30%,#ffd0e2,#ff3366);
+  width:130px;
+  height:180px;
+  background:radial-gradient(circle at 30% 30%,#ffd0e2,#ff6fa3);
   border-radius:60% 60% 30% 30%;
   transform-origin:50% 90%;
-  opacity:0;
-  filter:drop-shadow(0 0 20px rgba(255,0,90,.7));
+  filter:drop-shadow(0 0 15px rgba(255,120,180,.8));
 }
-#center{
+
+.center{
   position:absolute;
   inset:0;
   margin:auto;
-  width:55px;
-  height:55px;
-  background:black;
+  width:50px;
+  height:50px;
+  background:radial-gradient(circle,#fff,#ffb7d5);
   border-radius:50%;
-  opacity:0;
+  box-shadow:0 0 20px #ff9ac8;
 }
 
-/* Particles */
-.sparkle,.petalFall{
+.fall{
   position:absolute;
-  pointer-events:none;
-}
-.sparkle{
-  width:4px;
-  height:4px;
-  background:white;
-  border-radius:50%;
-  box-shadow:0 0 12px white;
-}
-.petalFall{
   width:12px;
-  height:20px;
+  height:18px;
   background:#ff9bb8;
   border-radius:60% 60% 30% 30%;
   opacity:.8;
@@ -158,17 +118,12 @@ html,body{
 
 <body>
 
-<div id="sky"></div>
-<div id="bunnyL" class="bunny"></div>
-<div id="bunnyR" class="bunny"></div>
-
 <button id="musicBtn">Play Music</button>
 
-<div id="stem"></div>
-<div id="flower"></div>
+<div id="title">Bun</div>
+<div id="subtitle">Happy Birthday</div>
 
-<div id="name">Bun</div>
-<div id="title">Happy Birthday</div>
+<div id="flower"></div>
 
 <div id="card">
 Alam mo, kahit anong mangyari, I will always <strong>“carrot” (care at)</strong> love you forever.
@@ -180,47 +135,25 @@ Sana maging kasing-saya mo yung celebration mo. Stay cute as always and have a g
 See you later. 🥕🐰
 </div>
 
-<audio id="music" loop preload="auto">
+<audio id="music" loop>
   <source src="https://cdn.pixabay.com/audio/2023/03/27/audio_9c1f1e7a94.mp3">
 </audio>
 
 <script>
 const flower=document.getElementById("flower");
-for(let i=0;i<7;i++){
+for(let i=0;i<6;i++){
   const p=document.createElement("div");
   p.className="petal";
-  p.style.transform=`rotate(${i*360/7}deg) scale(0)`;
+  p.style.transform=`rotate(${i*60}deg)`;
   flower.appendChild(p);
 }
 const c=document.createElement("div");
-c.id="center";
+c.className="center";
 flower.appendChild(c);
-
-const stem=document.getElementById("stem");
-const sky=document.getElementById("sky");
-const nameText=document.getElementById("name");
-const title=document.getElementById("title");
-const card=document.getElementById("card");
-const music=document.getElementById("music");
-const btn=document.getElementById("musicBtn");
-
-btn.onclick=()=>{
-  if(music.paused){music.play();btn.innerText="Pause Music";}
-  else{music.pause();btn.innerText="Play Music";}
-};
-
-function sparkle(){
-  const s=document.createElement("div");
-  s.className="sparkle";
-  s.style.left=Math.random()*100+"%";
-  s.style.top=Math.random()*100+"%";
-  document.body.appendChild(s);
-  setTimeout(()=>s.remove(),2000);
-}
 
 function fallPetal(){
   const p=document.createElement("div");
-  p.className="petalFall";
+  p.className="fall";
   p.style.left=Math.random()*100+"%";
   p.style.top="-20px";
   document.body.appendChild(p);
@@ -228,41 +161,23 @@ function fallPetal(){
   const i=setInterval(()=>{
     y+=2;
     p.style.top=y+"px";
-    p.style.left=parseFloat(p.style.left)+Math.sin(y/40)+"px";
+    p.style.left=parseFloat(p.style.left)+Math.sin(y/30)+"px";
     if(y>window.innerHeight){p.remove();clearInterval(i);}
   },16);
 }
+setInterval(fallPetal,350);
 
-let wind=0;
-setInterval(()=>{
-  wind+=.01;
-  stem.style.transform=`translateX(-50%) rotate(${Math.sin(wind)*2}deg)`;
-  flower.style.transform=`translateX(-50%) rotate(${Math.sin(wind)*3}deg)`;
-},16);
-
-setInterval(sparkle,200);
-setInterval(fallPetal,300);
-
-let h=0;
-const grow=setInterval(()=>{
-  h+=3;
-  stem.style.height=h+"px";
-  if(h>=260){
-    clearInterval(grow);
-    document.body.style.background="linear-gradient(#ffb6d9,#ffeaf4)";
-    sky.style.opacity=1;
-    document.querySelectorAll(".petal").forEach((p,i)=>{
-      p.style.opacity=1;
-      p.animate([{transform:`rotate(${i*360/7}deg) scale(0)`},
-                 {transform:`rotate(${i*360/7}deg) scale(1)`}],
-                 {duration:2000,fill:"forwards"});
-    });
-    c.style.opacity=1;
-    setTimeout(()=>nameText.style.opacity=1,1500);
-    setTimeout(()=>title.style.opacity=1,2500);
-    setTimeout(()=>card.style.opacity=1,4000);
+const music=document.getElementById("music");
+const btn=document.getElementById("musicBtn");
+btn.onclick=()=>{
+  if(music.paused){
+    music.play();
+    btn.innerText="Pause Music";
+  }else{
+    music.pause();
+    btn.innerText="Play Music";
   }
-},16);
+};
 </script>
 
 </body>

@@ -2,167 +2,275 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Happy Birthday Bun</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Bun!</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-html,body{
-  margin:0;padding:0;width:100%;height:100%;
-  background:linear-gradient(#ffe6f0,#fff);
-  overflow:hidden;
-  font-family:'Poppins',sans-serif;
-}
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: linear-gradient(120deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+        font-family: 'Poppins', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 1s ease;
+    }
 
-#title{
-  text-align:center;
-  font-family:'Pacifico',cursive;
-  font-size:52px;
-  color:#ff3b6a;
-  margin-top:20px;
-}
+    #startBtn {
+        padding: 15px 40px;
+        font-size: 22px;
+        background: #ff5f9e;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(255, 95, 158, 0.4);
+        font-family: 'Pacifico', cursive;
+        animation: pulse 2s infinite;
+    }
 
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
 
-.bunny, .carrot{
-  position:absolute;
-  font-size:60px;
-  opacity:.4;
-}
-.bunny{bottom:20px}
-#b1{left:20px} #b2{right:20px}
-#c1{top:100px;left:20px}
-#c2{top:120px;right:20px}
+    .container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
 
+    #title {
+        position: absolute;
+        top: 5%;
+        text-align: center;
+        font-family: 'Pacifico', cursive;
+        font-size: 60px;
+        color: #ff5f9e;
+        text-shadow: 2px 2px 0px white;
+        z-index: 10;
+        animation: floatTitle 3s ease-in-out infinite;
+    }
 
-#garden{
-  position:absolute;
-  top:100px;
-  left:50%;
-  transform:translateX(-50%);
-  width:100%;
-  height:400px;
-  pointer-events:none;
-}
+    #subtitle {
+        position: absolute;
+        top: 15%;
+        text-align: center;
+        font-size: 20px;
+        color: #ff8fba;
+        letter-spacing: 2px;
+        font-weight: 600;
+        z-index: 10;
+    }
 
+    @keyframes floatTitle {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
 
-.poppy{
-  position:absolute;
-  width:140px;
-  height:140px;
-}
-.petal{
-  position:absolute;
-  inset:0;
-  margin:auto;
-  width:70px;
-  height:100px;
-  background:radial-gradient(circle at 30% 30%,#ffb3c1,#ff1744);
-  border-radius:60% 60% 20% 20%;
-  filter:drop-shadow(0 0 10px rgba(255,50,100,.7));
-}
+    #flower-container {
+        position: absolute;
+        top: 25%;
+        width: 200px;
+        height: 200px;
+        z-index: 5;
+        animation: sway 4s ease-in-out infinite alternate;
+    }
 
+    @keyframes sway {
+        0% { transform: rotate(-5deg); }
+        100% { transform: rotate(5deg); }
+    }
 
-.center{
-  position:absolute;
-  inset:0;
-  margin:auto;
-  width:30px;
-  height:30px;
-  background:radial-gradient(circle,#fff,#ffd1dc,#ff9bb8);
-  border-radius:50%;
-  box-shadow:0 0 20px rgba(255,150,180,.9);
-}
+    .petal {
+        position: absolute;
+        width: 100px;
+        height: 120px;
+        background: radial-gradient(circle at 30% 30%, #ffc3d9, #ff5f9e);
+        border-radius: 50% 50% 10% 10%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transform-origin: bottom center;
+        bottom: 50%;
+        left: 50%;
+        margin-left: -50px;
+    }
 
+    .flower-center {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background: radial-gradient(circle, #ffe082, #ffca28);
+        border-radius: 50%;
+        top: 40%; 
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 15px rgba(255, 202, 40, 0.6);
+        z-index: 20;
+    }
 
-#card{
-  position:absolute;
-  bottom:40px;
-  left:50%;
-  transform:translateX(-50%);
-  width:80%;
-  max-width:700px;
-  background:white;
-  border-radius:25px;
-  padding:35px;
-  box-shadow:0 20px 40px rgba(255,100,150,.3);
-  text-align:center;
-  line-height:1.8;
-}
+    #card {
+        position: absolute;
+        bottom: 5%;
+        width: 85%;
+        max-width: 600px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        text-align: center;
+        line-height: 1.8;
+        font-size: 16px;
+        color: #555;
+        z-index: 20;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 1s ease;
+    }
 
+    strong {
+        color: #ff5f9e;
+    }
 
-.fall{
-  position:absolute;
-  width:12px;
-  height:18px;
-  background:#ff9bb8;
-  border-radius:60% 60% 20% 20%;
-  opacity:.8;
-}
+    .falling-petal {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        background: #ff5f9e;
+        border-radius: 50% 0 50% 0;
+        opacity: 0.6;
+        pointer-events: none;
+        animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+        to {
+            transform: translateY(105vh) rotate(720deg);
+        }
+    }
 </style>
 </head>
 
 <body>
 
-<div id="title">Happy Birthday, Bun</div>
+    <div id="overlay">
+        <h1 style="font-family: 'Pacifico', cursive; color: #ff5f9e; margin-bottom: 20px;">For Bun 🐰</h1>
+        <button id="startBtn">Tap to Celebrate</button>
+    </div>
 
-<div id="b1" class="bunny">🐰</div>
-<div id="b2" class="bunny">🐰</div>
-<div id="c1" class="carrot">🥕</div>
-<div id="c2" class="carrot">🥕</div>
+    <div class="container" id="mainContainer">
+        
+        <div id="title">Bun</div>
+        <div id="subtitle">Happy Birthday</div>
 
-<div id="garden"></div>
+        <div id="flower-container">
+            <div class="flower-center"></div>
+        </div>
 
-<div id="card">
-Alam mo, kahit anong mangyari, I will always <strong>“carrot” (care at)</strong> love you forever.
-<br><br>
-Pero seryoso, enjoy your day today kasi deserve mo lahat ng treats at happiness sa mundo.
-<br><br>
-Sana maging kasing-saya mo yung celebration mo. Stay cute as always and have a great dayyy.
-<br><br>
-See you later. 🥕🐰
-</div>
+        <div id="card">
+            Alam mo, kahit anong mangyari, I will always <strong>“carrot” (care at)</strong> love you forever.
+            <br><br>
+            Pero seryoso, enjoy your day today kasi deserve mo lahat ng treats at happiness sa mundo.
+            <br><br>
+            Sana maging kasing-saya mo yung celebration mo. Stay cute as always and have a great dayyy.
+            <br><br>
+            See you later. 🥕🐰
+        </div>
 
-<script>
-const garden=document.getElementById("garden");
+    </div>
 
+    <audio id="bgMusic" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_27565e6650.mp3" type="audio/mpeg">
+    </audio>
 
-for(let i=0;i<10;i++){
-  const f=document.createElement("div");
-  f.className="poppy";
-  f.style.left=Math.random()*90+"%";
-  f.style.top=Math.random()*250+"px";
+    <script>
+        const overlay = document.getElementById('overlay');
+        const startBtn = document.getElementById('startBtn');
+        const mainContainer = document.getElementById('mainContainer');
+        const music = document.getElementById('bgMusic');
+        const flowerContainer = document.getElementById('flower-container');
+        const card = document.getElementById('card');
 
-  for(let p=0;p<6;p++){
-    const pet=document.createElement("div");
-    pet.className="petal";
-    pet.style.transform=`rotate(${p*60}deg) translateY(-20px)`;
-    f.appendChild(pet);
-  }
-  const c=document.createElement("div");
-  c.className="center";
-  f.appendChild(c);
+        function createFlower() {
+            for(let i = 0; i < 6; i++) {
+                const p = document.createElement("div");
+                p.className = "petal";
+                p.style.transform = `translateX(-50%) rotate(${i * 60}deg)`; 
+                p.style.transformOrigin = "bottom center";
+                flowerContainer.prepend(p);
+            }
+        }
 
-  garden.appendChild(f);
-}
+        startBtn.addEventListener('click', () => {
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                mainContainer.style.display = 'flex';
+                
+                music.volume = 0.5;
+                music.play().catch(e => console.log("Audio play failed: ", e));
 
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 500);
 
-function fall(){
-  const p=document.createElement("div");
-  p.className="fall";
-  p.style.left=Math.random()*100+"%";
-  p.style.top="-20px";
-  document.body.appendChild(p);
-  let y=0;
-  const i=setInterval(()=>{
-    y+=2;
-    p.style.top=y+"px";
-    p.style.left=parseFloat(p.style.left)+Math.sin(y/30)+"px";
-    if(y>window.innerHeight){p.remove();clearInterval(i);}
-  },16);
-}
-setInterval(fall,300);
-</script>
+                setInterval(createFallingPetal, 300);
+
+            }, 1000);
+        });
+
+        function createFallingPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('falling-petal');
+            
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.top = '-20px';
+            
+            const colors = ['#ff5f9e', '#ff8fba', '#ffd1e1', '#ffffff'];
+            petal.style.background = colors[Math.floor(Math.random() * colors.length)];
+            
+            const size = Math.random() * 10 + 10 + 'px';
+            petal.style.width = size;
+            petal.style.height = size;
+
+            petal.style.animationDuration = Math.random() * 3 + 4 + 's';
+
+            document.body.appendChild(petal);
+
+            setTimeout(() => {
+                petal.remove();
+            }, 7000);
+        }
+
+        createFlower();
+    </script>
 
 </body>
 </html>

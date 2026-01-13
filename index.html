@@ -6,11 +6,13 @@
 <title>Happy Birthday Bun</title>
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
 <style>
+    /* --- 1. Base & Background --- */
     :root {
         --primary: #ff5f9e;
         --secondary: #ff8fba;
         --bg-start: #fff0f5;
         --bg-end: #ffc3d9;
+        --text-dark: #444;
     }
 
     * { box-sizing: border-box; }
@@ -21,10 +23,25 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background: radial-gradient(circle at center, var(--bg-start) 0%, var(--bg-end) 100%);
+        /* Multi-layered background for depth */
+        background: 
+            radial-gradient(circle at 75% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at center, var(--bg-start) 0%, var(--bg-end) 100%);
         font-family: 'Quicksand', sans-serif;
     }
 
+    /* Background particle canvas */
+    #canvas-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    /* --- 2. Start Screen --- */
     #start-screen {
         position: fixed;
         top: 0;
@@ -41,40 +58,42 @@
     }
 
     .heart-btn {
-        width: 80px;
-        height: 80px;
+        width: 90px;
+        height: 90px;
         background: var(--primary);
         position: relative;
         transform: rotate(45deg);
-        box-shadow: 0 10px 20px rgba(255, 95, 158, 0.4);
+        box-shadow: 0 10px 25px rgba(255, 95, 158, 0.5);
         cursor: pointer;
-        animation: pulseHeart 1.5s infinite;
+        animation: pulseHeart 1.8s infinite ease-in-out;
     }
 
     .heart-btn::before, .heart-btn::after {
         content: "";
-        width: 80px;
-        height: 80px;
+        width: 90px;
+        height: 90px;
         position: absolute;
         border-radius: 50%;
         background: var(--primary);
     }
-    .heart-btn::before { left: -40px; }
-    .heart-btn::after { top: -40px; }
+    .heart-btn::before { left: -45px; }
+    .heart-btn::after { top: -45px; }
 
     .start-text {
-        margin-top: 60px;
+        margin-top: 70px;
         font-family: 'Dancing Script', cursive;
-        font-size: 24px;
+        font-size: 28px;
         color: var(--primary);
+        letter-spacing: 1px;
     }
 
     @keyframes pulseHeart {
         0% { transform: rotate(45deg) scale(1); }
-        50% { transform: rotate(45deg) scale(1.1); }
+        50% { transform: rotate(45deg) scale(1.15); }
         100% { transform: rotate(45deg) scale(1); }
     }
 
+    /* --- 3. Main Layout --- */
     .main-container {
         display: flex;
         width: 100%;
@@ -92,6 +111,7 @@
         justify-content: center;
         align-items: center;
         padding: 40px;
+        perspective: 1000px;
     }
 
     .flower-area {
@@ -104,6 +124,7 @@
         position: relative;
     }
 
+    /* Mobile Layout */
     @media (max-width: 768px) {
         .main-container {
             flex-direction: column;
@@ -112,31 +133,54 @@
             order: 2;
             padding: 20px;
             align-items: flex-start;
+            justify-content: center;
         }
         .flower-area {
             order: 1;
-            flex: 0.8;
+            flex: 1.2;
             justify-content: flex-end;
-            padding-bottom: 20px;
+            padding-bottom: 30px;
         }
-        .header-title h1 { font-size: 3.5rem !important; }
+        .header-title h1 { font-size: 4rem !important; }
+        .header-title h2 { font-size: 1.1rem !important; }
+        .card-box { padding: 25px !important; }
     }
 
+    /* --- 4. The Flower (Clean, No Center) --- */
     .flower-wrapper {
         position: relative;
-        width: 200px;
-        height: 250px;
+        width: 220px;
+        height: 280px;
         display: flex;
         justify-content: center;
         align-items: flex-end;
     }
 
+    /* Subtle glow behind the flower */
+    .flower-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 180px;
+        height: 180px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+        filter: blur(20px);
+        opacity: 0;
+        transition: opacity 1.5s ease 1s;
+    }
+    .main-container[style*="opacity: 1"] .flower-wrapper::before {
+        opacity: 1;
+    }
+
     .stem {
-        width: 8px;
+        width: 10px;
         height: 0;
-        background: linear-gradient(to top, #2e7d32, #4caf50);
-        border-radius: 4px;
+        background: linear-gradient(to right, #4caf50, #66bb6a, #4caf50);
+        border-radius: 5px;
         transition: height 1.5s ease-in-out;
+        box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
     }
 
     .flower-head {
@@ -152,55 +196,56 @@
         transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1.2s, bottom 1.5s ease-in-out;
     }
 
-    .grow-stem { height: 200px; }
-    .lift-head { bottom: 200px; transform: translateX(-50%) scale(1); }
+    .grow-stem { height: 220px; }
+    .lift-head { bottom: 220px; transform: translateX(-50%) scale(1); }
 
     .petal {
         position: absolute;
         width: 90px;
-        height: 110px;
-        background: radial-gradient(circle at 30% 30%, #ff8fba, #ff2e63);
+        height: 115px;
+        background: linear-gradient(135deg, #ffc3d9 0%, #ff8fba 50%, #ff2e63 100%);
         border-radius: 50% 50% 10% 10%;
         transform-origin: bottom center;
-        box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        box-shadow: 
+            inset 0 -5px 15px rgba(255, 46, 99, 0.3),
+            0 5px 15px rgba(0,0,0,0.05);
     }
 
-    .p1 { transform: rotate(0deg) translateY(-10px); }
-    .p2 { transform: rotate(60deg) translateY(-10px); }
-    .p3 { transform: rotate(120deg) translateY(-10px); }
-    .p4 { transform: rotate(180deg) translateY(-10px); }
-    .p5 { transform: rotate(240deg) translateY(-10px); }
-    .p6 { transform: rotate(300deg) translateY(-10px); }
+    /* P1-P6 rotations */
+    .p1 { transform: rotate(0deg) translateY(-8px); }
+    .p2 { transform: rotate(60deg) translateY(-8px); }
+    .p3 { transform: rotate(120deg) translateY(-8px); }
+    .p4 { transform: rotate(180deg) translateY(-8px); }
+    .p5 { transform: rotate(240deg) translateY(-8px); }
+    .p6 { transform: rotate(300deg) translateY(-8px); }
 
-    .center-core {
-        position: absolute;
-        width: 40px;
-        height: 40px;
-        background: radial-gradient(circle, #fff59d, #fbc02d);
-        border-radius: 50%;
-        box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-        z-index: 10;
-    }
-
+    /* --- 5. Premium Letter Card --- */
     .card-box {
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(10px);
-        padding: 30px;
-        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(15px) saturate(120%);
+        -webkit-backdrop-filter: blur(15px) saturate(120%);
+        padding: 40px;
+        border-radius: 25px;
         width: 100%;
         max-width: 500px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        border: 1px solid rgba(255,255,255,0.5);
+        box-shadow: 
+            0 20px 40px rgba(0,0,0,0.08),
+            inset 0 0 0 2px rgba(255, 255, 255, 0.5);
         opacity: 0;
-        transform: translateY(20px);
-        transition: all 1s ease 2.5s;
+        transform: translateY(30px) rotateX(5deg);
+        transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 2.5s;
+        border: 1px solid rgba(255, 255, 255, 0.8);
     }
 
-    .card-visible { opacity: 1; transform: translateY(0); }
+    .card-visible { 
+        opacity: 1; 
+        transform: translateY(0) rotateX(0); 
+    }
 
+    /* --- 6. Titles & Text --- */
     .header-title {
         position: absolute;
-        top: 10%;
+        top: 8%;
         width: 100%;
         text-align: center;
         z-index: 5;
@@ -208,36 +253,56 @@
 
     .header-title h1 {
         font-family: 'Dancing Script', cursive;
-        font-size: 5rem;
+        font-size: 5.5rem;
         margin: 0;
-        color: var(--primary);
-        text-shadow: 2px 2px 0 white;
+        background: linear-gradient(to right, var(--primary), #ff9966);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(2px 2px 0px rgba(255,255,255,0.8));
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 1s ease 0.5s;
     }
 
     .header-title h2 {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         color: var(--secondary);
         letter-spacing: 4px;
-        margin-top: -10px;
+        margin-top: -15px;
         text-transform: uppercase;
+        font-weight: 700;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 1s ease 0.7s;
+    }
+
+    .show-title h1, .show-title h2 {
+        opacity: 1;
+        transform: translateY(0);
     }
 
     #typewriter {
-        font-size: 1.1rem;
-        color: #444;
-        line-height: 1.6;
+        font-size: 1.15rem;
+        color: var(--text-dark);
+        line-height: 1.7;
         white-space: pre-wrap;
+        font-weight: 500;
     }
 
     #typewriter::after {
         content: "|";
         color: var(--primary);
+        font-weight: 300;
         animation: blink 1s infinite;
     }
 
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
     
-    .highlight { color: var(--primary); font-weight: bold; }
+    .highlight { 
+        color: var(--primary); 
+        font-weight: 700; 
+        font-size: 1.2rem;
+    }
 </style>
 </head>
 <body>
@@ -246,9 +311,11 @@
         <source src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_27565e6650.mp3" type="audio/mpeg">
     </audio>
 
+    <canvas id="canvas-bg"></canvas>
+
     <div id="start-screen">
         <div class="heart-btn" id="startBtn"></div>
-        <div class="start-text">Tap Me</div>
+        <div class="start-text">Tap to Open</div>
     </div>
 
     <div class="main-container" id="mainLayout">
@@ -260,7 +327,7 @@
         </div>
 
         <div class="flower-area">
-            <div class="header-title">
+            <div class="header-title" id="headerTitle">
                 <h1>Bun</h1>
                 <h2>Happy Birthday</h2>
             </div>
@@ -274,7 +341,6 @@
                     <div class="petal p4"></div>
                     <div class="petal p5"></div>
                     <div class="petal p6"></div>
-                    <div class="center-core"></div>
                 </div>
             </div>
         </div>
@@ -285,6 +351,7 @@
     const startScreen = document.getElementById('start-screen');
     const mainLayout = document.getElementById('mainLayout');
     const music = document.getElementById('bgMusic');
+    const headerTitle = document.getElementById('headerTitle');
     
     const stem = document.getElementById('stem');
     const flowerHead = document.getElementById('flowerHead');
@@ -298,9 +365,13 @@
         setTimeout(() => { startScreen.style.display = 'none'; }, 800);
 
         mainLayout.style.opacity = '1';
+        headerTitle.classList.add('show-title');
         
-        music.volume = 0.5;
-        music.play().catch(e => console.log("User interaction needed"));
+        music.volume = 0.4;
+        music.play().catch(e => console.log("User interaction needed for audio"));
+
+        // Init particles on click
+        initParticles();
 
         setTimeout(() => {
             stem.classList.add('grow-stem');
@@ -316,13 +387,11 @@
     function startTyping() {
         let i = 0;
         typewriter.innerHTML = "";
-        
         function type() {
             if (i < msg.length) {
-                let char = msg.charAt(i);
-                typewriter.textContent += char;
+                typewriter.textContent += msg.charAt(i);
                 i++;
-                setTimeout(type, 50); 
+                setTimeout(type, 45); 
             } else {
                 let finalHTML = typewriter.innerHTML;
                 finalHTML = finalHTML.replace('"carrot" (care at)', '<span class="highlight">"carrot" (care at)</span>');
@@ -330,6 +399,57 @@
             }
         }
         type();
+    }
+
+    // --- Enhanced Particle System ---
+    function initParticles() {
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        const colors = ['rgba(255, 95, 158, 0.3)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 195, 217, 0.4)'];
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 60; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
     }
 </script>
 </body>

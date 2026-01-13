@@ -111,26 +111,28 @@
         position: absolute;
         width: 100px;
         height: 120px;
+        background: #ffc3d9; 
         background: radial-gradient(circle at 30% 30%, #ffc3d9, #ff5f9e);
         border-radius: 50% 50% 10% 10%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         transform-origin: bottom center;
         bottom: 50%;
         left: 50%;
         margin-left: -50px;
+        z-index: 1;
     }
 
-    .flower-center {
+    .flower-core {
         position: absolute;
         width: 50px;
         height: 50px;
-        background: radial-gradient(circle, #ffe082, #ffca28);
+        background: #ffeb3b !important;
+        background: radial-gradient(circle, #ffe082, #ffca28) !important;
         border-radius: 50%;
         top: 40%; 
         left: 50%;
         transform: translate(-50%, -50%);
-        box-shadow: 0 0 15px rgba(255, 202, 40, 0.6);
-        z-index: 20;
+        box-shadow: 0 0 15px rgba(255, 235, 59, 0.8);
+        z-index: 50; 
     }
 
     #card {
@@ -190,7 +192,7 @@
         <div id="subtitle">Happy Birthday</div>
 
         <div id="flower-container">
-            <div class="flower-center"></div>
+            <div class="flower-core"></div>
         </div>
 
         <div id="card">

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Special Game</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Pacifico&family=Quicksand:wght@500&display=swap" rel="stylesheet">
+    <title>Congrats, Bunn! ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Pacifico&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-pink: #ff4d6d;
@@ -15,72 +15,84 @@
             --romantic-font: 'Dancing Script', cursive;
             --main-font: 'Quicksand', sans-serif;
         }
+
         body {
             font-family: var(--main-font);
-            background-color: var(--bg-color);
+            background: radial-gradient(circle, #fff0f3 0%, #ffdde1 100%);
             color: var(--text-color);
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            background: radial-gradient(circle, #fff0f3 0%, #ffdde1 100%);
         }
-        .bg-heart {
-            position: absolute;
-            color: rgba(255, 77, 109, 0.2);
-            font-size: 20px;
-            user-select: none;
-            z-index: -1;
-            animation: float 6s linear infinite;
+
+        /* --- Header UI --- */
+        #game-header {
+            text-align: center;
+            margin-top: 50px;
+            z-index: 5;
+            transition: opacity 0.5s;
         }
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
-        }
+
         h1 {
             font-family: var(--accent-font);
-            font-size: 3rem;
-            margin-bottom: 20px;
+            font-size: 3.5rem;
             color: var(--primary-pink);
+            margin: 0;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
         }
-        .game-container {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 15px;
-            background-color: white;
-            padding: 20px;
-            border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(255, 77, 109, 0.15);
-            border: 4px solid var(--secondary-pink);
+
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 10px;
+            color: #c9184a;
         }
-        .cell {
-            width: 100px;
-            height: 100px;
-            background-color: var(--bg-color);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--accent-font);
-            font-size: 2.8rem;
+
+        /* --- Game Elements --- */
+        #game-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 2.5rem;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            color: var(--primary-pink);
+            user-select: none;
+            animation: floatUp linear forwards;
+            filter: drop-shadow(0 5px 15px rgba(255, 77, 109, 0.2));
         }
-        .cell:hover {
-            background-color: var(--secondary-pink);
-            transform: scale(1.05);
-            color: white;
+
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) scale(1); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
         }
-        .cell.taken {
-            cursor: not-allowed;
-            transform: none;
+
+        /* --- Confetti Effect --- */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary-pink);
+            z-index: 2;
+            animation: confettiFall 3s linear forwards;
         }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(-10vh) rotate(0deg); }
+            100% { transform: translateY(110vh) rotate(720deg); }
+        }
+
+        /* --- Message Overlay --- */
         #message-overlay {
             display: none;
             position: fixed;
@@ -88,148 +100,155 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.98);
+            background: rgba(255, 240, 243, 0.95);
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 10;
             text-align: center;
-            animation: fadeIn 0.8s ease-in-out;
             padding: 20px;
             box-sizing: border-box;
+            animation: zoomIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .heart-icon {
-            color: var(--primary-pink);
-            font-size: 4rem;
-            animation: beat 0.8s infinite alternate;
-            margin-bottom: 10px;
-            font-family: var(--main-font);
+
+        .letter-box {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(255, 77, 109, 0.2);
+            max-width: 600px;
+            border: 3px solid var(--secondary-pink);
+            position: relative;
         }
-        .result-text {
-            font-family: var(--main-font);
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-            letter-spacing: 1px;
-        }
-        .final-question {
+
+        .congrats-title {
             font-family: var(--romantic-font);
-            font-size: 4.5rem;
-            font-weight: bold;
+            font-size: 4rem;
             color: var(--primary-pink);
-            margin: 0 20px 20px 20px;
-            line-height: 1.2;
+            margin-bottom: 20px;
         }
-        .long-message {
-            font-family: var(--main-font);
-            font-size: 1.2rem;
+
+        .heartfelt-text {
+            font-size: 1.15rem;
+            line-height: 1.8;
             color: var(--text-color);
-            max-width: 700px;
-            line-height: 1.6;
+            text-align: justify;
         }
-        @keyframes beat {
-            to { transform: scale(1.2) rotate(5deg); }
+
+        .closing {
+            margin-top: 25px;
+            font-family: var(--accent-font);
+            font-size: 1.5rem;
+            color: var(--primary-pink);
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.5); }
             to { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
 <body>
-    <h1 id="title">Tic-Tac-Love</h1>
-    <div class="game-container" id="board">
-        <div class="cell" data-index="0"></div>
-        <div class="cell" data-index="1"></div>
-        <div class="cell" data-index="2"></div>
-        <div class="cell" data-index="3"></div>
-        <div class="cell" data-index="4"></div>
-        <div class="cell" data-index="5"></div>
-        <div class="cell" data-index="6"></div>
-        <div class="cell" data-index="7"></div>
-        <div class="cell" data-index="8"></div>
+
+    <div id="game-header">
+        <h1>Pop the Hearts!</h1>
+        <p class="subtitle">Celebration mode: ON! Catch 10 hearts to see your surprise.</p>
     </div>
+
+    <div id="game-area"></div>
+
     <div id="message-overlay">
-        <div class="heart-icon">&hearts;</div>
-        <div id="status-line" class="result-text"></div>
-        <div class="final-question">belated monthsaryy bunn</div>
-        <div class="long-message">
-            <p>Sorry kung late na kitang nabati, but still thank youu. I really appreciate you, sa lahat ng support, effort, at sa pagiging nandiyan lagi. Hoping na matapos natin tong sem na 'to nang maayos, na hindi tayo natatapos, and makapag-relaxxxxx after everything we've been through.</p>
-            <p>Kahit ang daming pagod, stress, at pressure, proud pa rin ako sa'yo for staying strong and doing your best. Deserve mo lahat ng pahinga at happiness. I hope you keep believing in yourself, kasi kaya mo talaga. I'm always here for you, through the good days and the hard ones. Thank you for being you, and for making things lighter without even trying.</p>
-            <p>Looking forward sa days na mas peaceful na, mas masaya, at mas magaan lahat. You deserve that and more.</p>
+        <div class="letter-box">
+            <div class="congrats-title">Congrats, Bunn!</div>
+            <div class="heartfelt-text">
+                <p>First of all, super proud ako sa'yo! Natapos mo na ang P2 nang buong-buo. Alam ko kung gaano kabigat yung pressure, yung puyat, at yung stress nitong mga nakaraang araw, pero look at you now—survived and conquered!</p>
+                <p>Lagi mong tatandaan na lahat ng effort at sakripisyo na binubuhos mo ngayon, <b>magbubunga din lahat 'yan</b>. Hindi man laging madali, pero nakikita ko kung gaano ka ka-dedicated, at deserve mo lahat ng success na darating sa'yo. Your hard work is inspiring, and I'm so lucky to be by your side watching you achieve your goals.</p>
+                <p>Thank you for staying strong and for still being the amazing person you are kahit pagod ka na. Sobrang thankful ako sa'yo, sa lahat ng effort mo, at sa pagiging ikaw. Ngayon na tapos na ang P2, please take the time to breathe and relax. Deserve mo ang pinaka-masarap na pahinga!</p>
+            </div>
+            <div class="closing">I'm always proud of you! ❤️</div>
         </div>
     </div>
+
     <script>
-        function createHeart() {
-            const heart = document.createElement('div');
-            heart.classList.add('bg-heart');
-            heart.innerHTML = '&hearts;';
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDuration = Math.random() * 3 + 3 + 's';
-            heart.style.opacity = Math.random();
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 6000);
-        }
-        setInterval(createHeart, 300);
-
-        const board = document.getElementById('board');
-        const cells = document.querySelectorAll('.cell');
+        const gameArea = document.getElementById('game-area');
+        const header = document.getElementById('game-header');
         const overlay = document.getElementById('message-overlay');
-        const statusLine = document.getElementById('status-line');
         
+        let score = 0;
+        const targetScore = 10;
         let gameActive = true;
-        let gameState = ["", "", "", "", "", "", "", "", ""];
-        
-        const winningConditions = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8],
-            [0, 3, 6], [1, 4, 7], [2, 5, 8],
-            [0, 4, 8], [2, 4, 6]
-        ];
 
-        function handleCellClick(e) {
-            const index = parseInt(e.target.getAttribute('data-index'));
-            if (gameState[index] !== "" || !gameActive) return;
-            updateCell(e.target, index, "X");
-            if (checkWin("X")) return endGame("You won! So...");
-            if (checkDraw()) return endGame("A tie! But regardless...");
-            gameActive = false;
-            setTimeout(aiTurn, 400);
+        const heartEmojis = ['❤️', '💖', '✨', '🎉', '💗'];
+        const confettiColors = ['#ff4d6d', '#ffb3c1', '#ff758f', '#ffccd5', '#ffffff'];
+
+        function createHeart() {
+            if (!gameActive) return;
+
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerText = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+            heart.style.left = Math.random() * 90 + 'vw';
+            
+            // Random duration for variety
+            const duration = Math.random() * 2 + 3;
+            heart.style.animationDuration = duration + 's';
+
+            // Interaction
+            const pop = (e) => {
+                if (!gameActive) return;
+                e.preventDefault();
+                score++;
+                heart.style.transform = 'scale(2)';
+                heart.style.opacity = '0';
+                setTimeout(() => heart.remove(), 200);
+                
+                if (score >= targetScore) {
+                    triggerVictory();
+                }
+            };
+
+            heart.addEventListener('mousedown', pop);
+            heart.addEventListener('touchstart', pop);
+
+            gameArea.appendChild(heart);
+
+            // Cleanup
+            setTimeout(() => {
+                if (gameArea.contains(heart)) heart.remove();
+            }, duration * 1000);
         }
 
-        function updateCell(cell, index, symbol) {
-            gameState[index] = symbol;
-            cell.innerText = symbol;
-            cell.classList.add('taken');
-            if(symbol === "O") cell.style.color = "#ff8fa3";
-        }
-
-        function aiTurn() {
-            let available = gameState.map((v, i) => v === "" ? i : null).filter(v => v !== null);
-            if (available.length > 0) {
-                const random = available[Math.floor(Math.random() * available.length)];
-                updateCell(cells[random], random, "O");
-                gameActive = true;
-                if (checkWin("O")) endGame("You lost! Which means...");
-                else if (checkDraw()) endGame("It is a draw! However...");
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const c = document.createElement('div');
+                    c.classList.add('confetti');
+                    c.style.left = Math.random() * 100 + 'vw';
+                    c.style.backgroundColor = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                    c.style.width = Math.random() * 8 + 5 + 'px';
+                    c.style.height = c.style.width;
+                    c.style.animationDuration = Math.random() * 2 + 1 + 's';
+                    c.style.opacity = Math.random();
+                    document.body.appendChild(c);
+                    setTimeout(() => c.remove(), 3000);
+                }, i * 50);
             }
         }
 
-        function checkWin(s) {
-            return winningConditions.some(c => c.every(i => gameState[i] === s));
-        }
-
-        function checkDraw() { return !gameState.includes(""); }
-
-        function endGame(msg) {
+        function triggerVictory() {
             gameActive = false;
+            createConfetti();
+            header.style.opacity = '0';
+            
             setTimeout(() => {
-                statusLine.innerText = msg;
+                gameArea.innerHTML = '';
+                header.style.display = 'none';
                 overlay.style.display = 'flex';
-                document.getElementById('title').style.display = 'none';
-                document.getElementById('board').style.display = 'none';
-            }, 600);
+            }, 800);
         }
 
-        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        // Spawn speed
+        setInterval(createHeart, 700);
     </script>
 </body>
 </html>

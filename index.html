@@ -65,7 +65,6 @@
             margin: 5px 0;
             color: #c9184a;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .progress-container {
@@ -176,11 +175,6 @@
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
-
-        @media (max-width: 600px) {
-            h1 { font-size: 2.2rem; }
-            .main-title { font-size: 2.6rem; }
-        }
     </style>
 </head>
 <body>
@@ -209,6 +203,63 @@
     </div>
 
     <script>
+        // --- SYNTH SOUND ENGINE (Kawaii 8-bit Style) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSynthSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            const now = audioCtx.currentTime;
+
+            if (type === 'twinkle') { // High-pitched magical ping
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } 
+            else if (type === 'pop') { // Soft bubble pop
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            }
+            else if (type === 'wrong') { // Soft cartoon boing
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.2);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            }
+            else if (type === 'victory') { // Do-Mi-Sol-Do arpeggio
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.frequency.setValueAtTime(freq, now + (i * 0.1));
+                    g.gain.setValueAtTime(0.2, now + (i * 0.1));
+                    g.gain.exponentialRampToValueAtTime(0.01, now + (i * 0.1) + 0.4);
+                    o.start(now + (i * 0.1));
+                    o.stop(now + (i * 0.1) + 0.4);
+                });
+            }
+        }
+
+        // --- GAME LOGIC ---
         const gameArea = document.getElementById('game-area');
         const header = document.getElementById('game-header');
         const overlay = document.getElementById('message-overlay');
@@ -220,24 +271,7 @@
 
         const goodHearts = ['❤️', '💖', '💗'];
         const badItems = ['💔', '💣', '🖤'];
-        const specialItems = [
-            { emoji: '✨', sound: 'twinkle' },
-            { emoji: '🎉', sound: 'pop' }
-        ];
-
-        // NEW "CUTE" SOUNDS
-        const sounds = {
-            twinkle: new Audio('https://cdn.pixabay.com/audio/2022/01/18/audio_d0c6ff1bab.mp3'), // Magical high-pitched ping
-            pop: new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_7838cf002e.mp3'),     // Soft cute bubble pop
-            victory: new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3'), // Happy level-up jingle
-            wrong: new Audio('https://cdn.pixabay.com/audio/2022/03/10/audio_c33ca8f01b.mp3')     // Soft "boing" for mistakes
-        };
-
-        function playSound(type) {
-            const audioClone = sounds[type].cloneNode();
-            audioClone.volume = 0.4;
-            audioClone.play().catch(e => console.log("Audio play blocked until interaction"));
-        }
+        const specialItems = ['✨', '🎉'];
 
         function createItem() {
             if (!gameActive) return;
@@ -256,9 +290,7 @@
                 item.innerText = badItems[Math.floor(Math.random() * badItems.length)];
             } else {
                 itemType = 'special';
-                const specialChoice = specialItems[Math.floor(Math.random() * specialItems.length)];
-                item.innerText = specialChoice.emoji;
-                item.dataset.soundType = specialChoice.sound;
+                item.innerText = specialItems[Math.floor(Math.random() * specialItems.length)];
             }
 
             item.style.left = Math.random() * 80 + 10 + 'vw';
@@ -271,19 +303,20 @@
                 
                 if (itemType === 'good') {
                     score++;
-                    playSound('twinkle'); // Added a subtle twinkle for good hearts too!
+                    playSynthSound('twinkle'); // Cute ping for heart
                     progressBar.style.width = (score / targetScore * 100) + '%';
                     item.style.transform = 'scale(2)';
                 } 
                 else if (itemType === 'bad') {
                     score = Math.max(0, score - 1); 
-                    playSound('wrong'); 
+                    playSynthSound('wrong'); // "Boing" for mistake
                     progressBar.style.width = (score / targetScore * 100) + '%';
                     document.body.classList.add('error-state');
                     setTimeout(() => document.body.classList.remove('error-state'), 400);
                 } 
                 else if (itemType === 'special') {
-                    playSound(item.dataset.soundType);
+                    // Stars ✨ play twinkle, Party 🎉 play pop
+                    playSynthSound(item.innerText === '✨' ? 'twinkle' : 'pop');
                     item.style.transform = 'scale(2.5) rotate(20deg)';
                 }
                 
@@ -295,8 +328,8 @@
                 }
             };
 
+            item.addEventListener('touchstart', pop, {passive: false});
             item.addEventListener('mousedown', pop);
-            item.addEventListener('touchstart', pop);
             gameArea.appendChild(item);
 
             setTimeout(() => { if (gameArea.contains(item)) item.remove(); }, duration * 1000);
@@ -304,7 +337,7 @@
 
         function triggerVictory() {
             gameActive = false;
-            playSound('victory'); 
+            playSynthSound('victory'); // Magical rising jingle
             header.style.opacity = '0';
             setTimeout(() => {
                 header.style.display = 'none';
@@ -312,7 +345,7 @@
             }, 800);
         }
 
-        setInterval(createItem, 550);
+        setInterval(createItem, 600);
     </script>
 </body>
 </html>

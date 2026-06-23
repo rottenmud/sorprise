@@ -656,9 +656,60 @@
 
   function groundY() { return H - Math.max(60, H * 0.10); }
 
-  /* Slingshot anchor position (world space, scales with screen) */
+  /* Slingshot anchor position — fixed in WORLD space, near the left edge
+     of the level. Stays put no matter how wide the screen is. */
   function slingPos() {
-    return { x: Math.max(110, W * 0.14), y: groundY() - Math.min(150, H * 0.22) };
+    return { x: 140, y: groundY() - Math.min(150, H * 0.22) };
+  }
+
+  /* ------------------------------------------------------------------
+     CAMERA SYSTEM
+     The level is built in a "world" coordinate space that's wider than
+     any single screen (so structures always have room to breathe, even
+     on narrow phones). The camera is just a horizontal scroll offset:
+     worldX - camera.x = screenX. It eases toward whatever it's
+     "following" (the carrot mid-flight, or the slingshot otherwise) so
+     the player can always see where the carrot is headed.
+     ------------------------------------------------------------------ */
+  const WORLD_PADDING_RIGHT = 160; // breathing room past the last structure
+  let WORLD_WIDTH = 1600; // recomputed once the level is built
+
+  const camera = {
+    x: 0,           // current scroll offset (world units)
+    targetX: 0,     // where we're easing toward
+    follow: null,   // null = look at slingshot; otherwise an object with .x/.y
+    locked: false   // true while user is aiming, to keep the sling steady on screen
+  };
+
+  function clampCameraX(x) {
+    const maxX = Math.max(0, WORLD_WIDTH - W);
+    return Math.max(0, Math.min(maxX, x));
+  }
+
+  // Decide what the camera should be centering on right now, and ease toward it.
+  function updateCamera(dt) {
+    if (gameWon) return; // freeze the view once we've won — let the celebration breathe
+    let desired;
+    if (camera.locked) {
+      // While aiming, keep the slingshot comfortably on the left third of the screen.
+      desired = slingPos().x - W * 0.28;
+    } else if (camera.follow && camera.follow.alive !== false) {
+      // Follow the flying carrot, keeping it a little left-of-center so the
+      // player can see what's ahead of it.
+      desired = camera.follow.x - W * 0.42;
+    } else {
+      // Idle: ease back to showing the slingshot at rest.
+      desired = slingPos().x - W * 0.28;
+    }
+    camera.targetX = clampCameraX(desired);
+    // Smooth easing (frame-rate independent-ish)
+    const ease = 1 - Math.pow(0.0035, dt);
+    camera.x += (camera.targetX - camera.x) * Math.min(1, ease * 6);
+  }
+
+  // Convert a screen-space pointer position into world-space coordinates.
+  function screenToWorld(pos) {
+    return { x: pos.x + camera.x, y: pos.y };
   }
 
   /* ------------------------------------------------------------------
@@ -694,8 +745,10 @@
     ctx.restore();
   }
 
-  function drawBackground(dt) {
-    // Sky gradient (cached via CSS already on body; canvas needs its own for layering)
+  // Screen-fixed layer: sky, sun, clouds. Drawn WITHOUT camera translation,
+  // so it behaves like a distant backdrop that doesn't scroll with the world
+  // (this also reads as gentle parallax depth as the camera pans).
+  function drawSky(dt) {
     const grad = ctx.createLinearGradient(0, 0, 0, H);
     grad.addColorStop(0, '#FFE3EE');
     grad.addColorStop(0.45, '#FFD6E8');
@@ -723,32 +776,44 @@
       if (c.x > W + 60) c.x = -60;
       drawCloud(c);
     });
+  }
 
-    // Distant hills
+  // World-space layer: hills, ground, grass, flowers. Drawn INSIDE the
+  // camera translation, sized across the whole WORLD_WIDTH so it scrolls
+  // naturally as the camera pans to follow the carrot.
+  function drawGroundLayer(dt) {
+    const gY = groundY();
+    const worldL = camera.x - 40;
+    const worldR = camera.x + W + 40;
+
+    // Distant hills (gentle repeating bumps across the visible span)
     ctx.fillStyle = 'rgba(255, 182, 217, 0.35)';
     ctx.beginPath();
-    ctx.moveTo(0, groundY());
-    ctx.quadraticCurveTo(W * 0.2, groundY() - 60, W * 0.4, groundY() - 10);
-    ctx.quadraticCurveTo(W * 0.65, groundY() - 70, W * 0.85, groundY() - 15);
-    ctx.quadraticCurveTo(W * 0.95, groundY() - 40, W, groundY());
-    ctx.lineTo(W, groundY() + 200);
-    ctx.lineTo(0, groundY() + 200);
+    ctx.moveTo(worldL, gY);
+    const hillStep = (worldR - worldL) / 4;
+    for (let i = 0; i <= 4; i++) {
+      const x = worldL + hillStep * i;
+      const bump = (i % 2 === 0) ? -10 : -65;
+      ctx.quadraticCurveTo(x - hillStep / 2, gY + bump, x, gY - 10);
+    }
+    ctx.lineTo(worldR, gY + 200);
+    ctx.lineTo(worldL, gY + 200);
     ctx.closePath();
     ctx.fill();
 
-    // Ground (grass strip + dirt)
-    const gY = groundY();
+    // Ground (grass strip)
     const grassGrad = ctx.createLinearGradient(0, gY, 0, H);
     grassGrad.addColorStop(0, '#BFEAA5');
     grassGrad.addColorStop(1, '#8FCB7A');
     ctx.fillStyle = grassGrad;
-    ctx.fillRect(0, gY, W, H - gY);
+    ctx.fillRect(worldL, gY, worldR - worldL, H - gY);
 
-    // Little grass tufts + flowers along the ground line
+    // Little grass tufts along the ground line, spanning the visible world range
     ctx.save();
     ctx.strokeStyle = '#7AB867';
     ctx.lineWidth = 2;
-    for (let x = 0; x < W; x += 26) {
+    const tuftStart = Math.floor(worldL / 26) * 26;
+    for (let x = tuftStart; x < worldR; x += 26) {
       const h = 6 + (Math.sin(x * 0.13) + 1) * 4;
       ctx.beginPath();
       ctx.moveTo(x, gY);
@@ -759,11 +824,13 @@
     }
     ctx.restore();
 
-    // tiny flowers scattered on the grass
-    for (let i = 0; i < 14; i++) {
-      const fx = (i * 97 + 40) % W;
-      const fy = gY + 14 + ((i * 53) % Math.max(20, (H - gY - 20)));
-      drawTinyFlower(fx, fy, i % 3 === 0 ? '#FF8FB1' : (i % 3 === 1 ? '#A8D8FF' : '#FFE08A'));
+    // tiny flowers scattered on the grass, deterministic by world position
+    const flowerStart = Math.floor(worldL / 97) * 97;
+    for (let x = flowerStart; x < worldR; x += 97) {
+      const seed = Math.floor(x / 97);
+      const fy = gY + 14 + (Math.abs(Math.sin(seed * 12.9898)) * Math.max(20, (H - gY - 30)));
+      const colorPick = seed % 3;
+      drawTinyFlower(x + 40, fy, colorPick === 0 ? '#FF8FB1' : (colorPick === 1 ? '#A8D8FF' : '#FFE08A'));
     }
   }
 
@@ -1299,8 +1366,9 @@
       const speed = Math.hypot(this.vx, this.vy);
       if (speed < 12) this.restTimer += dt; else this.restTimer = 0;
 
-      // off-screen or fully at rest too long => despawn
-      if (this.x > W + 100 || this.x < -100 || this.restTimer > 1.6) {
+      // off-world or fully at rest too long => despawn (bounds now refer to the
+      // whole WORLD, not just the visible screen, since the camera can scroll)
+      if (this.x > WORLD_WIDTH + 100 || this.x < -100 || this.restTimer > 1.6) {
         this.alive = false;
       }
     }
@@ -1384,9 +1452,13 @@
     bunnyIdCounter = 0;
 
     const gy = groundY();
-    // Lay structures across the right ~78% of the screen, scaled to width.
-    const baseX = Math.max(W * 0.42, slingPos().x + 220);
-    const spanX = Math.max(420, W - baseX - 60);
+    // Lay structures across a fixed WORLD span (not the live screen width!) so the
+    // level always has consistent room to breathe, however narrow the phone is.
+    // We use a generous "design width" baseline (like designing for a tablet),
+    // and the camera handles scrolling to show it all on smaller screens.
+    const designWidth = Math.max(W, 900);
+    const baseX = slingPos().x + 260;
+    const spanX = Math.max(900, designWidth * 1.15);
 
     // Helper to place a tower: a stack of crates with a bunny on top,
     // plus sometimes a bunny tucked beside it.
@@ -1490,6 +1562,15 @@
       bunnyOnGround(extraX);
     }
 
+    // The world extends a bit past the last structure, plus padding for breathing room.
+    WORLD_WIDTH = Math.max(W, baseX + spanX + WORLD_PADDING_RIGHT);
+
+    // Reset camera to rest on the slingshot at the start of the level.
+    camera.follow = null;
+    camera.locked = false;
+    camera.x = clampCameraX(slingPos().x - W * 0.28);
+    camera.targetX = camera.x;
+
     carrotsRemaining = bunnies.length + 3; // a little generous buffer of carrots
     updateHUD();
   }
@@ -1508,6 +1589,7 @@
     const sp = slingPos();
     activeCarrot = new Carrot(sp.x, sp.y);
     carrots.push(activeCarrot);
+    camera.follow = null; // new turn — ease the camera back to the slingshot
   }
 
   function drawSlingshot() {
@@ -1585,18 +1667,20 @@
     const rect = canvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    return { x: clientX - rect.left, y: clientY - rect.top };
+    // Convert screen position into WORLD space by adding the camera offset,
+    // since the whole scene is drawn shifted left by camera.x.
+    return { x: (clientX - rect.left) + camera.x, y: clientY - rect.top };
   }
 
   function onPointerDown(e) {
     if (gameWon) return;
     if (!activeCarrot || activeCarrot.launched) return;
     const pos = getPointerPos(e);
-    const sp = slingPos();
-    const dist = Math.hypot(pos.x - activeCarrot.x, pos.y - activeCarrot.y);
     // generous grab radius so it's easy on mobile
-    if (dist < 60) {
+    const dist = Math.hypot(pos.x - activeCarrot.x, pos.y - activeCarrot.y);
+    if (dist < 70) {
       aiming = true;
+      camera.locked = true; // hold the camera steady on the slingshot while aiming
       pointerId = e.pointerId !== undefined ? e.pointerId : 'touch';
       document.getElementById('hint').style.opacity = '0';
     }
@@ -1622,6 +1706,7 @@
   function onPointerUp(e) {
     if (!aiming || !activeCarrot) return;
     aiming = false;
+    camera.locked = false;
     const pullDist = Math.hypot(aimDX, aimDY);
     if (pullDist < 12) {
       // too small a pull — snap back, don't launch
@@ -1633,6 +1718,7 @@
     const vx = -aimDX * LAUNCH_POWER;
     const vy = -aimDY * LAUNCH_POWER;
     activeCarrot.launch(vx, vy);
+    camera.follow = activeCarrot; // camera now tracks the carrot mid-flight
     carrotsRemaining--;
     updateHUD();
     aimDX = 0; aimDY = 0;
@@ -1723,7 +1809,7 @@
     setTimeout(() => SoundEngine.playTransform(), 120);
     spawnHeartBurst(bun.x, bun.y, 14);
     spawnSparkleBurst(bun.x, bun.y, 10);
-    showScorePopup(bun.x, bun.y, '+100 💕');
+    showScorePopup(bun.x - camera.x, bun.y, '+100 💕');
     updateHUD();
     checkWinCondition();
   }
@@ -1782,8 +1868,10 @@
       setTimeout(() => spawnDomSparkle(), i * 90);
     }
     // also a canvas-side burst centered on screen for extra flourish
-    spawnHeartBurst(W / 2, H * 0.4, 40);
-    spawnSparkleBurst(W / 2, H * 0.4, 30);
+    // (convert screen-center to world-space since particles render inside
+    // the camera-translated draw pass)
+    spawnHeartBurst(camera.x + W / 2, H * 0.4, 40);
+    spawnSparkleBurst(camera.x + W / 2, H * 0.4, 30);
   }
 
   function spawnDomConfetti() {
@@ -1835,6 +1923,74 @@
   }
 
   /* ------------------------------------------------------------------
+     12b. OFFSCREEN BUNNY HINT ARROWS
+     A small screen-fixed indicator on the left/right edge that points
+     toward the nearest remaining angry bunny when it's off-camera, so
+     the player always knows which way the action is happening.
+     ------------------------------------------------------------------ */
+  function drawOffscreenBunnyHints() {
+    const remaining = bunnies.filter(b => !b.happy);
+    if (remaining.length === 0) return;
+
+    const visibleL = camera.x;
+    const visibleR = camera.x + W;
+
+    // Find the nearest off-screen bunny to the left and to the right.
+    let nearestLeft = null, nearestRight = null;
+    remaining.forEach(b => {
+      if (b.x < visibleL - 10) {
+        if (!nearestLeft || b.x > nearestLeft.x) nearestLeft = b;
+      } else if (b.x > visibleR + 10) {
+        if (!nearestRight || b.x < nearestRight.x) nearestRight = b;
+      }
+    });
+
+    const midY = H * 0.42;
+    if (nearestLeft) drawEdgeArrow('left', midY);
+    if (nearestRight) drawEdgeArrow('right', midY);
+  }
+
+  function drawEdgeArrow(side, y) {
+    const margin = 26;
+    const x = side === 'left' ? margin : W - margin;
+    const dir = side === 'left' ? -1 : 1;
+    const pulse = 0.85 + Math.sin(performance.now() / 260) * 0.15;
+
+    ctx.save();
+    ctx.globalAlpha = pulse;
+    ctx.translate(x, y);
+    ctx.fillStyle = '#FF6F9E';
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(dir * 12, 0);
+    ctx.lineTo(dir * -10, -12);
+    ctx.lineTo(dir * -10, 12);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    // tiny bunny emoji-ish dot label above the arrow (drawn as a soft circle + ear hint)
+    ctx.save();
+    ctx.globalAlpha = pulse;
+    ctx.translate(x, y - 26);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.arc(0, 0, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#FF6F9E';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = '#E59CAE';
+    ctx.beginPath();
+    ctx.ellipse(-4, -8, 2.4, 6, -0.3, 0, Math.PI * 2);
+    ctx.ellipse(4, -8, 2.4, 6, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  /* ------------------------------------------------------------------
      13. MAIN GAME LOOP
      ------------------------------------------------------------------ */
   let lastT = performance.now();
@@ -1849,9 +2005,11 @@
     carrots = carrots.filter(c => c.alive || c === activeCarrot);
 
     handleCollisions(dt);
+    updateCamera(dt);
 
     // If the active carrot has finished its flight (landed/despawned), prep the next one
     if (activeCarrot && activeCarrot.launched && !activeCarrot.alive) {
+      if (camera.follow === activeCarrot) camera.follow = null;
       activeCarrot = null;
       if (!gameWon) {
         if (carrotsRemaining > 0 || bunnies.some(b => !b.happy)) {
@@ -1865,13 +2023,30 @@
   }
 
   function render(dt) {
-    drawBackground(dt);
+    // Screen-fixed backdrop (sky, sun, clouds) — no camera shift.
+    drawSky(dt);
+
+    // Everything below this point lives in WORLD space, so we shift the
+    // whole canvas left by the camera offset. This is what makes the
+    // slingshot, structures, bunnies, and the flying carrot all scroll
+    // together as the camera pans to follow the action.
+    ctx.save();
+    ctx.translate(-camera.x, 0);
+
+    drawGroundLayer(dt);
     drawSlingshot();
     blocks.forEach(b => b.draw());
     bunnies.forEach(b => b.draw());
     drawTrajectoryPreview();
     carrots.forEach(c => c.draw());
     updateAndDrawParticles(dt);
+
+    ctx.restore();
+
+    // Screen-fixed UI overlay: a little arrow pointing toward any remaining
+    // bunnies that are currently off-screen, so the player always knows
+    // which way to look.
+    drawOffscreenBunnyHints();
   }
 
   function frame(now) {
@@ -1899,6 +2074,8 @@
   window.addEventListener('resize', () => {
     resizeCanvas();
     initClouds();
+    camera.x = clampCameraX(camera.x);
+    camera.targetX = clampCameraX(camera.targetX);
   });
 
   /* ------------------------------------------------------------------

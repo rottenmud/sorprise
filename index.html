@@ -2,748 +2,2003 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>💕 LOVE QUEST – 6th Monthsary</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Bun's 7th Monthsary Adventure 🐰🥕❤️</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{
-  background:#0d0015;
-  background-image:radial-gradient(ellipse at top,#2a0040 0%,#0d0015 70%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-height:100vh;font-family:'Press Start 2P',monospace;overflow:hidden;
-}
+  /* ============================================================
+     GLOBAL RESET & BASE
+     ============================================================ */
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; overflow: hidden;
+    width: 100%; height: 100%;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', sans-serif;
+    background: linear-gradient(180deg, #FFE6EF 0%, #FFD3E3 35%, #FFEFD9 100%);
+    touch-action: none;
+    user-select: none;
+  }
 
-/* ── SCREEN OVERLAYS ── */
-.screen{
-  position:fixed;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;z-index:200;padding:20px;text-align:center;
-}
-#startScreen{background:#0d0015;background-image:radial-gradient(ellipse at top,#2a0040 0%,#0d0015 70%);}
-#winScreen{display:none;background:rgba(0,0,0,0.96);}
-#winScreen.show{display:flex;animation:fadeIn 1.2s ease;}
-@keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+  #gameContainer {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
 
-/* ── TYPOGRAPHY ── */
-.logo{
-  font-size:clamp(14px,3vw,22px);color:#FFD700;line-height:2;
-  text-shadow:0 0 20px #FFD700,0 0 40px #FF69B4;margin-bottom:8px;
-  animation:glow 2s ease-in-out infinite alternate;
-}
-.sub{font-size:clamp(7px,1.5vw,9px);color:#FF85C0;line-height:2.8;margin:18px 0 26px;}
-.hint{font-size:7px;color:rgba(255,255,255,.3);line-height:2.4;margin-top:20px;}
-@keyframes glow{
-  from{text-shadow:0 0 10px #FFD700;}
-  to{text-shadow:0 0 30px #FFD700,0 0 60px #FF69B4,0 0 90px #FF1493;}
-}
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
 
-/* ── WIN SCREEN ── */
-.win-big{font-size:48px;animation:hb .8s ease-in-out infinite;margin-bottom:14px;}
-@keyframes hb{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
-.win-title{
-  font-size:clamp(11px,2.2vw,17px);color:#FFD700;margin-bottom:22px;line-height:1.9;
-  text-shadow:0 0 20px #FFD700;animation:glow 1.5s ease-in-out infinite alternate;
-}
-.win-msg{
-  font-size:clamp(7px,1.2vw,9px);color:#FFD0E8;line-height:3;
-  max-width:580px;margin-bottom:24px;
-}
-.win-msg em{color:#FF85C0;font-style:normal;}
-.win-hearts{font-size:32px;margin-bottom:26px;}
+  /* ============================================================
+     TOP HUD
+     ============================================================ */
+  #hud {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    z-index: 50;
+    pointer-events: none;
+  }
 
-/* ── BUTTON ── */
-.btn{
-  font-family:'Press Start 2P',monospace;font-size:clamp(8px,1.4vw,11px);
-  background:transparent;border:3px solid #FF69B4;color:#FF69B4;
-  padding:13px 26px;cursor:pointer;transition:all .15s;
-}
-.btn:hover{background:#FF69B4;color:#0d0015;transform:scale(1.06);}
-.blink{animation:bl 1s step-start infinite;}
-@keyframes bl{50%{opacity:.25}}
+  .hud-pill {
+    background: rgba(255, 255, 255, 0.85);
+    border: 3px solid #FFB6D9;
+    border-radius: 30px;
+    padding: 8px 18px;
+    font-weight: bold;
+    color: #D6336C;
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.25);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: auto;
+  }
 
-/* ── GAME WRAPPER ── */
-#gameWrap{
-  display:none;position:relative;
-  border:4px solid #FF69B4;
-  box-shadow:0 0 24px #FF69B4,0 0 55px #7B20CC;
-}
-canvas{display:block;image-rendering:pixelated;}
+  #titleBanner {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 49;
+    pointer-events: none;
+  }
 
-/* ── HUD ── */
-#hud{
-  position:absolute;top:0;left:0;right:0;padding:7px 12px;
-  display:flex;justify-content:space-between;align-items:center;
-  background:linear-gradient(to bottom,rgba(0,0,0,.78),transparent);
-  font-size:8px;color:#fff;text-shadow:1px 1px #000,2px 2px #000;
-  pointer-events:none;z-index:10;
-}
+  #titleBanner h1 {
+    margin: 0;
+    font-size: clamp(14px, 3vw, 22px);
+    color: #C2255C;
+    text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+    letter-spacing: 0.5px;
+  }
 
-/* ── TOUCH ── */
-#touch{
-  position:absolute;bottom:12px;left:0;right:0;
-  display:flex;justify-content:space-between;padding:0 12px;z-index:20;
-}
-.tbtn{
-  width:54px;height:54px;background:rgba(255,255,255,.12);
-  border:2px solid rgba(255,255,255,.35);border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:none;
-}
-#tjump{
-  width:62px;height:62px;background:rgba(255,105,180,.22);
-  border-color:#FF69B4;border-radius:50%;font-size:26px;
-}
-.dpad{display:flex;gap:6px;}
+  #resetBtn {
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+  }
+
+  /* ============================================================
+     BOTTOM HINT
+     ============================================================ */
+  #hint {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.8);
+    border-radius: 20px;
+    padding: 6px 16px;
+    color: #B5476B;
+    font-size: clamp(11px, 2vw, 14px);
+    font-weight: bold;
+    z-index: 50;
+    transition: opacity 0.5s;
+    pointer-events: none;
+  }
+
+  /* ============================================================
+     MODALS — Shared overlay
+     ============================================================ */
+  .overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 200, 220, 0.55);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
+  .overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ---- Win modal (the initial "you did it" card with the open-letter button) ---- */
+  #winModal {
+    background: linear-gradient(160deg, #fff 0%, #FFF0F6 100%);
+    border-radius: 28px;
+    border: 4px solid #FFB6D9;
+    padding: 36px 28px 30px;
+    max-width: 420px;
+    width: 88%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(214, 51, 108, 0.35);
+    transform: scale(0.7) translateY(40px);
+    transition: transform 0.6s cubic-bezier(.34,1.56,.64,1);
+    position: relative;
+  }
+  #winModal.show { transform: scale(1) translateY(0); }
+
+  #winModal .win-emoji {
+    font-size: 52px;
+    display: block;
+    margin-bottom: 6px;
+    animation: bounce-soft 1.6s ease-in-out infinite;
+  }
+  @keyframes bounce-soft {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(-4deg); }
+  }
+
+  #winModal h2 {
+    color: #D6336C;
+    margin: 4px 0 8px;
+    font-size: clamp(20px, 5vw, 26px);
+  }
+
+  #winModal p {
+    color: #92516B;
+    font-size: clamp(13px, 3.2vw, 15px);
+    line-height: 1.5;
+    margin: 0 0 22px;
+  }
+
+  .cute-btn {
+    background: linear-gradient(135deg, #FF8FB1, #FF6F9E);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 28px;
+    font-size: clamp(14px, 3.5vw, 17px);
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 8px 0 #E0507B, 0 12px 18px rgba(224, 80, 123, 0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+  }
+  .cute-btn:active {
+    transform: translateY(6px);
+    box-shadow: 0 2px 0 #E0507B, 0 4px 8px rgba(224, 80, 123, 0.4);
+  }
+
+  .cute-btn-secondary {
+    background: linear-gradient(135deg, #A8D8FF, #7FC1F5);
+    box-shadow: 0 8px 0 #5A9FD4, 0 12px 18px rgba(90, 159, 212, 0.4);
+  }
+  .cute-btn-secondary:active {
+    box-shadow: 0 2px 0 #5A9FD4, 0 4px 8px rgba(90, 159, 212, 0.4);
+  }
+
+  /* ---- Love letter modal ---- */
+  #letterModal {
+    background: #FFFDF8;
+    background-image:
+      radial-gradient(circle at 10% 10%, rgba(255, 182, 217, 0.25) 0%, transparent 40%),
+      radial-gradient(circle at 90% 90%, rgba(168, 216, 255, 0.25) 0%, transparent 40%);
+    border-radius: 18px;
+    border: 3px dashed #FFB6D9;
+    padding: 30px 26px;
+    max-width: 480px;
+    width: 90%;
+    max-height: 86vh;
+    overflow-y: auto;
+    text-align: center;
+    box-shadow: 0 25px 70px rgba(150, 50, 90, 0.4);
+    position: relative;
+    transform: scale(0.8) rotate(-2deg);
+    opacity: 0;
+    transition: transform 0.7s cubic-bezier(.34,1.4,.64,1), opacity 0.7s ease;
+  }
+  #letterModal.show {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+
+  #letterModal::-webkit-scrollbar { width: 8px; }
+  #letterModal::-webkit-scrollbar-thumb { background: #FFB6D9; border-radius: 10px; }
+
+  .letter-deco-corner {
+    position: absolute;
+    font-size: 26px;
+    opacity: 0.8;
+    pointer-events: none;
+  }
+  .tl { top: 6px; left: 8px; transform: rotate(-15deg); }
+  .tr { top: 6px; right: 8px; transform: rotate(15deg) scaleX(-1); }
+  .bl { bottom: 6px; left: 8px; transform: rotate(15deg); }
+  .br { bottom: 6px; right: 8px; transform: rotate(-15deg) scaleX(-1); }
+
+  #letterHeader {
+    font-size: 34px;
+    margin-bottom: 4px;
+  }
+
+  #letterTitle {
+    color: #D6336C;
+    font-size: clamp(18px, 4.5vw, 23px);
+    margin: 4px 0 18px;
+    font-weight: bold;
+  }
+
+  #letterText {
+    text-align: left;
+    color: #6B4255;
+    font-size: clamp(13px, 3.2vw, 15.5px);
+    line-height: 1.85;
+    white-space: pre-wrap;
+    min-height: 220px;
+    font-family: 'Segoe UI', 'Trebuchet MS', sans-serif;
+  }
+
+  #letterCursor {
+    display: inline-block;
+    width: 2px;
+    background: #D6336C;
+    animation: blink 0.8s steps(1) infinite;
+    margin-left: 1px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  #skipTypingBtn {
+    background: none;
+    border: 1.5px solid #FFB6D9;
+    color: #D6336C;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 14px;
+    font-family: inherit;
+    opacity: 0.8;
+  }
+
+  #loveYouTooWrap {
+    margin-top: 22px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #musicNote {
+    font-size: 11px;
+    color: #A8779A;
+    margin-top: 6px;
+  }
+
+  /* ============================================================
+     SLINGSHOT AIM TRAJECTORY DOTS handled in canvas
+     ============================================================ */
+
+  /* ============================================================
+     FLOATING DOM HEARTS (used for celebration + endless hearts)
+     ============================================================ */
+  #heartLayer {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 300;
+    overflow: hidden;
+  }
+  .floaty-heart {
+    position: absolute;
+    bottom: -40px;
+    font-size: 22px;
+    opacity: 0.9;
+    animation-name: floatUp;
+    animation-timing-function: ease-in;
+    animation-fill-mode: forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0) translateX(0) rotate(0deg) scale(0.6); opacity: 0; }
+    10% { opacity: 1; }
+    100% { transform: translateY(-110vh) translateX(var(--drift, 30px)) rotate(var(--spin, 25deg)) scale(1.1); opacity: 0; }
+  }
+
+  .confetti-piece {
+    position: absolute;
+    top: -20px;
+    width: 9px;
+    height: 14px;
+    opacity: 0.95;
+    animation-name: confettiFall;
+    animation-timing-function: cubic-bezier(.25,.46,.45,.94);
+    animation-fill-mode: forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(115vh) rotate(720deg); opacity: 0.3; }
+  }
+
+  .sparkle-piece {
+    position: absolute;
+    font-size: 16px;
+    animation-name: sparklePop;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+  }
+  @keyframes sparklePop {
+    0% { transform: scale(0) rotate(0deg); opacity: 1; }
+    60% { transform: scale(1.3) rotate(180deg); opacity: 1; }
+    100% { transform: scale(0.4) rotate(360deg); opacity: 0; }
+  }
+
+  /* ============================================================
+     SCORE POPUP (canvas-adjacent floating text, made via DOM)
+     ============================================================ */
+  .score-popup {
+    position: absolute;
+    color: #D6336C;
+    font-weight: bold;
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 60;
+    animation: scorePop 1s ease-out forwards;
+    text-shadow: 1px 1px 0 #fff;
+  }
+  @keyframes scorePop {
+    0% { transform: translateY(0) scale(0.7); opacity: 0; }
+    20% { transform: translateY(-10px) scale(1.2); opacity: 1; }
+    100% { transform: translateY(-60px) scale(1); opacity: 0; }
+  }
+
+  /* ============================================================
+     MUTE BUTTON
+     ============================================================ */
+  #muteBtn {
+    cursor: pointer;
+    background: rgba(255,255,255,0.85);
+    border: 3px solid #FFB6D9;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(255,105,180,0.25);
+    pointer-events: auto;
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 480px) {
+    .hud-pill { font-size: 13px; padding: 6px 12px; }
+    #muteBtn { width: 36px; height: 36px; font-size: 15px; }
+  }
 </style>
 </head>
 <body>
 
-<!-- ══ START ══ -->
-<div class="screen" id="startScreen">
-  <div class="logo">💕 LOVE QUEST 💕<br>6TH MONTHSARY</div>
-  <div class="sub">
-    Collect 6 hearts ❤️<br>
-    Stomp the baddies 👾<br>
-    Grab speed rings ⚡<br>
-    Reach the Goal Shrine 🏰<br>
-    Find the secret message 💌
-  </div>
-  <button class="btn blink" id="startBtn">► PRESS START ◄</button>
-  <div class="hint">
-    ← → / A D · MOVE<br>
-    SPACE / ↑ · JUMP &nbsp;(double-jump OK!)<br>
-    Touch buttons on mobile 📱
-  </div>
-</div>
+<div id="gameContainer">
+  <canvas id="gameCanvas"></canvas>
 
-<!-- ══ GAME ══ -->
-<div id="gameWrap">
-  <canvas id="c" width="800" height="420"></canvas>
+  <!-- HUD -->
+  <div id="titleBanner">
+    <h1>🐰 Bun's 7th Monthsary Adventure 🥕❤️</h1>
+  </div>
+
   <div id="hud">
-    <span id="hH">❤️ 0 / 6</span>
-    <span id="hL">💕 LOVE WORLD 1-6 💕</span>
-    <span id="hS">SCORE: 0</span>
+    <div class="hud-pill">🥕 <span id="carrotCount">0</span> left</div>
+    <div class="hud-pill">⭐ Score: <span id="scoreCount">0</span></div>
+    <div class="hud-pill" id="muteBtn">🔊</div>
   </div>
-  <div id="touch">
-    <div class="dpad">
-      <div class="tbtn" id="tl">◀</div>
-      <div class="tbtn" id="tr">▶</div>
-    </div>
-    <div class="tbtn" id="tjump">🐇</div>
-  </div>
-</div>
 
-<!-- ══ WIN ══ -->
-<div class="screen" id="winScreen">
-  <div class="win-big">💖</div>
-  <div class="win-title">🎉 HAPPY 6TH MONTHSARY! 🎉</div>
-  <div class="win-msg" id="winMsg"></div>
-  <div class="win-hearts">💖 💕 💖 💕 💖 💕</div>
-  <button class="btn" onclick="location.reload()">↩ PLAY AGAIN 🐰</button>
+  <div id="hint">Drag the carrot back, then let go to launch! 🐰</div>
+
+  <!-- Floating hearts / confetti / sparkles layer -->
+  <div id="heartLayer"></div>
+
+  <!-- WIN MODAL -->
+  <div class="overlay" id="winOverlay">
+    <div id="winModal">
+      <span class="win-emoji">🥰🐰💕</span>
+      <h2>You fixed it all, Bun!</h2>
+      <p>Every grumpy bunny turned happy again — just like every misunderstanding we worked through together. There's a little something waiting for you...</p>
+      <button class="cute-btn" id="openMessageBtn">💌 Open This Message</button>
+    </div>
+  </div>
+
+  <!-- LETTER MODAL -->
+  <div class="overlay" id="letterOverlay">
+    <div id="letterModal">
+      <span class="letter-deco-corner tl">🐰</span>
+      <span class="letter-deco-corner tr">🥕</span>
+      <span class="letter-deco-corner bl">🌷</span>
+      <span class="letter-deco-corner br">🐻</span>
+      <div id="letterHeader">💌</div>
+      <div id="letterTitle">A Little Letter For You</div>
+      <div id="letterText"><span id="letterCursor"></span></div>
+      <button id="skipTypingBtn">Skip ⏩</button>
+      <div id="loveYouTooWrap">
+        <button class="cute-btn" id="loveYouTooBtn">🐰 I Love You Too</button>
+        <div id="musicNote">🎵 playing a little tune for you...</div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
-// ════════════════════════════════════════════════
-//  LOVE QUEST  –  6th Monthsary Platformer
-//  Fixed & Finalized
-// ════════════════════════════════════════════════
+/* ====================================================================
+   BUN'S 7TH MONTHSARY ADVENTURE
+   A handmade Angry-Birds-style game where every "angry bunny" you turn
+   happy represents a misunderstanding healed together. <3
 
-const canvas = document.getElementById('c');
-const ctx    = canvas.getContext('2d');
-ctx.imageSmoothingEnabled = false;
-const W = 800, H = 420;
+   Everything below is self-contained: no external assets, fonts,
+   images, or sound files — all visuals are drawn on canvas, and all
+   sound is synthesized live with the Web Audio API.
+   ==================================================================== */
 
-// ── Win message ─────────────────────────────────
-document.getElementById('winMsg').innerHTML = `
-Hello bunn, happy 6th monthsaryyy sa atin! 🎉<br>
-Kalahating buwan naden pala tau noh 🥹<br>
-Sa wa bakasyon na din! 🏖️<br><br>
-Sobrang proud ako sau kasi naipasa mo<br>
-lahat ng pagsubok at requirements mo. 🎓✨<br>
-Deserve na deserve mo talagang mag-relax<br>
-at mag-enjoy ngayon. 🛌💆‍♀️<br><br>
-Pero bago ang lahat, ang priority natin ngayon<br>
-ay ang health mo. 🏥💊 Sana talaga gumaling ka<br>
-nang tuluyan at malessen na 'yang asthma mo. 🫁<br>
-Nag-aalala ako sau palagi mula rito,<br>
-kaya please alagaan mo ang sarili mo. 🙏🥺<br><br>
-Tas subukan mo din magtake ng rabbitusin<br>
-pag inuubo ka... charezz 😂🐰💊<br>
-Baka naman effective, bunny ka pa naman natin!<br><br>
-Kahit mahirap ang LDR at madalas laro lang<br>
-ang bonding natin, 🎮 thankful ako<br>
-kasi ikaw ang bunn ko. 💝<br>
-Konting tiis lang sa distansya ha? 📍<br>
-Kahit malayo tayo, palagi lang akong<br>
-nandito para sau. 💕<br><br>
-<em>I love you always, cutiee! 💖🐰</em>
-`;
+(function () {
+  'use strict';
 
-// ── Audio ────────────────────────────────────────
-let AC;
-try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){}
-function tone(f,d,type='square',vol=0.07,delay=0){
-  if(!AC) return;
-  try{
-    const o=AC.createOscillator(), g=AC.createGain();
-    o.connect(g); g.connect(AC.destination);
-    o.type=type; o.frequency.value=f;
-    const t=AC.currentTime+delay;
-    g.gain.setValueAtTime(vol,t);
-    g.gain.exponentialRampToValueAtTime(0.0001,t+d);
-    o.start(t); o.stop(t+d);
-  }catch(e){}
-}
-const sfx={
-  jump:   ()=>{tone(380,.04);tone(540,.07,undefined,undefined,.03);},
-  dbl:    ()=>{tone(700,.06,'sine');tone(950,.06,'sine',undefined,.04);},
-  collect:()=>[800,1050,1300,1600].forEach((f,i)=>tone(f,.08,'sine',.12,i*.04)),
-  ring:   ()=>tone(1500,.07,'sine',.1),
-  stomp:  ()=>{tone(160,.15,'sawtooth',.1);},
-  hurt:   ()=>{tone(110,.25,'sawtooth',.11);},
-  win:    ()=>{const m=[523,659,784,1047,880,1047,1319,1047,1319,1568];m.forEach((f,i)=>tone(f,.25,'sine',.18,i*.18));},
-};
-const BG=[262,330,392,330,262,330,523,392,349,440,523,440,349,440,698,523,
-          294,370,440,370,294,370,587,440,392,494,587,494,392,494,784,587];
-let bgI=0,bgTimer=null;
-function startMusic(){ bgTimer=setInterval(()=>{ tone(BG[bgI%BG.length],.18,'triangle',.04); bgI++; },250); }
+  /* ------------------------------------------------------------------
+     0. CANVAS + RESPONSIVE SETUP
+     ------------------------------------------------------------------ */
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
 
-// ── Input ────────────────────────────────────────
-const keys={};
-addEventListener('keydown',e=>{
-  keys[e.code]=true;
-  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)) e.preventDefault();
-});
-addEventListener('keyup',e=>{ keys[e.code]=false; });
+  let DPR = Math.min(window.devicePixelRatio || 1, 2);
+  let W = 0, H = 0; // logical (CSS pixel) size
 
-// Touch – proper pointer events to avoid stuck state
-let tL=false,tR=false,tJ=false;
-function bindBtn(id,setter){
-  const el=document.getElementById(id);
-  if(!el) return;
-  el.addEventListener('pointerdown', e=>{ e.preventDefault(); el.setPointerCapture(e.pointerId); setter(true);  });
-  el.addEventListener('pointerup',   e=>{ e.preventDefault(); setter(false); });
-  el.addEventListener('pointercancel',e=>{ setter(false); });
-}
-bindBtn('tl',v=>tL=v);
-bindBtn('tr',v=>tR=v);
-bindBtn('tjump',v=>tJ=v);
-
-// ── Jump: rising-edge detection ──────────────────
-// Prevents auto-repeat when key is held
-let prevJumpDown=false;
-function consumeJump(){
-  const down=!!(keys['Space']||keys['ArrowUp']||keys['KeyW']||tJ);
-  const edge=down&&!prevJumpDown;
-  prevJumpDown=down;
-  return edge;
-}
-
-// ── Level geometry ───────────────────────────────
-const GY=382; // ground top y
-
-// Static platforms {x,y,w,h,s}  s=style: dirt|gold|ice
-const SPLATS=[
-  // Ground chunks
-  {x:0,   y:GY,w:620,h:38,s:'dirt'},
-  {x:690, y:GY,w:480,h:38,s:'dirt'},
-  {x:1260,y:GY,w:540,h:38,s:'dirt'},
-  {x:1900,y:GY,w:440,h:38,s:'dirt'},
-  {x:2440,y:GY,w:660,h:38,s:'dirt'},
-  {x:3200,y:GY,w:900,h:38,s:'dirt'},
-  // Floating
-  {x:190, y:315,w:80, h:14,s:'dirt'},
-  {x:330, y:275,w:80, h:14,s:'dirt'},
-  {x:470, y:235,w:80, h:14,s:'dirt'},
-  {x:720, y:320,w:80, h:14,s:'dirt'},
-  {x:850, y:278,w:80, h:14,s:'dirt'},
-  {x:990, y:238,w:80, h:14,s:'dirt'},
-  {x:1110,y:285,w:80, h:14,s:'dirt'},
-  {x:1370,y:295,w:90, h:14,s:'dirt'},
-  {x:1520,y:255,w:90, h:14,s:'dirt'},
-  {x:1670,y:210,w:90, h:14,s:'dirt'},
-  // Staircase
-  {x:2010,y:348,w:55, h:14,s:'dirt'},
-  {x:2080,y:318,w:55, h:14,s:'dirt'},
-  {x:2150,y:288,w:55, h:14,s:'dirt'},
-  {x:2220,y:258,w:55, h:14,s:'dirt'},
-  {x:2290,y:228,w:55, h:14,s:'dirt'},
-  {x:2360,y:198,w:55, h:14,s:'dirt'},
-  // Bridge section
-  {x:2540,y:318,w:110,h:14,s:'dirt'},
-  {x:2720,y:275,w:110,h:14,s:'dirt'},
-  {x:2900,y:235,w:110,h:14,s:'dirt'},
-  {x:3080,y:275,w:110,h:14,s:'dirt'},
-  // Golden final approach
-  {x:3310,y:310,w:90, h:14,s:'gold'},
-  {x:3460,y:270,w:90, h:14,s:'gold'},
-  {x:3610,y:230,w:90, h:14,s:'gold'},
-  {x:3760,y:185,w:130,h:14,s:'gold'},
-];
-
-// Moving platforms {x,y,w,h,s,baseX,range,dx}
-const MPLATS=[
-  {x:635, y:335,w:80,h:14,s:'ice',baseX:635, range:60, dx:1.5},
-  {x:1200,y:260,w:80,h:14,s:'ice',baseX:1200,range:80, dx:1.2},
-  {x:2420,y:250,w:75,h:14,s:'ice',baseX:2420,range:60, dx:1.8},
-  {x:3155,y:260,w:80,h:14,s:'ice',baseX:3155,range:75, dx:2.0},
-];
-
-// Hearts
-const HEARTS=[
-  {x:498,y:207},
-  {x:882,y:248},
-  {x:1540,y:225},
-  {x:2250,y:198},
-  {x:2928,y:205},
-  {x:3790,y:155},
-].map(h=>({...h,done:false}));
-
-// Speed rings {x,y}
-const RINGS=[
-  {x:230,y:290},{x:260,y:290},{x:290,y:290},
-  {x:1000,y:208},{x:1030,y:208},{x:1060,y:208},
-  {x:2560,y:288},{x:2590,y:288},{x:2620,y:288},
-  {x:3470,y:240},{x:3500,y:240},{x:3530,y:240},
-];
-const ringHit=new Set();
-
-// Enemies
-const ENEMIES=[
-  {x:280, y:GY-24,w:26,h:24,vx:1.0,baseX:230,range:130,alive:true},
-  {x:800, y:GY-24,w:26,h:24,vx:1.2,baseX:760,range:100,alive:true},
-  {x:1400,y:GY-24,w:26,h:24,vx:1.1,baseX:1340,range:120,alive:true},
-  {x:1690,y:188,  w:26,h:24,vx:1.0,baseX:1670,range:80, alive:true},
-  {x:2630,y:GY-24,w:26,h:24,vx:1.6,baseX:2540,range:160,alive:true},
-  {x:3260,y:GY-24,w:26,h:24,vx:1.5,baseX:3200,range:160,alive:true},
-];
-
-// Goal position
-const GOAL_X=3950;
-
-// ── Player ───────────────────────────────────────
-const P={
-  x:80, y:340, w:22, h:28,
-  vx:0, vy:0,
-  onGround:false, jumpsLeft:2,
-  facing:1, walkTick:0,
-  invincible:0, speedBoost:0,
-};
-
-// ── Particles ────────────────────────────────────
-const PARTS=[];
-function burst(x,y,color,n=10){
-  for(let i=0;i<n;i++){
-    PARTS.push({x,y,vx:(Math.random()-.5)*5,vy:(Math.random()-2.5)*3,
-      life:1,decay:.025+Math.random()*.015,color,sz:Math.random()*5+2});
+  function resizeCanvas() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   }
-}
+  resizeCanvas();
 
-// ── Camera & state ───────────────────────────────
-let camX=0,tick=0,score=0,heartsGot=0,won=false,running=false;
+  /* ------------------------------------------------------------------
+     1. SOUND ENGINE (Web Audio API — fully synthesized, no files)
+     ------------------------------------------------------------------ */
+  const SoundEngine = (function () {
+    let actx = null;
+    let muted = false;
+    let musicNodes = null;
 
-// ══════════════════════════════════════════════════
-//  DRAWING
-// ══════════════════════════════════════════════════
-
-function platStyle(s){
-  if(s==='gold') return{top:'#FFE44A',mid:'#D49000',bot:'#7A4A00'};
-  if(s==='ice')  return{top:'#C0EEFF',mid:'#50AAEE',bot:'#1A70CC'};
-  return               {top:'#4CC44C',mid:'#7B4010',bot:'#3A1C00'};
-}
-function drawPlat(x,y,w,h,s){
-  const c=platStyle(s);
-  ctx.fillStyle=c.mid; ctx.fillRect(x,y,w,h);
-  ctx.fillStyle=c.top; ctx.fillRect(x,y,w,Math.min(5,h));
-  ctx.fillStyle='rgba(255,255,255,.22)'; ctx.fillRect(x,y,3,h);
-  ctx.fillStyle=c.bot; ctx.fillRect(x+w-3,y,3,h); ctx.fillRect(x,y+h-3,w,3);
-  if(h>16){
-    ctx.fillStyle='rgba(0,0,0,.12)';
-    for(let bx=x+28;bx<x+w;bx+=28) ctx.fillRect(bx,y+6,1,h-6);
-    ctx.fillRect(x,y+h*.5|0,w,1);
-  }
-}
-
-function drawBunny(x,y){
-  const inv=P.invincible, f=P.facing;
-  if(inv>0&&Math.floor(inv/5)%2===1) return;
-
-  // shadow
-  ctx.fillStyle='rgba(0,0,0,.2)';
-  ctx.fillRect(x+3,y+P.h+1,P.w-6,4);
-
-  // body
-  ctx.fillStyle='#FF80BC'; ctx.fillRect(x+3,y+10,16,14);
-  ctx.fillStyle='#FFC0DE'; ctx.fillRect(x+5,y+12,12,10);
-  ctx.fillStyle='#FFD8EE'; ctx.fillRect(x+7,y+15,8,6);
-
-  // head
-  ctx.fillStyle='#FF80BC'; ctx.fillRect(x+3,y+1,16,12);
-  ctx.fillStyle='#FFC0DE'; ctx.fillRect(x+5,y+2,12,10);
-
-  // ears
-  ctx.fillStyle='#FF80BC';
-  ctx.fillRect(x+5, y-11,5,13); ctx.fillRect(x+12,y-11,5,13);
-  ctx.fillStyle='#FF4090';
-  ctx.fillRect(x+6, y-9, 3,9);  ctx.fillRect(x+13,y-9, 3,9);
-
-  // eye
-  const ex=f===1?x+13:x+5;
-  ctx.fillStyle='#180808'; ctx.fillRect(ex,y+4,4,4);
-  ctx.fillStyle='#fff';    ctx.fillRect(ex+1,y+4,1,1);
-  // blush
-  ctx.fillStyle='rgba(255,80,100,.3)';
-  ctx.fillRect(x+3,y+7,5,3); ctx.fillRect(x+14,y+7,5,3);
-  // nose
-  ctx.fillStyle='#FF1870'; ctx.fillRect(x+8,y+8,6,2);
-
-  // tail
-  ctx.fillStyle='#fff';
-  const tx=f===1?x:x+12; ctx.fillRect(tx,y+13,8,8);
-
-  // legs
-  const mv=P.onGround&&Math.abs(P.vx)>.5;
-  const lf=mv?Math.floor(P.walkTick/7)%2:0;
-  ctx.fillStyle='#FF80BC';
-  ctx.fillRect(x+4, y+22,7,5+lf);
-  ctx.fillRect(x+11,y+22,7,5+(1-lf));
-
-  // speed lines
-  if(Math.abs(P.vx)>5){
-    ctx.fillStyle='rgba(255,255,180,.3)';
-    for(let i=1;i<=4;i++) ctx.fillRect(x-f*i*8,y+12,6,2);
-  }
-}
-
-function drawEnemy(e){
-  const x=(e.x-camX)|0, y=e.y|0;
-  ctx.fillStyle='#6B2B00'; ctx.fillRect(x+2,y+8,e.w-4,e.h-8);
-  ctx.fillStyle='#9B4020'; ctx.fillRect(x,y+2,e.w,e.h/2+4);
-  ctx.fillStyle='#B83020'; ctx.fillRect(x-2,y,e.w+4,10);
-  ctx.fillStyle='#D04030'; ctx.fillRect(x+2,y+1,4,3); ctx.fillRect(x+16,y+1,4,3);
-  ctx.fillStyle='#fff'; ctx.fillRect(x+4,y+4,5,5); ctx.fillRect(x+13,y+4,5,5);
-  ctx.fillStyle='#000'; ctx.fillRect(x+6,y+5,3,3); ctx.fillRect(x+14,y+5,3,3);
-  ctx.fillStyle='#000'; ctx.fillRect(x+3,y+3,7,2); ctx.fillRect(x+13,y+3,7,2);
-  ctx.fillStyle='#4A1800'; ctx.fillRect(x,y+e.h-5,11,5); ctx.fillRect(x+e.w-11,y+e.h-5,11,5);
-}
-
-function drawHeart(cx,cy){
-  const bob=Math.sin(tick*.04)*3|0;
-  const px=cx|0, py=(cy+bob)|0, ps=3;
-  const m=[[0,1,1,0,1,1,0],[1,1,1,1,1,1,1],[1,1,1,1,1,1,1],[0,1,1,1,1,1,0],[0,0,1,1,1,0,0],[0,0,0,1,0,0,0]];
-  m.forEach((row,r)=>row.forEach((c,col)=>{
-    if(!c) return;
-    ctx.fillStyle=r<2?'#FF2255':'#EE0040';
-    ctx.fillRect(px+col*ps,py+r*ps,ps,ps);
-  }));
-  ctx.fillStyle='#FF80A0'; ctx.fillRect(px+ps,py,ps,ps);
-}
-
-function drawRing(x,y){
-  const rx=(x-camX)|0, bob=Math.sin(tick*.07+x)*3|0;
-  ctx.strokeStyle='#FFD700'; ctx.lineWidth=3;
-  ctx.beginPath(); ctx.arc(rx+8,y+8+bob,8,0,Math.PI*2); ctx.stroke();
-  ctx.strokeStyle='#FFA000'; ctx.lineWidth=1;
-  ctx.beginPath(); ctx.arc(rx+8,y+8+bob,5,0,Math.PI*2); ctx.stroke();
-  ctx.fillStyle='#FFFFAA'; ctx.fillRect(rx+5,y+4+bob,3,2);
-}
-
-function drawGoal(){
-  const x=(GOAL_X-camX)|0, baseY=GY-140;
-  // Base
-  ctx.fillStyle='#C09000'; ctx.fillRect(x-18,baseY+80,100,140+38);
-  ctx.fillStyle='#E0B000'; ctx.fillRect(x-18,baseY+70,100,14);
-  for(let i=0;i<4;i++) ctx.fillRect(x-18+i*26,baseY+60,18,16);
-  // Pole
-  ctx.fillStyle='#D8D8D8'; ctx.fillRect(x+22,baseY-100,5,190);
-  // Flag wave
-  const wv=Math.sin(tick*.12)*7;
-  ctx.fillStyle='#FF69B4';
-  ctx.beginPath();
-  ctx.moveTo(x+27,baseY-100); ctx.lineTo(x+27+38+wv,baseY-84);
-  ctx.lineTo(x+27+38-wv,baseY-64); ctx.lineTo(x+27,baseY-48); ctx.fill();
-  // Heart on flag
-  ctx.fillStyle='#FFD700';
-  [[0,1,0],[1,1,1],[0,1,0]].forEach((row,r)=>row.forEach((c,col)=>{
-    if(c) ctx.fillRect(x+35+col*8,baseY-94+r*7,7,6);
-  }));
-  // Label
-  ctx.fillStyle='#FFD700'; ctx.font='9px "Press Start 2P"';
-  ctx.textAlign='center'; ctx.fillText('GOAL! 💕',x+22,baseY-112); ctx.textAlign='left';
-}
-
-function drawBG(){
-  const sky=ctx.createLinearGradient(0,0,0,H);
-  sky.addColorStop(0,'#0a001c'); sky.addColorStop(.55,'#28004A'); sky.addColorStop(1,'#08180A');
-  ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
-
-  // Stars
-  const ST=[[30,20],[90,55],[170,15],[260,48],[380,22],[470,62],[560,28],[680,18],
-            [130,80],[310,38],[510,70],[610,45],[740,58],[420,10],[220,75],[760,25],[50,90]];
-  ST.forEach(([sx,sy])=>{
-    const bx=((sx-camX*.08)%W+W)%W;
-    const t=Math.sin(tick*.04+sx)*.5+.5;
-    ctx.fillStyle=`rgba(255,230,255,${.3+t*.7})`; ctx.fillRect(bx|0,sy,2,2);
-  });
-
-  // Hills
-  ctx.fillStyle='#162A18';
-  const ho=-(camX*.2)%600;
-  for(let i=-1;i<=3;i++){
-    ctx.beginPath(); ctx.moveTo(ho+i*600,H);
-    ctx.quadraticCurveTo(ho+i*600+150,270,ho+i*600+300,H); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(ho+i*600+200,H);
-    ctx.quadraticCurveTo(ho+i*600+370,240,ho+i*600+500,H); ctx.fill();
-  }
-
-  // Clouds
-  ctx.fillStyle='rgba(255,200,230,.15)';
-  [[60,60],[280,45],[540,75],[800,50],[1060,68]].forEach(([cx,cy])=>{
-    const bx=((cx-camX*.4)%(W+200)+W+200)%(W+200)-100;
-    ctx.fillRect(bx,cy,72,22); ctx.fillRect(bx+10,cy-14,52,18); ctx.fillRect(bx-8,cy+6,24,14);
-  });
-}
-
-// ══════════════════════════════════════════════════
-//  PHYSICS UPDATE (two-pass X then Y)
-// ══════════════════════════════════════════════════
-
-function aabb(ax,ay,aw,ah,bx,by,bw,bh){
-  return ax<bx+bw&&ax+aw>bx&&ay<by+bh&&ay+ah>by;
-}
-
-function update(){
-  if(!running||won) return;
-  tick++;
-
-  // Input
-  const left  =!!(keys['ArrowLeft'] ||keys['KeyA']||tL);
-  const right =!!(keys['ArrowRight']||keys['KeyD']||tR);
-  const jumped=consumeJump(); // only true on rising edge
-
-  const topSpd=P.speedBoost>0?6.5:4.2;
-  const accel =P.speedBoost>0?1.2:.85;
-  if(P.speedBoost>0) P.speedBoost--;
-
-  if(right){P.vx+=accel; P.facing=1;}
-  else if(left){P.vx-=accel; P.facing=-1;}
-  else P.vx*=.72;
-  P.vx=Math.max(-topSpd,Math.min(topSpd,P.vx));
-
-  // Jump
-  if(jumped&&P.jumpsLeft>0){
-    P.vy=-12.5; P.jumpsLeft--;
-    P.jumpsLeft===1?sfx.jump():sfx.dbl();
-    burst(P.x+P.w/2,P.y+P.h,'#FF80BC',6);
-  }
-
-  // Gravity
-  P.vy=Math.min(P.vy+.55,18);
-
-  // ── X pass ─────────────────────────────────────
-  P.x+=P.vx;
-  P.x=Math.max(0,P.x);
-  const allP=[...SPLATS,...MPLATS];
-  allP.forEach(pl=>{
-    if(!aabb(P.x,P.y,P.w,P.h,pl.x,pl.y,pl.w,pl.h)) return;
-    if(P.vx>0) P.x=pl.x-P.w;
-    else if(P.vx<0) P.x=pl.x+pl.w;
-    P.vx=0;
-  });
-
-  // ── Y pass ─────────────────────────────────────
-  P.onGround=false;
-  P.y+=P.vy;
-  allP.forEach(pl=>{
-    if(!aabb(P.x,P.y,P.w,P.h,pl.x,pl.y,pl.w,pl.h)) return;
-    if(P.vy>0&&P.y+P.h-P.vy<=pl.y+2){
-      P.y=pl.y-P.h; P.vy=0; P.onGround=true; P.jumpsLeft=2;
-    } else if(P.vy<0&&P.y-P.vy>=pl.y+pl.h-2){
-      P.y=pl.y+pl.h; P.vy=0;
+    function ensureCtx() {
+      if (!actx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        actx = new AC();
+      }
+      if (actx.state === 'suspended') actx.resume();
+      return actx;
     }
-  });
 
-  // Fell off
-  if(P.y>H+80){ P.x=80;P.y=340;P.vx=0;P.vy=0; score=Math.max(0,score-100); sfx.hurt(); }
-
-  P.walkTick++;
-
-  // Moving platforms
-  MPLATS.forEach(mp=>{
-    mp.x+=mp.dx;
-    if(mp.x>mp.baseX+mp.range||mp.x<mp.baseX-mp.range) mp.dx*=-1;
-  });
-
-  // Enemies
-  ENEMIES.forEach(e=>{
-    if(!e.alive) return;
-    e.x+=e.vx;
-    if(e.x>e.baseX+e.range||e.x<e.baseX) e.vx*=-1;
-    if(P.invincible>0) return;
-    if(!aabb(P.x,P.y,P.w,P.h,e.x,e.y,e.w,e.h)) return;
-    // stomp: player falling and feet above enemy center
-    if(P.vy>0&&P.y+P.h<e.y+e.h*.6+8){
-      e.alive=false; P.vy=-10; score+=100;
-      burst(e.x+e.w/2,e.y,'#B83020',12); sfx.stomp();
-    } else {
-      P.invincible=75; P.vx=P.x<e.x?-5:5; P.vy=-7;
-      score=Math.max(0,score-50); sfx.hurt();
-      burst(P.x+P.w/2,P.y+P.h/2,'#FF0040',8);
+    // Generic tone helper: frequency sweep + envelope
+    function tone(freqStart, freqEnd, duration, type, volume, delay) {
+      if (muted) return;
+      try {
+        const ac = ensureCtx();
+        const t0 = ac.currentTime + (delay || 0);
+        const osc = ac.createOscillator();
+        const gain = ac.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freqStart, t0);
+        osc.frequency.exponentialRampToValueAtTime(Math.max(freqEnd, 1), t0 + duration);
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.exponentialRampToValueAtTime(volume, t0 + duration * 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+        osc.connect(gain);
+        gain.connect(ac.destination);
+        osc.start(t0);
+        osc.stop(t0 + duration + 0.05);
+      } catch (e) { /* audio not available, fail silently */ }
     }
-  });
 
-  // Collect hearts
-  HEARTS.forEach(h=>{
-    if(h.done) return;
-    if(aabb(P.x,P.y,P.w,P.h,h.x-11,h.y-10,38,38)){
-      h.done=true; heartsGot++; score+=200;
-      burst(h.x,h.y,'#FF0040',14); sfx.collect();
+    // Launch "twang" sound
+    function playLaunch() {
+      tone(180, 520, 0.18, 'triangle', 0.18, 0);
+      tone(90, 260, 0.18, 'sine', 0.12, 0.02);
     }
-  });
 
-  // Collect rings
-  RINGS.forEach((r,i)=>{
-    if(ringHit.has(i)) return;
-    if(aabb(P.x,P.y,P.w,P.h,r.x,r.y,16,16)){
-      ringHit.add(i); P.speedBoost=70; score+=50;
-      burst(r.x,r.y,'#FFD700',8); sfx.ring();
+    // Soft "boing" impact sound
+    function playHit() {
+      tone(260, 90, 0.18, 'square', 0.14, 0);
     }
+
+    // Cute upward "sparkle" chime when a bunny turns happy
+    function playTransform() {
+      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 E5 G5 C6
+      notes.forEach((f, i) => tone(f, f * 1.02, 0.32, 'sine', 0.13, i * 0.07));
+    }
+
+    // Whoosh for trajectory feedback (very soft, optional flourish)
+    function playPop() {
+      tone(700, 1400, 0.08, 'sine', 0.06, 0);
+    }
+
+    // Big fanfare for winning the whole level
+    function playWinFanfare() {
+      const melody = [523.25, 587.33, 659.25, 783.99, 880, 1046.5];
+      melody.forEach((f, i) => tone(f, f, 0.4, 'triangle', 0.16, i * 0.13));
+    }
+
+    // Gentle wood-block "thud" for structure collapse
+    function playThud() {
+      tone(150, 60, 0.12, 'square', 0.08, 0);
+    }
+
+    // ---- Background romantic music (simple generative loop) ----
+    function startMusic() {
+      if (muted) return;
+      stopMusic();
+      try {
+        const ac = ensureCtx();
+        const master = ac.createGain();
+        master.gain.value = 0.08;
+        master.connect(ac.destination);
+
+        // A gentle, slow arpeggio loop in a major scale — like a music box.
+        const scale = [523.25, 587.33, 659.25, 698.46, 783.99, 880, 987.77, 1046.5];
+        const pattern = [0, 2, 4, 2, 1, 3, 5, 3, 0, 4, 2, 0]; // indices into scale
+        let step = 0;
+        const stepDur = 0.45;
+
+        function scheduleStep() {
+          if (!musicNodes || musicNodes.stopped) return;
+          const ac2 = ensureCtx();
+          const t0 = ac2.currentTime + 0.05;
+          const idx = pattern[step % pattern.length];
+          const freq = scale[idx];
+
+          const osc = ac2.createOscillator();
+          const gain = ac2.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.0001, t0);
+          gain.gain.exponentialRampToValueAtTime(0.22, t0 + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t0 + stepDur * 0.95);
+          osc.connect(gain);
+          gain.connect(master);
+          osc.start(t0);
+          osc.stop(t0 + stepDur);
+
+          // soft underlying pad every 4 steps
+          if (step % 4 === 0) {
+            const padOsc = ac2.createOscillator();
+            const padGain = ac2.createGain();
+            padOsc.type = 'triangle';
+            padOsc.frequency.value = freq / 2;
+            padGain.gain.setValueAtTime(0.0001, t0);
+            padGain.gain.exponentialRampToValueAtTime(0.06, t0 + 0.3);
+            padGain.gain.exponentialRampToValueAtTime(0.0001, t0 + stepDur * 4 * 0.9);
+            padOsc.connect(padGain);
+            padGain.connect(master);
+            padOsc.start(t0);
+            padOsc.stop(t0 + stepDur * 4);
+          }
+
+          step++;
+        }
+
+        const intervalId = setInterval(scheduleStep, stepDur * 1000);
+        scheduleStep();
+        musicNodes = { master, intervalId, stopped: false };
+      } catch (e) { /* ignore */ }
+    }
+
+    function stopMusic() {
+      if (musicNodes) {
+        clearInterval(musicNodes.intervalId);
+        musicNodes.stopped = true;
+        try { musicNodes.master.disconnect(); } catch (e) {}
+        musicNodes = null;
+      }
+    }
+
+    function setMuted(m) {
+      muted = m;
+      if (muted) stopMusic();
+    }
+
+    return {
+      playLaunch, playHit, playTransform, playPop, playWinFanfare, playThud,
+      startMusic, stopMusic, setMuted,
+      isMuted: () => muted,
+      unlock: ensureCtx
+    };
+  })();
+
+  // Mute button wiring
+  const muteBtn = document.getElementById('muteBtn');
+  muteBtn.addEventListener('click', () => {
+    const newMuted = !SoundEngine.isMuted();
+    SoundEngine.setMuted(newMuted);
+    muteBtn.textContent = newMuted ? '🔇' : '🔊';
   });
 
-  // Win
-  if(P.x+P.w>GOAL_X-10&&P.x<GOAL_X+90&&P.y+P.h>GY-260&&P.y<GY+38) triggerWin();
+  // Unlock audio context on first user interaction (mobile requirement)
+  function unlockAudioOnce() {
+    SoundEngine.unlock();
+    window.removeEventListener('pointerdown', unlockAudioOnce);
+  }
+  window.addEventListener('pointerdown', unlockAudioOnce);
 
-  // Invincible timer
-  if(P.invincible>0) P.invincible--;
+  /* ------------------------------------------------------------------
+     2. WORLD / PHYSICS CONSTANTS
+     ------------------------------------------------------------------ */
+  const GRAVITY = 1400;          // px/s^2
+  const GROUND_FRICTION = 0.985; // velocity damping per physics tick when rolling
+  const RESTITUTION = 0.42;      // bounciness on ground impact
+  const AIR_DRAG = 0.9994;
+  const FIXED_DT = 1 / 120;      // physics substep
+  const MAX_SUBSTEPS = 8;
 
-  // Particles
-  for(let i=PARTS.length-1;i>=0;i--){
-    const p=PARTS[i];
-    p.x+=p.vx; p.y+=p.vy; p.vy+=.18; p.life-=p.decay;
-    if(p.life<=0) PARTS.splice(i,1);
+  function groundY() { return H - Math.max(60, H * 0.10); }
+
+  /* Slingshot anchor position (world space, scales with screen) */
+  function slingPos() {
+    return { x: Math.max(110, W * 0.14), y: groundY() - Math.min(150, H * 0.22) };
   }
 
-  // Camera (smooth, clamped)
-  camX+=(P.x-W/3-camX)*.1;
-  camX=Math.max(0,camX);
-
-  // HUD
-  document.getElementById('hH').textContent=`❤️ ${heartsGot} / 6`;
-  document.getElementById('hS').textContent=`SCORE: ${score}`;
-}
-
-// ══════════════════════════════════════════════════
-//  RENDER
-// ══════════════════════════════════════════════════
-function draw(){
-  ctx.clearRect(0,0,W,H);
-  drawBG();
-
-  // Platforms
-  [...SPLATS,...MPLATS].forEach(pl=>{
-    const sx=(pl.x-camX)|0;
-    if(sx+pl.w<0||sx>W) return;
-    drawPlat(sx,pl.y|0,pl.w,pl.h,pl.s||'dirt');
-    if(pl.dx!==undefined){
-      ctx.fillStyle='rgba(255,255,255,.45)'; ctx.font='9px monospace';
-      ctx.textAlign='center';
-      ctx.fillText(pl.dx>0?'→':'←',sx+pl.w/2,pl.y+11);
-      ctx.textAlign='left';
+  /* ------------------------------------------------------------------
+     3. BACKGROUND DECOR (clouds, sun, flowers) — drawn once per frame,
+        cheap procedural shapes, no images required.
+     ------------------------------------------------------------------ */
+  const clouds = [];
+  function initClouds() {
+    clouds.length = 0;
+    const count = 6;
+    for (let i = 0; i < count; i++) {
+      clouds.push({
+        x: Math.random() * W,
+        y: 40 + Math.random() * (H * 0.35),
+        scale: 0.6 + Math.random() * 0.9,
+        speed: 6 + Math.random() * 10
+      });
     }
-  });
-
-  // Enemies
-  ENEMIES.forEach(e=>{
-    if(!e.alive) return;
-    const ex=(e.x-camX)|0;
-    if(ex>W||ex+e.w<0) return;
-    drawEnemy(e);
-  });
-
-  // Rings
-  RINGS.forEach((r,i)=>{
-    if(ringHit.has(i)) return;
-    const rx=(r.x-camX)|0;
-    if(rx<-20||rx>W) return;
-    drawRing(r.x,r.y);
-  });
-
-  // Hearts
-  HEARTS.forEach(h=>{
-    if(h.done) return;
-    const hx=(h.x-camX)|0;
-    if(hx<-40||hx>W) return;
-    drawHeart(hx+4,h.y);
-  });
-
-  // Goal
-  if(GOAL_X-camX<W+200&&GOAL_X-camX>-200) drawGoal();
-
-  // Player
-  drawBunny((P.x-camX)|0,P.y|0);
-
-  // Particles
-  PARTS.forEach(p=>{
-    ctx.globalAlpha=p.life;
-    ctx.fillStyle=p.color;
-    ctx.fillRect(p.x|0,p.y|0,p.sz|0,p.sz|0);
-  });
-  ctx.globalAlpha=1;
-
-  // On-screen notices
-  ctx.textAlign='center';
-  if(P.speedBoost>0){
-    ctx.fillStyle='#FFD700'; ctx.font='9px "Press Start 2P"';
-    ctx.fillText('⚡ SPEED BOOST!',W/2,36);
   }
-  if(P.jumpsLeft===1&&!P.onGround){
-    ctx.fillStyle='rgba(255,210,100,.8)'; ctx.font='8px "Press Start 2P"';
-    ctx.fillText('↑ DOUBLE JUMP!',W/2,55);
+  initClouds();
+
+  function drawCloud(c) {
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.scale(c.scale, c.scale);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 30, 18, 0, 0, Math.PI * 2);
+    ctx.ellipse(24, -6, 22, 16, 0, 0, Math.PI * 2);
+    ctx.ellipse(-24, -4, 20, 15, 0, 0, Math.PI * 2);
+    ctx.ellipse(8, -16, 18, 14, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
   }
-  ctx.textAlign='left';
-}
 
-// ══════════════════════════════════════════════════
-//  LOOP & START
-// ══════════════════════════════════════════════════
-function loop(){ update(); draw(); requestAnimationFrame(loop); }
+  function drawBackground(dt) {
+    // Sky gradient (cached via CSS already on body; canvas needs its own for layering)
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#FFE3EE');
+    grad.addColorStop(0.45, '#FFD6E8');
+    grad.addColorStop(1, '#FFF1DC');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
 
-function triggerWin(){
-  if(won) return; won=true; running=false;
-  if(bgTimer) clearInterval(bgTimer);
-  sfx.win();
-  for(let i=0;i<8;i++){
-    setTimeout(()=>{
-      burst(P.x-camX+P.w/2,P.y+P.h/2,'#FFD700',20);
-      burst(P.x-camX+P.w/2,P.y+P.h/2,'#FF69B4',20);
-    },i*200);
+    // Sun (soft glow)
+    const sunX = W * 0.85, sunY = H * 0.16, sunR = Math.min(W, H) * 0.07;
+    const sunGrad = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR * 2.4);
+    sunGrad.addColorStop(0, 'rgba(255, 244, 200, 0.95)');
+    sunGrad.addColorStop(1, 'rgba(255, 244, 200, 0)');
+    ctx.fillStyle = sunGrad;
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, sunR * 2.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#FFF6DC';
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, sunR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Clouds drift slowly
+    clouds.forEach(c => {
+      c.x += c.speed * dt;
+      if (c.x > W + 60) c.x = -60;
+      drawCloud(c);
+    });
+
+    // Distant hills
+    ctx.fillStyle = 'rgba(255, 182, 217, 0.35)';
+    ctx.beginPath();
+    ctx.moveTo(0, groundY());
+    ctx.quadraticCurveTo(W * 0.2, groundY() - 60, W * 0.4, groundY() - 10);
+    ctx.quadraticCurveTo(W * 0.65, groundY() - 70, W * 0.85, groundY() - 15);
+    ctx.quadraticCurveTo(W * 0.95, groundY() - 40, W, groundY());
+    ctx.lineTo(W, groundY() + 200);
+    ctx.lineTo(0, groundY() + 200);
+    ctx.closePath();
+    ctx.fill();
+
+    // Ground (grass strip + dirt)
+    const gY = groundY();
+    const grassGrad = ctx.createLinearGradient(0, gY, 0, H);
+    grassGrad.addColorStop(0, '#BFEAA5');
+    grassGrad.addColorStop(1, '#8FCB7A');
+    ctx.fillStyle = grassGrad;
+    ctx.fillRect(0, gY, W, H - gY);
+
+    // Little grass tufts + flowers along the ground line
+    ctx.save();
+    ctx.strokeStyle = '#7AB867';
+    ctx.lineWidth = 2;
+    for (let x = 0; x < W; x += 26) {
+      const h = 6 + (Math.sin(x * 0.13) + 1) * 4;
+      ctx.beginPath();
+      ctx.moveTo(x, gY);
+      ctx.lineTo(x - 3, gY - h);
+      ctx.moveTo(x, gY);
+      ctx.lineTo(x + 3, gY - h);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // tiny flowers scattered on the grass
+    for (let i = 0; i < 14; i++) {
+      const fx = (i * 97 + 40) % W;
+      const fy = gY + 14 + ((i * 53) % Math.max(20, (H - gY - 20)));
+      drawTinyFlower(fx, fy, i % 3 === 0 ? '#FF8FB1' : (i % 3 === 1 ? '#A8D8FF' : '#FFE08A'));
+    }
   }
-  setTimeout(()=>document.getElementById('winScreen').classList.add('show'),2000);
-}
 
-// Start button – use click, not keydown/space so no jump leaks
-document.getElementById('startBtn').addEventListener('click',()=>{
-  if(AC) AC.resume();
-  document.getElementById('startScreen').style.display='none';
-  document.getElementById('gameWrap').style.display='block';
-  // Clear any key state accumulated before game starts
-  Object.keys(keys).forEach(k=>delete keys[k]);
-  prevJumpDown=false;
-  tL=false; tR=false; tJ=false;
-  running=true;
-  startMusic();
-  loop();
-});
+  function drawTinyFlower(x, y, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = color;
+    for (let p = 0; p < 5; p++) {
+      ctx.save();
+      ctx.rotate((p / 5) * Math.PI * 2);
+      ctx.beginPath();
+      ctx.ellipse(0, -4, 2.6, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.fillStyle = '#FFD86B';
+    ctx.beginPath();
+    ctx.arc(0, 0, 2.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
 
-// Responsive scale
-function resize(){
-  const sc=Math.min((innerWidth-8)/W,(innerHeight-8)/H,1);
-  const w=document.getElementById('gameWrap');
-  w.style.transform=`scale(${sc})`;
-  w.style.transformOrigin='top center';
-  w.style.marginTop=`${(innerHeight-H*sc)/2}px`;
-}
-resize(); addEventListener('resize',resize);
+  /* ------------------------------------------------------------------
+     4. PARTICLE SYSTEM (hearts, sparkles, dust, confetti on canvas)
+     ------------------------------------------------------------------ */
+  let particles = [];
+
+  function spawnHeartBurst(x, y, count) {
+    for (let i = 0; i < (count || 10); i++) {
+      const ang = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.1;
+      const speed = 60 + Math.random() * 120;
+      particles.push({
+        type: 'heart',
+        x, y,
+        vx: Math.cos(ang) * speed,
+        vy: Math.sin(ang) * speed - 40,
+        life: 0, maxLife: 1.1 + Math.random() * 0.6,
+        size: 10 + Math.random() * 14,
+        color: Math.random() < 0.5 ? '#FF6F9E' : '#FFB6D9',
+        spin: (Math.random() - 0.5) * 4
+      });
+    }
+  }
+
+  function spawnSparkleBurst(x, y, count) {
+    for (let i = 0; i < (count || 8); i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const speed = 40 + Math.random() * 90;
+      particles.push({
+        type: 'sparkle',
+        x, y,
+        vx: Math.cos(ang) * speed,
+        vy: Math.sin(ang) * speed,
+        life: 0, maxLife: 0.6 + Math.random() * 0.5,
+        size: 6 + Math.random() * 8,
+        color: '#FFF1B8'
+      });
+    }
+  }
+
+  function spawnDust(x, y, count) {
+    for (let i = 0; i < (count || 6); i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const speed = 20 + Math.random() * 50;
+      particles.push({
+        type: 'dust',
+        x, y,
+        vx: Math.cos(ang) * speed,
+        vy: Math.sin(ang) * speed - 20,
+        life: 0, maxLife: 0.5 + Math.random() * 0.3,
+        size: 4 + Math.random() * 6,
+        color: 'rgba(180,140,110,0.5)'
+      });
+    }
+  }
+
+  function updateAndDrawParticles(dt) {
+    particles.forEach(p => {
+      p.life += dt;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += (p.type === 'dust' ? 60 : 90) * dt;
+      p.vx *= 0.98;
+    });
+    particles = particles.filter(p => p.life < p.maxLife);
+
+    particles.forEach(p => {
+      const t = p.life / p.maxLife;
+      const alpha = 1 - t;
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, alpha);
+      ctx.translate(p.x, p.y);
+      if (p.type === 'heart') {
+        ctx.rotate((p.spin || 0) * t);
+        const s = p.size * (0.7 + 0.3 * (1 - t));
+        drawHeartShape(0, 0, s, p.color);
+      } else if (p.type === 'sparkle') {
+        ctx.rotate(t * Math.PI);
+        drawSparkleShape(0, 0, p.size * (1 - t * 0.3), p.color);
+      } else { // dust
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size * (1 - t * 0.5), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    });
+  }
+
+  function drawHeartShape(x, y, size, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    const s = size / 2;
+    ctx.moveTo(0, s * 0.6);
+    ctx.bezierCurveTo(-s, -s * 0.4, -s * 1.6, s * 0.9, 0, s * 1.8);
+    ctx.bezierCurveTo(s * 1.6, s * 0.9, s, -s * 0.4, 0, s * 0.6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawSparkleShape(x, y, size, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    for (let i = 0; i < 4; i++) {
+      ctx.save();
+      ctx.rotate((i / 4) * Math.PI * 2);
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(size * 0.15, size * 0.15, 0, size);
+      ctx.quadraticCurveTo(-size * 0.15, size * 0.15, 0, 0);
+      ctx.restore();
+    }
+    ctx.fill();
+    ctx.restore();
+  }
+
+  /* ------------------------------------------------------------------
+     5. BLOCKS (obstacles / structure pieces that bunnies sit on)
+     ------------------------------------------------------------------ */
+  class Block {
+    constructor(x, y, w, h, material) {
+      this.x = x; this.y = y; // center position
+      this.w = w; this.h = h;
+      this.material = material || 'wood'; // 'wood' | 'cloud' | 'crate'
+      this.vy = 0; this.vx = 0;
+      this.angle = 0;
+      this.angVel = 0;
+      this.settled = false;
+      this.health = material === 'cloud' ? 1 : 3; // clouds break in one hit
+      this.alive = true;
+      this.shakeT = 0;
+    }
+    get top() { return this.y - this.h / 2; }
+    get bottom() { return this.y + this.h / 2; }
+    get left() { return this.x - this.w / 2; }
+    get right() { return this.x + this.w / 2; }
+
+    update(dt) {
+      if (this.shakeT > 0) this.shakeT -= dt;
+      if (this.settled) return;
+      this.vy += GRAVITY * dt;
+      this.y += this.vy * dt;
+      this.x += this.vx * dt;
+      this.angle += this.angVel * dt;
+      // land on ground
+      const gy = groundY();
+      if (this.bottom > gy) {
+        this.y = gy - this.h / 2;
+        this.vy *= -RESTITUTION * 0.3;
+        this.vx *= GROUND_FRICTION;
+        this.angVel *= 0.8;
+        if (Math.abs(this.vy) < 18) { this.vy = 0; this.settled = true; this.angle = 0; }
+      }
+    }
+
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y + (this.shakeT > 0 ? Math.sin(this.shakeT * 60) * 2 : 0));
+      ctx.rotate(this.angle);
+      const w = this.w, h = this.h;
+      if (this.material === 'cloud') {
+        // Fluffy pastel cloud platform
+        ctx.fillStyle = '#FFFFFF';
+        ctx.strokeStyle = '#D8C7F2';
+        ctx.lineWidth = 2;
+        roundedRectPath(-w/2, -h/2, w, h, h/2.2);
+        ctx.fill(); ctx.stroke();
+      } else if (this.material === 'crate') {
+        // Pastel blue crate with carrot-cross pattern
+        const grad = ctx.createLinearGradient(-w/2, -h/2, w/2, h/2);
+        grad.addColorStop(0, '#BFE3FF');
+        grad.addColorStop(1, '#8FCBF0');
+        ctx.fillStyle = grad;
+        roundedRectPath(-w/2, -h/2, w, h, 6);
+        ctx.fill();
+        ctx.strokeStyle = '#6FAEDB';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(-w/2 + 4, -h/2 + 4, w - 8, h - 8);
+        ctx.beginPath();
+        ctx.moveTo(-w/2 + 4, -h/2 + 4); ctx.lineTo(w/2 - 4, h/2 - 4);
+        ctx.moveTo(w/2 - 4, -h/2 + 4); ctx.lineTo(-w/2 + 4, h/2 - 4);
+        ctx.stroke();
+      } else {
+        // Pastel wood plank
+        const grad = ctx.createLinearGradient(-w/2, -h/2, w/2, h/2);
+        grad.addColorStop(0, '#FFD9A0');
+        grad.addColorStop(1, '#F3B873');
+        ctx.fillStyle = grad;
+        roundedRectPath(-w/2, -h/2, w, h, 5);
+        ctx.fill();
+        ctx.strokeStyle = '#D89752';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        // wood grain lines
+        ctx.strokeStyle = 'rgba(216,151,82,0.5)';
+        ctx.lineWidth = 1.5;
+        for (let i = 1; i < 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-w/2 + 4, -h/2 + (h/3) * i);
+          ctx.lineTo(w/2 - 4, -h/2 + (h/3) * i);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+  }
+
+  function roundedRectPath(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  /* ------------------------------------------------------------------
+     6. BUNNIES (the targets — start angry/sad, become happy when hit)
+     ------------------------------------------------------------------ */
+  let bunnyIdCounter = 0;
+
+  class Bunny {
+    constructor(x, y, restingOn) {
+      this.id = bunnyIdCounter++;
+      this.x = x; this.y = y;
+      this.r = 22; // body radius
+      this.vy = 0; this.vx = 0;
+      this.angle = 0; this.angVel = 0;
+      this.happy = false;
+      this.alive = true;
+      this.settled = restingOn !== undefined;
+      this.restingOn = restingOn; // Block reference, or null = ground
+      this.hopT = Math.random() * 10; // for idle bob animation, randomized phase
+      this.blink = Math.random() * 5;
+      this.hitFlash = 0;
+      this.popScale = 1;
+      this.transformT = -1; // >=0 while playing the transform animation
+      this.earWiggle = Math.random() * 10;
+      this.fallen = false;
+    }
+
+    get top() { return this.y - this.r; }
+    get bottom() { return this.y + this.r; }
+    get left() { return this.x - this.r; }
+    get right() { return this.x + this.r; }
+
+    takeHit() {
+      if (this.happy) return;
+      this.happy = true;
+      this.transformT = 0;
+      this.hitFlash = 0.25;
+      this.fallen = false;
+      // little upward pop of joy
+      this.vy = -160;
+      this.settled = false;
+    }
+
+    update(dt) {
+      this.hopT += dt;
+      this.blink += dt;
+      this.earWiggle += dt;
+      if (this.hitFlash > 0) this.hitFlash -= dt;
+      if (this.transformT >= 0) this.transformT += dt;
+
+      if (!this.settled) {
+        this.vy += GRAVITY * 0.7 * dt;
+        this.y += this.vy * dt;
+        this.x += this.vx * dt;
+        this.vx *= 0.99;
+        const gy = groundY();
+        if (this.bottom > gy) {
+          this.y = gy - this.r;
+          this.vy *= -0.3;
+          if (Math.abs(this.vy) < 30) { this.vy = 0; this.settled = true; }
+          this.fallen = true;
+        }
+        // if resting block was destroyed/moved, check we still rest on it
+      } else if (this.restingOn && this.restingOn.alive) {
+        // follow the block we sit on (if it moves/settles)
+        this.x = this.restingOn._bunnyAnchorX !== undefined ? this.restingOn._bunnyAnchorX : this.x;
+      }
+    }
+
+    draw() {
+      const bob = this.settled ? Math.sin(this.hopT * 2.2) * 2 : 0;
+      const earWiggleAmt = Math.sin(this.earWiggle * 3) * 0.08;
+      ctx.save();
+      ctx.translate(this.x, this.y + bob);
+
+      // pop scale animation right after transform starts
+      let scale = 1;
+      if (this.transformT >= 0 && this.transformT < 0.35) {
+        const t = this.transformT / 0.35;
+        scale = 1 + Math.sin(t * Math.PI) * 0.35;
+      }
+      ctx.scale(scale, scale);
+
+      const bodyColor = this.happy ? '#FFFFFF' : '#F4E9E2';
+      const earInner = this.happy ? '#FFC2D9' : '#E8A8B8';
+      const cheek = this.happy ? '#FFB6CE' : '#E59CAE';
+
+      // shadow
+      ctx.save();
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.ellipse(0, this.r + 6, this.r * 0.85, this.r * 0.28, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // ears
+      ['left', 'right'].forEach(side => {
+        const dir = side === 'left' ? -1 : 1;
+        ctx.save();
+        ctx.translate(dir * this.r * 0.55, -this.r * 0.95);
+        ctx.rotate(dir * (0.25 + earWiggleAmt) * (this.happy ? 1 : 0.6));
+        ctx.fillStyle = bodyColor;
+        ctx.beginPath();
+        ctx.ellipse(0, -this.r * 0.55, this.r * 0.32, this.r * 0.85, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = earInner;
+        ctx.beginPath();
+        ctx.ellipse(0, -this.r * 0.5, this.r * 0.16, this.r * 0.55, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      // body
+      ctx.fillStyle = bodyColor;
+      ctx.beginPath();
+      ctx.ellipse(0, this.r * 0.15, this.r * 0.92, this.r * 0.8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // head
+      ctx.beginPath();
+      ctx.arc(0, -this.r * 0.25, this.r * 0.72, 0, Math.PI * 2);
+      ctx.fill();
+
+      // cheeks
+      ctx.fillStyle = cheek;
+      ctx.globalAlpha = 0.7;
+      ctx.beginPath();
+      ctx.ellipse(-this.r * 0.42, -this.r * 0.05, this.r * 0.18, this.r * 0.13, 0, 0, Math.PI * 2);
+      ctx.ellipse(this.r * 0.42, -this.r * 0.05, this.r * 0.18, this.r * 0.13, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // hit flash (white overlay flash)
+      if (this.hitFlash > 0) {
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, this.hitFlash * 4);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(0, -this.r * 0.25, this.r * 0.78, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      this.drawFace();
+
+      // little carrot-shaped paws (front feet)
+      ctx.fillStyle = bodyColor;
+      ctx.beginPath();
+      ctx.ellipse(-this.r * 0.4, this.r * 0.75, this.r * 0.22, this.r * 0.18, 0, 0, Math.PI * 2);
+      ctx.ellipse(this.r * 0.4, this.r * 0.75, this.r * 0.22, this.r * 0.18, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+
+      // heart sparkle aura for happy bunnies (gentle floating hearts above head)
+      if (this.happy) {
+        const auraT = this.hopT;
+        ctx.save();
+        ctx.globalAlpha = 0.85;
+        const hx = Math.sin(auraT * 1.3) * this.r * 0.5;
+        const hy = -this.r * 1.7 + Math.sin(auraT * 2) * 3 + bob;
+        drawHeartShape(this.x + hx, this.y + hy, 10, '#FF8FB1');
+        ctx.restore();
+      }
+    }
+
+    drawFace() {
+      const r = this.r;
+      ctx.save();
+      const eyeY = -r * 0.32;
+      const blinking = (this.blink % 4) > 3.85;
+
+      if (this.happy) {
+        // ===== HAPPY FACE =====
+        ctx.strokeStyle = '#5B3A45';
+        ctx.lineWidth = 2.4;
+        ctx.lineCap = 'round';
+        // curved happy eyes (^ ^)
+        [-1, 1].forEach(dir => {
+          ctx.beginPath();
+          ctx.arc(dir * r * 0.28, eyeY + 2, r * 0.16, Math.PI * 1.15, Math.PI * 1.85, false);
+          ctx.stroke();
+        });
+        // smiling mouth
+        ctx.beginPath();
+        ctx.arc(0, r * 0.02, r * 0.32, 0.15 * Math.PI, 0.85 * Math.PI, false);
+        ctx.stroke();
+        // tiny nose
+        ctx.fillStyle = '#E8889E';
+        ctx.beginPath();
+        ctx.ellipse(0, -r * 0.08, r * 0.07, r * 0.05, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // ===== ANGRY / SAD FACE =====
+        ctx.strokeStyle = '#4A2E36';
+        ctx.lineWidth = 2.6;
+        ctx.lineCap = 'round';
+
+        if (!blinking) {
+          // angled angry eyebrows
+          [-1, 1].forEach(dir => {
+            ctx.beginPath();
+            ctx.moveTo(dir * r * 0.16, eyeY - r * 0.22);
+            ctx.lineTo(dir * r * 0.46, eyeY - r * 0.34 * dir * -1 + r * 0.05);
+            ctx.stroke();
+          });
+          // eyes (small, slightly narrowed)
+          ctx.fillStyle = '#3A2228';
+          [-1, 1].forEach(dir => {
+            ctx.beginPath();
+            ctx.ellipse(dir * r * 0.28, eyeY + 4, r * 0.085, r * 0.11, 0, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        } else {
+          [-1, 1].forEach(dir => {
+            ctx.beginPath();
+            ctx.moveTo(dir * r * 0.2, eyeY + 4);
+            ctx.lineTo(dir * r * 0.38, eyeY + 4);
+            ctx.stroke();
+          });
+        }
+
+        // down-turned grumpy/sad mouth
+        ctx.beginPath();
+        ctx.arc(0, r * 0.32, r * 0.26, Math.PI * 1.15, Math.PI * 1.85, true);
+        ctx.stroke();
+
+        // tiny furrow between brows
+        ctx.beginPath();
+        ctx.moveTo(0, eyeY - r * 0.1);
+        ctx.lineTo(0, eyeY + r * 0.02);
+        ctx.stroke();
+
+        // a little sad tear sometimes (every other bunny, decorative, deterministic on id)
+        if (this.id % 2 === 0) {
+          ctx.fillStyle = '#A8D8FF';
+          ctx.globalAlpha = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(r * 0.3, eyeY + 10);
+          ctx.quadraticCurveTo(r * 0.38, eyeY + 22, r * 0.3, eyeY + 26);
+          ctx.quadraticCurveTo(r * 0.22, eyeY + 22, r * 0.3, eyeY + 10);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+      }
+      ctx.restore();
+    }
+  }
+
+  /* ------------------------------------------------------------------
+     7. CARROT (projectile)
+     ------------------------------------------------------------------ */
+  class Carrot {
+    constructor(x, y) {
+      this.x = x; this.y = y;
+      this.vx = 0; this.vy = 0;
+      this.r = 14;
+      this.angle = 0;
+      this.launched = false;
+      this.alive = true;
+      this.trail = [];
+      this.restTimer = 0; // time spent nearly-still after landing, to despawn
+      this.bounces = 0;
+    }
+
+    launch(vx, vy) {
+      this.vx = vx; this.vy = vy;
+      this.launched = true;
+      SoundEngine.playLaunch();
+    }
+
+    update(dt) {
+      if (!this.launched) return;
+      this.trail.push({ x: this.x, y: this.y });
+      if (this.trail.length > 14) this.trail.shift();
+
+      this.vy += GRAVITY * dt;
+      this.vx *= AIR_DRAG;
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
+      this.angle = Math.atan2(this.vy, this.vx);
+
+      const gy = groundY();
+      if (this.y + this.r > gy) {
+        this.y = gy - this.r;
+        this.vy *= -RESTITUTION;
+        this.vx *= 0.7;
+        this.bounces++;
+        spawnDust(this.x, gy, 5);
+        if (Math.abs(this.vy) < 40) this.vy = 0;
+      }
+
+      const speed = Math.hypot(this.vx, this.vy);
+      if (speed < 12) this.restTimer += dt; else this.restTimer = 0;
+
+      // off-screen or fully at rest too long => despawn
+      if (this.x > W + 100 || this.x < -100 || this.restTimer > 1.6) {
+        this.alive = false;
+      }
+    }
+
+    draw() {
+      // motion trail (little fading carrot-orange dots)
+      this.trail.forEach((t, i) => {
+        const a = (i / this.trail.length) * 0.35;
+        ctx.save();
+        ctx.globalAlpha = a;
+        ctx.fillStyle = '#FF9F4A';
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, this.r * 0.5 * (i / this.trail.length), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle + Math.PI / 2);
+
+      // carrot body (cone)
+      const grad = ctx.createLinearGradient(0, -this.r * 1.4, 0, this.r * 1.1);
+      grad.addColorStop(0, '#FFB066');
+      grad.addColorStop(1, '#FF8A3D');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(0, this.r * 1.3);
+      ctx.quadraticCurveTo(this.r * 0.95, -this.r * 0.2, 0, -this.r * 1.4);
+      ctx.quadraticCurveTo(-this.r * 0.95, -this.r * 0.2, 0, this.r * 1.3);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#E06B1F';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // texture lines
+      ctx.strokeStyle = 'rgba(224,107,31,0.5)';
+      ctx.lineWidth = 1;
+      for (let i = -2; i <= 2; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * 2.4, -this.r * 0.6);
+        ctx.lineTo(i * 1.2, this.r * 0.9);
+        ctx.stroke();
+      }
+
+      // green carrot top (leaves)
+      ctx.fillStyle = '#7FCB6B';
+      [-1, 0, 1].forEach(dir => {
+        ctx.save();
+        ctx.translate(dir * 3, -this.r * 1.3);
+        ctx.rotate(dir * 0.5);
+        ctx.beginPath();
+        ctx.ellipse(0, -5, 2.4, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      ctx.restore();
+    }
+  }
+
+  /* ------------------------------------------------------------------
+     8. LEVEL LAYOUT — 15+ angry bunnies across multiple structures
+     ------------------------------------------------------------------ */
+  let blocks = [];
+  let bunnies = [];
+  let carrots = [];
+  let activeCarrot = null;
+  let carrotsRemaining = 0;
+  let score = 0;
+  let gameWon = false;
+
+  function buildLevel() {
+    blocks = [];
+    bunnies = [];
+    carrots = [];
+    activeCarrot = null;
+    score = 0;
+    gameWon = false;
+    bunnyIdCounter = 0;
+
+    const gy = groundY();
+    // Lay structures across the right ~78% of the screen, scaled to width.
+    const baseX = Math.max(W * 0.42, slingPos().x + 220);
+    const spanX = Math.max(420, W - baseX - 60);
+
+    // Helper to place a tower: a stack of crates with a bunny on top,
+    // plus sometimes a bunny tucked beside it.
+    function tower(cx, levels, material) {
+      let curBottom = gy;
+      const w = 56, h = 34;
+      for (let i = 0; i < levels; i++) {
+        const b = new Block(cx, curBottom - h / 2, w, h, material || 'crate');
+        b.settled = true;
+        blocks.push(b);
+        curBottom -= h;
+      }
+      return curBottom; // top Y available for a bunny to sit on
+    }
+
+    function bunnyOn(cx, topY) {
+      const bun = new Bunny(cx, topY - 22, true);
+      bunnies.push(bun);
+      return bun;
+    }
+
+    function bunnyOnGround(cx) {
+      const bun = new Bunny(cx, gy - 22, true);
+      bunnies.push(bun);
+      return bun;
+    }
+
+    // Layout plan: several "groups" spread across the available span.
+    // Group 1: simple twin towers with a bunny atop each + one ground bunny between
+    const g1 = baseX;
+    let topY = tower(g1, 2, 'crate');
+    bunnyOn(g1, topY);
+    let topY2 = tower(g1 + 80, 2, 'crate');
+    bunnyOn(g1 + 80, topY2);
+    bunnyOnGround(g1 + 40);
+
+    // Group 2: a pyramid of crates with bunnies nestled in gaps (wood planks as roof)
+    const g2 = baseX + spanX * 0.27;
+    {
+      const w = 50, h = 32;
+      // bottom row (3 crates)
+      const bottomY = gy - h / 2;
+      [g2 - 60, g2, g2 + 60].forEach(x => {
+        const b = new Block(x, bottomY, w, h, 'crate'); b.settled = true; blocks.push(b);
+      });
+      // bunnies sitting in the two gaps of bottom row
+      bunnyOn(g2 - 30, bottomY - h / 2);
+      bunnyOn(g2 + 30, bottomY - h / 2);
+      // middle row (2 crates) resting on bottom row
+      const midY = bottomY - h;
+      [g2 - 30, g2 + 30].forEach(x => {
+        const b = new Block(x, midY, w, h, 'crate'); b.settled = true; blocks.push(b);
+      });
+      // top bunny crowning the pyramid
+      bunnyOn(g2, midY - h / 2);
+      // a wood plank roof leaning, with a bunny sheltering beside it
+      bunnyOnGround(g2 - 100);
+    }
+
+    // Group 3: a tall single tower (4 crates) with cloud platforms jutting out, each with a bunny
+    const g3 = baseX + spanX * 0.52;
+    {
+      const w = 50, h = 30;
+      let by = gy;
+      const blocksHere = [];
+      for (let i = 0; i < 4; i++) {
+        const b = new Block(g3, by - h / 2, w, h, 'crate'); b.settled = true; blocks.push(b); blocksHere.push(b);
+        by -= h;
+      }
+      bunnyOn(g3, by); // bunny on very top
+      // cloud platform sticking out to the left at mid height, with a bunny
+      const cloudY = gy - h * 2;
+      const cloud = new Block(g3 - 70, cloudY, 70, 22, 'cloud'); cloud.settled = true; blocks.push(cloud);
+      bunnyOn(g3 - 70, cloudY - 11);
+      // wood plank to the right at low height with a bunny
+      const plankY = gy - h * 1;
+      const plank = new Block(g3 + 75, plankY, 70, 20, 'wood'); plank.settled = true; blocks.push(plank);
+      bunnyOn(g3 + 75, plankY - 10);
+    }
+
+    // Group 4: wide low wall of crates with 3 bunnies peeking over the top + 1 hiding behind
+    const g4 = baseX + spanX * 0.80;
+    {
+      const w = 54, h = 30;
+      const wallY = gy - h / 2;
+      [g4 - 60, g4, g4 + 60].forEach(x => {
+        const b = new Block(x, wallY, w, h, 'wood'); b.settled = true; blocks.push(b);
+      });
+      bunnyOn(g4 - 60, wallY - h / 2);
+      bunnyOn(g4, wallY - h / 2);
+      bunnyOn(g4 + 60, wallY - h / 2);
+      bunnyOnGround(g4 + 120); // hiding behind, on the ground
+    }
+
+    // A couple of lone bunnies scattered near the very end for good measure
+    bunnyOnGround(baseX + spanX * 0.97);
+
+    // Total bunny count should be >= 15. Let's verify and pad if needed.
+    while (bunnies.filter(b => true).length < 15) {
+      const extraX = baseX + Math.random() * spanX;
+      bunnyOnGround(extraX);
+    }
+
+    carrotsRemaining = bunnies.length + 3; // a little generous buffer of carrots
+    updateHUD();
+  }
+
+  /* ------------------------------------------------------------------
+     9. SLINGSHOT — drawing + aiming/launch input handling
+     ------------------------------------------------------------------ */
+  const MAX_STRETCH = 110;     // max pixels the carrot can be pulled back
+  const LAUNCH_POWER = 9.2;    // velocity multiplier from pull distance
+
+  let aiming = false;
+  let aimDX = 0, aimDY = 0; // current pull vector from sling anchor
+  let pointerId = null;
+
+  function spawnCarrotOnSling() {
+    const sp = slingPos();
+    activeCarrot = new Carrot(sp.x, sp.y);
+    carrots.push(activeCarrot);
+  }
+
+  function drawSlingshot() {
+    const sp = slingPos();
+    const forkTopL = { x: sp.x - 16, y: sp.y - 70 };
+    const forkTopR = { x: sp.x + 16, y: sp.y - 70 };
+    const baseY = groundY() + 6;
+
+    ctx.save();
+    ctx.strokeStyle = '#C98A4B';
+    ctx.lineCap = 'round';
+
+    // Pouch/band drawn BEHIND the carrot when pulled back, in front otherwise.
+    const carrotPos = activeCarrot && !activeCarrot.launched
+      ? { x: activeCarrot.x, y: activeCarrot.y }
+      : { x: sp.x, y: sp.y };
+
+    // back leg of slingshot (drawn first, slightly behind)
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.moveTo(forkTopL.x - 4, forkTopL.y);
+    ctx.lineTo(sp.x - 4, baseY);
+    ctx.stroke();
+
+    // elastic bands (two strands from each fork tip to the carrot)
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#E8A8B8';
+    ctx.beginPath();
+    ctx.moveTo(forkTopL.x, forkTopL.y);
+    ctx.lineTo(carrotPos.x, carrotPos.y);
+    ctx.moveTo(forkTopR.x, forkTopR.y);
+    ctx.lineTo(carrotPos.x, carrotPos.y);
+    ctx.stroke();
+
+    // front leg + fork (drawn on top)
+    ctx.lineWidth = 11;
+    ctx.strokeStyle = '#D89752';
+    ctx.beginPath();
+    ctx.moveTo(forkTopL.x, forkTopL.y);
+    ctx.lineTo(sp.x, baseY);
+    ctx.moveTo(forkTopR.x, forkTopR.y);
+    ctx.lineTo(sp.x, baseY);
+    ctx.stroke();
+
+    // little pink heart decoration at the base of the slingshot <3
+    drawHeartShape(sp.x, baseY - 4, 12, '#FF8FB1');
+
+    ctx.restore();
+  }
+
+  // Trajectory preview dots while aiming
+  function drawTrajectoryPreview() {
+    if (!aiming || !activeCarrot) return;
+    const vx = -aimDX * LAUNCH_POWER;
+    const vy = -aimDY * LAUNCH_POWER;
+    let px = activeCarrot.x, py = activeCarrot.y;
+    let pvx = vx, pvy = vy;
+    const dt = 0.05;
+    ctx.save();
+    for (let i = 0; i < 18; i++) {
+      pvy += GRAVITY * dt;
+      px += pvx * dt;
+      py += pvy * dt;
+      if (py > groundY()) break;
+      ctx.globalAlpha = Math.max(0.12, 0.5 - i * 0.025);
+      ctx.fillStyle = '#FF6F9E';
+      ctx.beginPath();
+      ctx.arc(px, py, 4.5 - i * 0.12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function getPointerPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
+
+  function onPointerDown(e) {
+    if (gameWon) return;
+    if (!activeCarrot || activeCarrot.launched) return;
+    const pos = getPointerPos(e);
+    const sp = slingPos();
+    const dist = Math.hypot(pos.x - activeCarrot.x, pos.y - activeCarrot.y);
+    // generous grab radius so it's easy on mobile
+    if (dist < 60) {
+      aiming = true;
+      pointerId = e.pointerId !== undefined ? e.pointerId : 'touch';
+      document.getElementById('hint').style.opacity = '0';
+    }
+  }
+
+  function onPointerMove(e) {
+    if (!aiming || !activeCarrot) return;
+    const pos = getPointerPos(e);
+    const sp = slingPos();
+    let dx = pos.x - sp.x;
+    let dy = pos.y - sp.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist > MAX_STRETCH) {
+      dx = (dx / dist) * MAX_STRETCH;
+      dy = (dy / dist) * MAX_STRETCH;
+    }
+    // only allow pulling backward/downward-ish (toward player), mostly free though for fun aiming
+    activeCarrot.x = sp.x + dx;
+    activeCarrot.y = sp.y + dy;
+    aimDX = dx; aimDY = dy;
+  }
+
+  function onPointerUp(e) {
+    if (!aiming || !activeCarrot) return;
+    aiming = false;
+    const pullDist = Math.hypot(aimDX, aimDY);
+    if (pullDist < 12) {
+      // too small a pull — snap back, don't launch
+      const sp = slingPos();
+      activeCarrot.x = sp.x; activeCarrot.y = sp.y;
+      aimDX = 0; aimDY = 0;
+      return;
+    }
+    const vx = -aimDX * LAUNCH_POWER;
+    const vy = -aimDY * LAUNCH_POWER;
+    activeCarrot.launch(vx, vy);
+    carrotsRemaining--;
+    updateHUD();
+    aimDX = 0; aimDY = 0;
+  }
+
+  canvas.addEventListener('pointerdown', onPointerDown);
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp);
+  // touch fallbacks for broader compatibility
+  canvas.addEventListener('touchstart', onPointerDown, { passive: true });
+  window.addEventListener('touchmove', onPointerMove, { passive: true });
+  window.addEventListener('touchend', onPointerUp, { passive: true });
+
+  /* ------------------------------------------------------------------
+     10. COLLISIONS
+     ------------------------------------------------------------------ */
+  function circleRectOverlap(cx, cy, cr, rect) {
+    const closestX = Math.max(rect.left, Math.min(cx, rect.right));
+    const closestY = Math.max(rect.top, Math.min(cy, rect.bottom));
+    const dx = cx - closestX, dy = cy - closestY;
+    return (dx * dx + dy * dy) < (cr * cr);
+  }
+
+  function handleCollisions(dt) {
+    carrots.forEach(carrot => {
+      if (!carrot.launched || !carrot.alive) return;
+
+      // Carrot vs Bunny
+      bunnies.forEach(bun => {
+        if (bun.happy) return; // already transformed, can't re-hit meaningfully
+        const dist = Math.hypot(carrot.x - bun.x, carrot.y - bun.y);
+        if (dist < carrot.r + bun.r * 0.85) {
+          transformBunny(bun, carrot);
+          // slow the carrot a bit on impact (soft, not a hard stop, for nice chain hits)
+          carrot.vx *= 0.7; carrot.vy *= 0.6;
+        }
+      });
+
+      // Carrot vs Block
+      blocks.forEach(block => {
+        if (!block.alive) return;
+        if (circleRectOverlap(carrot.x, carrot.y, carrot.r, block)) {
+          const speed = Math.hypot(carrot.vx, carrot.vy);
+          if (speed > 80) {
+            block.health -= 1;
+            block.vx += carrot.vx * 0.12;
+            block.vy -= 60;
+            block.angVel += (Math.random() - 0.5) * 4;
+            block.settled = false;
+            block.shakeT = 0.2;
+            SoundEngine.playThud();
+            spawnDust(carrot.x, carrot.y, 6);
+            // bounce carrot off the block softly
+            const nx = carrot.x - block.x, ny = carrot.y - block.y;
+            const nlen = Math.hypot(nx, ny) || 1;
+            carrot.vx = (nx / nlen) * speed * 0.4;
+            carrot.vy = (ny / nlen) * speed * 0.4 - 60;
+            if (block.health <= 0) {
+              block.alive = false;
+              spawnDust(block.x, block.y, 14);
+            }
+          }
+        }
+      });
+    });
+
+    // Remove destroyed blocks
+    blocks = blocks.filter(b => b.alive);
+
+    // Unsettle any bunny whose supporting block was destroyed (simple support check:
+    // if no block exists close beneath the bunny anymore, let it fall)
+    bunnies.forEach(bun => {
+      if (!bun.settled || bun.happy) return;
+      const supported = bun.bottom >= groundY() - 4 || blocks.some(b =>
+        Math.abs((b.top) - bun.bottom) < 10 &&
+        bun.x > b.left - 10 && bun.x < b.right + 10
+      );
+      if (!supported) {
+        bun.settled = false;
+      }
+    });
+  }
+
+  function transformBunny(bun, carrot) {
+    bun.takeHit();
+    score += 100;
+    SoundEngine.playHit();
+    setTimeout(() => SoundEngine.playTransform(), 120);
+    spawnHeartBurst(bun.x, bun.y, 14);
+    spawnSparkleBurst(bun.x, bun.y, 10);
+    showScorePopup(bun.x, bun.y, '+100 💕');
+    updateHUD();
+    checkWinCondition();
+  }
+
+  /* ------------------------------------------------------------------
+     11. HUD + SCORE POPUPS (DOM-based, layered above canvas)
+     ------------------------------------------------------------------ */
+  const carrotCountEl = document.getElementById('carrotCount');
+  const scoreCountEl = document.getElementById('scoreCount');
+
+  function updateHUD() {
+    const happyCount = bunnies.filter(b => b.happy).length;
+    carrotCountEl.textContent = Math.max(0, carrotsRemaining);
+    scoreCountEl.textContent = score;
+  }
+
+  function showScorePopup(x, y, text) {
+    const el = document.createElement('div');
+    el.className = 'score-popup';
+    el.textContent = text;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    document.getElementById('gameContainer').appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+  }
+
+  /* ------------------------------------------------------------------
+     12. WIN CONDITION + CELEBRATION
+     ------------------------------------------------------------------ */
+  function checkWinCondition() {
+    if (gameWon) return;
+    const allHappy = bunnies.length > 0 && bunnies.every(b => b.happy);
+    if (allHappy) {
+      gameWon = true;
+      SoundEngine.playWinFanfare();
+      launchCelebration();
+      setTimeout(() => {
+        document.getElementById('winOverlay').classList.add('show');
+        document.getElementById('winModal').classList.add('show');
+      }, 900);
+    }
+  }
+
+  const heartLayer = document.getElementById('heartLayer');
+  const CONFETTI_COLORS = ['#FF8FB1', '#A8D8FF', '#FFE08A', '#C9A8FF', '#FFFFFF'];
+
+  function launchCelebration() {
+    // Big burst of confetti + hearts + sparkles across the screen
+    for (let i = 0; i < 60; i++) {
+      setTimeout(() => spawnDomConfetti(), i * 25);
+    }
+    for (let i = 0; i < 30; i++) {
+      setTimeout(() => spawnDomHeart(), i * 60);
+    }
+    for (let i = 0; i < 20; i++) {
+      setTimeout(() => spawnDomSparkle(), i * 90);
+    }
+    // also a canvas-side burst centered on screen for extra flourish
+    spawnHeartBurst(W / 2, H * 0.4, 40);
+    spawnSparkleBurst(W / 2, H * 0.4, 30);
+  }
+
+  function spawnDomConfetti() {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    const color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+    el.style.background = color;
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.borderRadius = Math.random() < 0.5 ? '50%' : '2px';
+    const duration = 2.5 + Math.random() * 2;
+    el.style.animationDuration = duration + 's';
+    heartLayer.appendChild(el);
+    setTimeout(() => el.remove(), duration * 1000 + 100);
+  }
+
+  function spawnDomHeart() {
+    const el = document.createElement('div');
+    el.className = 'floaty-heart';
+    el.textContent = ['❤️', '💕', '💖', '🥰', '💗'][Math.floor(Math.random() * 5)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
+    el.style.setProperty('--spin', (Math.random() * 50 - 25) + 'deg');
+    const duration = 4 + Math.random() * 3;
+    el.style.animationDuration = duration + 's';
+    heartLayer.appendChild(el);
+    setTimeout(() => el.remove(), duration * 1000 + 100);
+  }
+
+  function spawnDomSparkle() {
+    const el = document.createElement('div');
+    el.className = 'sparkle-piece';
+    el.textContent = ['✨', '⭐', '🌟'][Math.floor(Math.random() * 3)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.top = Math.random() * 100 + 'vh';
+    const duration = 1.2 + Math.random() * 0.8;
+    el.style.animationDuration = duration + 's';
+    heartLayer.appendChild(el);
+    setTimeout(() => el.remove(), duration * 1000 + 100);
+  }
+
+  // Endless heart rain (used after "I Love You Too" is clicked)
+  let endlessHeartsInterval = null;
+  function startEndlessHearts() {
+    if (endlessHeartsInterval) return;
+    endlessHeartsInterval = setInterval(() => {
+      spawnDomHeart();
+      if (Math.random() < 0.4) spawnDomSparkle();
+    }, 180);
+  }
+
+  /* ------------------------------------------------------------------
+     13. MAIN GAME LOOP
+     ------------------------------------------------------------------ */
+  let lastT = performance.now();
+
+  function update(dt) {
+    // clamp dt to avoid huge jumps (e.g. tab was inactive)
+    dt = Math.min(dt, 1 / 30);
+
+    blocks.forEach(b => b.update(dt));
+    bunnies.forEach(b => b.update(dt));
+    carrots.forEach(c => c.update(dt));
+    carrots = carrots.filter(c => c.alive || c === activeCarrot);
+
+    handleCollisions(dt);
+
+    // If the active carrot has finished its flight (landed/despawned), prep the next one
+    if (activeCarrot && activeCarrot.launched && !activeCarrot.alive) {
+      activeCarrot = null;
+      if (!gameWon) {
+        if (carrotsRemaining > 0 || bunnies.some(b => !b.happy)) {
+          // Always give a fresh carrot if bunnies remain (forgiving, gift-like difficulty)
+          if (bunnies.some(b => !b.happy)) {
+            spawnCarrotOnSling();
+          }
+        }
+      }
+    }
+  }
+
+  function render(dt) {
+    drawBackground(dt);
+    drawSlingshot();
+    blocks.forEach(b => b.draw());
+    bunnies.forEach(b => b.draw());
+    drawTrajectoryPreview();
+    carrots.forEach(c => c.draw());
+    updateAndDrawParticles(dt);
+  }
+
+  function frame(now) {
+    const dt = (now - lastT) / 1000;
+    lastT = now;
+    update(dt);
+    render(dt);
+    requestAnimationFrame(frame);
+  }
+
+  /* ------------------------------------------------------------------
+     14. RESET / RESIZE
+     ------------------------------------------------------------------ */
+  function resetGame() {
+    document.getElementById('winOverlay').classList.remove('show');
+    document.getElementById('winModal').classList.remove('show');
+    document.getElementById('letterOverlay').classList.remove('show');
+    document.getElementById('letterModal').classList.remove('show');
+    document.getElementById('hint').style.opacity = '1';
+    SoundEngine.stopMusic();
+    buildLevel();
+    spawnCarrotOnSling();
+  }
+
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    initClouds();
+  });
+
+  /* ------------------------------------------------------------------
+     15. LOVE LETTER — typewriter effect + modal interactions
+     ------------------------------------------------------------------ */
+  const LETTER_TEXT = `Happy 7th Monthsary, Bun. ❤️🥺
+
+Grabe, 7 months na pala tayo. Ang dami na nating pinagdaanan, at alam nmn natin pareho na hindi laging madali. Madalas tayong mag-away, magtampo, at minsan pareho tayong napapagod. 😔🤍
+
+Pero kahit ganun, andito pa rin tayo. Kahit ilang beses tayong nagkaroon ng misunderstandings, lagi pa rin nating sinusubukang ayusin. Hindi perfect ung rs natin, pero thankful ako kasi hindi tayo basta sumusuko sa isa't isa. 🫶✨
+
+Thank you, Bun, sa patience mo, sa pag-intindi sakin kahit mahirap minsan, at sa lahat ng effort mo para satin. 🥺💖 Sorry din sa mga pagkakataong naging dahilan ako ng lungkot o sakit mo. 😔🤍
+
+Sana habang tumatagal, mas matuto pa tayong intindihin ang isa't isa at mas dumami ung masasayang araw kesa sa mga away. 🌷💕
+
+Happy 7th Monthsary, Bun. ❤️ Kahit marami tayong ups and downs, thankful pa rin ako na ikaw ung kasama ko sa journey na to. 🥰🫶✨
+
+I love you. ❤️🐻🌷`;
+
+  const letterTextEl = document.getElementById('letterText');
+  const letterCursorEl = document.getElementById('letterCursor');
+  let typeTimer = null;
+  let typeIndex = 0;
+  let typingDone = false;
+
+  function startTypewriter() {
+    typeIndex = 0;
+    typingDone = false;
+    letterTextEl.textContent = '';
+    letterTextEl.appendChild(letterCursorEl);
+    clearInterval(typeTimer);
+
+    typeTimer = setInterval(() => {
+      if (typeIndex >= LETTER_TEXT.length) {
+        finishTyping();
+        return;
+      }
+      // Insert text before the cursor span
+      const chunk = LETTER_TEXT[typeIndex];
+      const textNode = document.createTextNode(chunk);
+      letterTextEl.insertBefore(textNode, letterCursorEl);
+      typeIndex++;
+
+      // small canvas-coupled "tick" sound only occasionally to feel gentle, not noisy
+      if (typeIndex % 6 === 0) SoundEngine.playPop();
+
+      // auto-scroll the letter box as text grows
+      const modal = document.getElementById('letterModal');
+      modal.scrollTop = modal.scrollHeight;
+    }, 28); // typing speed
+  }
+
+  function finishTyping() {
+    clearInterval(typeTimer);
+    if (!typingDone) {
+      typingDone = true;
+      // Make sure full text is shown (in case of skip)
+      letterTextEl.textContent = '';
+      letterTextEl.appendChild(document.createTextNode(LETTER_TEXT));
+      letterTextEl.appendChild(letterCursorEl);
+      document.getElementById('skipTypingBtn').style.display = 'none';
+      document.getElementById('loveYouTooWrap').style.display = 'flex';
+      // gentle little heart confetti as the letter finishes
+      spawnHeartBurst(W / 2, H * 0.3, 16);
+      for (let i = 0; i < 10; i++) setTimeout(() => spawnDomHeart(), i * 120);
+    }
+  }
+
+  document.getElementById('skipTypingBtn').addEventListener('click', finishTyping);
+
+  /* ------------------------------------------------------------------
+     16. MODAL BUTTON WIRING
+     ------------------------------------------------------------------ */
+  document.getElementById('openMessageBtn').addEventListener('click', () => {
+    document.getElementById('winOverlay').classList.remove('show');
+    const letterOverlay = document.getElementById('letterOverlay');
+    const letterModal = document.getElementById('letterModal');
+    letterOverlay.classList.add('show');
+    requestAnimationFrame(() => letterModal.classList.add('show'));
+    SoundEngine.startMusic();
+    startTypewriter();
+  });
+
+  document.getElementById('loveYouTooBtn').addEventListener('click', () => {
+    startEndlessHearts();
+    spawnHeartBurst(W / 2, H / 2, 30);
+    document.getElementById('loveYouTooBtn').textContent = '💖 Forever & Always 💖';
+    document.getElementById('loveYouTooBtn').disabled = true;
+    document.getElementById('loveYouTooBtn').style.opacity = '0.85';
+    document.getElementById('musicNote').textContent = '🎵 ...and the hearts keep coming, just like my love for you 🐰❤️';
+  });
+
+  /* ------------------------------------------------------------------
+     17. INITIALIZE
+     ------------------------------------------------------------------ */
+  buildLevel();
+  spawnCarrotOnSling();
+  requestAnimationFrame((t) => { lastT = t; requestAnimationFrame(frame); });
+
+})();
 </script>
 </body>
 </html>

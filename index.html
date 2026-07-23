@@ -2,2242 +2,706 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Bun's 7th Monthsary Adventure 🐰🥕❤️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Our Constellation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  /* ============================================================
-     GLOBAL RESET & BASE
-     ============================================================ */
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body {
-    margin: 0; padding: 0; overflow: hidden;
-    width: 100%; height: 100%;
-    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', sans-serif;
-    background: linear-gradient(180deg, #FFE6EF 0%, #FFD3E3 35%, #FFEFD9 100%);
-    touch-action: none;
-    user-select: none;
+  /* =========================================================
+     EDIT ME — quick customization
+     ========================================================= */
+  :root {
+    --navy-deep: #0a0e27;
+    --navy-mid: #131a3a;
+    --navy-light: #1f2a5c;
+    --gold: #f4c95d;
+    --gold-soft: #f9dfa0;
+    --pink: #ff8fa3;
+    --pink-soft: #ffc2cc;
+    --lavender: #a3aee0;
+    --white: #fdfbf7;
   }
 
-  #gameContainer {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background: var(--navy-deep);
+    font-family: 'Quicksand', sans-serif;
+    color: var(--white);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+  }
+
+  #sky {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(255,143,163,0.10), transparent 45%),
+      radial-gradient(ellipse at 85% 85%, rgba(163,174,224,0.12), transparent 50%),
+      linear-gradient(180deg, var(--navy-deep) 0%, var(--navy-mid) 55%, var(--navy-light) 100%);
     overflow: hidden;
   }
 
-  canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-    touch-action: none;
+  .twinkle {
+    position: absolute;
+    background: var(--white);
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: twinkle-anim ease-in-out infinite;
   }
 
-  /* ============================================================
-     TOP HUD
-     ============================================================ */
-  #hud {
-    position: absolute;
+  @keyframes twinkle-anim {
+    0%, 100% { opacity: 0.15; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.4); }
+  }
+
+  #ui-top {
+    position: fixed;
     top: 0; left: 0; right: 0;
+    padding: 14px 18px 8px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    padding: 10px 16px;
-    z-index: 50;
+    z-index: 20;
     pointer-events: none;
   }
 
-  .hud-pill {
-    background: rgba(255, 255, 255, 0.85);
-    border: 3px solid #FFB6D9;
-    border-radius: 30px;
-    padding: 8px 18px;
-    font-weight: bold;
-    color: #D6336C;
-    font-size: 16px;
-    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.25);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    pointer-events: auto;
-  }
-
-  #titleBanner {
-    position: absolute;
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
+  #names {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(15px, 4vw, 20px);
+    color: var(--gold-soft);
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
     text-align: center;
-    z-index: 49;
-    pointer-events: none;
   }
 
-  #titleBanner h1 {
-    margin: 0;
-    font-size: clamp(14px, 3vw, 22px);
-    color: #C2255C;
-    text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+  #months-label {
+    font-size: clamp(11px, 3vw, 13px);
+    color: var(--lavender);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  #hud {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: rgba(19, 26, 58, 0.55);
+    border: 1px solid rgba(244, 201, 93, 0.25);
+    backdrop-filter: blur(6px);
+    padding: 8px 18px;
+    border-radius: 999px;
+  }
+
+  #progress-text {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--gold);
     letter-spacing: 0.5px;
   }
 
-  #resetBtn {
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    font-size: 16px;
-  }
+  #lives { display: flex; gap: 4px; }
+  #lives span { font-size: 15px; filter: drop-shadow(0 0 4px rgba(255,143,163,0.6)); }
 
-  #skipLevelBtn {
-    position: absolute;
-    bottom: 44px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255,255,255,0.92);
-    border: 2px solid #FFB6D9;
-    border-radius: 20px;
-    padding: 7px 16px;
-    color: #D6336C;
-    font-size: clamp(11px, 2vw, 13px);
-    font-weight: bold;
-    z-index: 51;
-    cursor: pointer;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.6s ease;
-    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.25);
-  }
-  #skipLevelBtn.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
+  /* constellation canvas sits above the HUD, drawn on the game canvas itself */
 
-  /* ============================================================
-     BOTTOM HINT
-     ============================================================ */
-  #hint {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255,255,255,0.8);
-    border-radius: 20px;
-    padding: 6px 16px;
-    color: #B5476B;
-    font-size: clamp(11px, 2vw, 14px);
-    font-weight: bold;
-    z-index: 50;
-    transition: opacity 0.5s;
-    pointer-events: none;
-  }
-
-  /* ============================================================
-     MODALS — Shared overlay
-     ============================================================ */
-  .overlay {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(255, 200, 220, 0.55);
-    backdrop-filter: blur(3px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 200;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.6s ease;
-  }
-  .overlay.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  /* ---- Win modal (the initial "you did it" card with the open-letter button) ---- */
-  #winModal {
-    background: linear-gradient(160deg, #fff 0%, #FFF0F6 100%);
-    border-radius: 28px;
-    border: 4px solid #FFB6D9;
-    padding: 36px 28px 30px;
-    max-width: 420px;
-    width: 88%;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(214, 51, 108, 0.35);
-    transform: scale(0.7) translateY(40px);
-    transition: transform 0.6s cubic-bezier(.34,1.56,.64,1);
-    position: relative;
-  }
-  #winModal.show { transform: scale(1) translateY(0); }
-
-  #winModal .win-emoji {
-    font-size: 52px;
+  canvas#game {
+    position: fixed;
+    inset: 0;
     display: block;
-    margin-bottom: 6px;
-    animation: bounce-soft 1.6s ease-in-out infinite;
-  }
-  @keyframes bounce-soft {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(-4deg); }
+    z-index: 10;
   }
 
-  #winModal h2 {
-    color: #D6336C;
-    margin: 4px 0 8px;
-    font-size: clamp(20px, 5vw, 26px);
-  }
-
-  #winModal p {
-    color: #92516B;
-    font-size: clamp(13px, 3.2vw, 15px);
-    line-height: 1.5;
-    margin: 0 0 22px;
-  }
-
-  .cute-btn {
-    background: linear-gradient(135deg, #FF8FB1, #FF6F9E);
-    color: white;
-    border: none;
-    border-radius: 50px;
-    padding: 14px 28px;
-    font-size: clamp(14px, 3.5vw, 17px);
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 8px 0 #E0507B, 0 12px 18px rgba(224, 80, 123, 0.4);
-    transition: transform 0.15s, box-shadow 0.15s;
-    font-family: inherit;
-  }
-  .cute-btn:active {
-    transform: translateY(6px);
-    box-shadow: 0 2px 0 #E0507B, 0 4px 8px rgba(224, 80, 123, 0.4);
-  }
-
-  .cute-btn-secondary {
-    background: linear-gradient(135deg, #A8D8FF, #7FC1F5);
-    box-shadow: 0 8px 0 #5A9FD4, 0 12px 18px rgba(90, 159, 212, 0.4);
-  }
-  .cute-btn-secondary:active {
-    box-shadow: 0 2px 0 #5A9FD4, 0 4px 8px rgba(90, 159, 212, 0.4);
-  }
-
-  /* ---- Love letter modal ---- */
-  #letterModal {
-    background: #FFFDF8;
-    background-image:
-      radial-gradient(circle at 10% 10%, rgba(255, 182, 217, 0.25) 0%, transparent 40%),
-      radial-gradient(circle at 90% 90%, rgba(168, 216, 255, 0.25) 0%, transparent 40%);
-    border-radius: 18px;
-    border: 3px dashed #FFB6D9;
-    padding: 30px 26px;
-    max-width: 480px;
-    width: 90%;
-    max-height: 86vh;
-    overflow-y: auto;
-    text-align: center;
-    box-shadow: 0 25px 70px rgba(150, 50, 90, 0.4);
-    position: relative;
-    transform: scale(0.8) rotate(-2deg);
-    opacity: 0;
-    transition: transform 0.7s cubic-bezier(.34,1.4,.64,1), opacity 0.7s ease;
-  }
-  #letterModal.show {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-
-  #letterModal::-webkit-scrollbar { width: 8px; }
-  #letterModal::-webkit-scrollbar-thumb { background: #FFB6D9; border-radius: 10px; }
-
-  .letter-deco-corner {
-    position: absolute;
-    font-size: 26px;
-    opacity: 0.8;
-    pointer-events: none;
-  }
-  .tl { top: 6px; left: 8px; transform: rotate(-15deg); }
-  .tr { top: 6px; right: 8px; transform: rotate(15deg) scaleX(-1); }
-  .bl { bottom: 6px; left: 8px; transform: rotate(15deg); }
-  .br { bottom: 6px; right: 8px; transform: rotate(-15deg) scaleX(-1); }
-
-  #letterHeader {
-    font-size: 34px;
-    margin-bottom: 4px;
-  }
-
-  #letterTitle {
-    color: #D6336C;
-    font-size: clamp(18px, 4.5vw, 23px);
-    margin: 4px 0 18px;
-    font-weight: bold;
-  }
-
-  #letterText {
-    text-align: left;
-    color: #6B4255;
-    font-size: clamp(13px, 3.2vw, 15.5px);
-    line-height: 1.85;
-    white-space: pre-wrap;
-    min-height: 220px;
-    font-family: 'Segoe UI', 'Trebuchet MS', sans-serif;
-  }
-
-  #letterCursor {
-    display: inline-block;
-    width: 2px;
-    background: #D6336C;
-    animation: blink 0.8s steps(1) infinite;
-    margin-left: 1px;
-  }
-  @keyframes blink { 50% { opacity: 0; } }
-
-  #skipTypingBtn {
-    background: none;
-    border: 1.5px solid #FFB6D9;
-    color: #D6336C;
-    border-radius: 20px;
-    padding: 5px 14px;
-    font-size: 12px;
-    cursor: pointer;
-    margin-top: 14px;
-    font-family: inherit;
-    opacity: 0.8;
-  }
-
-  #loveYouTooWrap {
-    margin-top: 22px;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-
-  #musicNote {
-    font-size: 11px;
-    color: #A8779A;
-    margin-top: 6px;
-  }
-
-  /* ============================================================
-     SLINGSHOT AIM TRAJECTORY DOTS handled in canvas
-     ============================================================ */
-
-  /* ============================================================
-     FLOATING DOM HEARTS (used for celebration + endless hearts)
-     ============================================================ */
-  #heartLayer {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 300;
-    overflow: hidden;
-  }
-  .floaty-heart {
-    position: absolute;
-    bottom: -40px;
-    font-size: 22px;
-    opacity: 0.9;
-    animation-name: floatUp;
-    animation-timing-function: ease-in;
-    animation-fill-mode: forwards;
-    will-change: transform, opacity;
-  }
-  @keyframes floatUp {
-    0% { transform: translateY(0) translateX(0) rotate(0deg) scale(0.6); opacity: 0; }
-    10% { opacity: 1; }
-    100% { transform: translateY(-110vh) translateX(var(--drift, 30px)) rotate(var(--spin, 25deg)) scale(1.1); opacity: 0; }
-  }
-
-  .confetti-piece {
-    position: absolute;
-    top: -20px;
-    width: 9px;
-    height: 14px;
-    opacity: 0.95;
-    animation-name: confettiFall;
-    animation-timing-function: cubic-bezier(.25,.46,.45,.94);
-    animation-fill-mode: forwards;
-  }
-  @keyframes confettiFall {
-    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(115vh) rotate(720deg); opacity: 0.3; }
-  }
-
-  .sparkle-piece {
-    position: absolute;
-    font-size: 16px;
-    animation-name: sparklePop;
-    animation-timing-function: ease-out;
-    animation-fill-mode: forwards;
-  }
-  @keyframes sparklePop {
-    0% { transform: scale(0) rotate(0deg); opacity: 1; }
-    60% { transform: scale(1.3) rotate(180deg); opacity: 1; }
-    100% { transform: scale(0.4) rotate(360deg); opacity: 0; }
-  }
-
-  /* ============================================================
-     SCORE POPUP (canvas-adjacent floating text, made via DOM)
-     ============================================================ */
-  .score-popup {
-    position: absolute;
-    color: #D6336C;
-    font-weight: bold;
-    font-size: 20px;
-    pointer-events: none;
-    z-index: 60;
-    animation: scorePop 1s ease-out forwards;
-    text-shadow: 1px 1px 0 #fff;
-  }
-  @keyframes scorePop {
-    0% { transform: translateY(0) scale(0.7); opacity: 0; }
-    20% { transform: translateY(-10px) scale(1.2); opacity: 1; }
-    100% { transform: translateY(-60px) scale(1); opacity: 0; }
-  }
-
-  /* ============================================================
-     MUTE BUTTON
-     ============================================================ */
-  #muteBtn {
-    cursor: pointer;
-    background: rgba(255,255,255,0.85);
-    border: 3px solid #FFB6D9;
-    border-radius: 50%;
-    width: 42px;
-    height: 42px;
-    font-size: 18px;
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 10px rgba(255,105,180,0.25);
-    pointer-events: auto;
+    flex-direction: column;
+    text-align: center;
+    padding: 32px;
+    background: rgba(10, 14, 39, 0.72);
+    backdrop-filter: blur(3px);
   }
 
-  /* ============================================================
-     RESPONSIVE
-     ============================================================ */
-  @media (max-width: 480px) {
-    .hud-pill { font-size: 13px; padding: 6px 12px; }
-    #muteBtn { width: 36px; height: 36px; font-size: 15px; }
+  .hidden { display: none !important; }
+
+  .card {
+    max-width: 440px;
+    animation: rise 0.5s ease;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--pink-soft);
+    margin-bottom: 10px;
+  }
+
+  h1.title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(26px, 7vw, 40px);
+    margin: 0 0 14px;
+    color: var(--white);
+    line-height: 1.15;
+  }
+
+  .msg-body {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--lavender);
+    margin: 0 0 26px;
+  }
+
+  .msg-body em {
+    color: var(--gold-soft);
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  button.btn {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    color: var(--navy-deep);
+    background: linear-gradient(135deg, var(--gold), var(--pink-soft));
+    border: none;
+    padding: 13px 34px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(244, 201, 93, 0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  button.btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(244, 201, 93, 0.35); }
+  button.btn:active { transform: translateY(0px) scale(0.98); }
+
+  .hint {
+    margin-top: 16px;
+    font-size: 12px;
+    color: rgba(163, 174, 224, 0.7);
+  }
+
+  #milestone-toast {
+    position: fixed;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    z-index: 25;
+    background: rgba(19, 26, 58, 0.9);
+    border: 1px solid rgba(244, 201, 93, 0.35);
+    padding: 18px 26px;
+    border-radius: 16px;
+    max-width: 320px;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  #milestone-toast.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  #milestone-toast .m-star { font-size: 20px; margin-bottom: 6px; }
+  #milestone-toast .m-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--gold-soft);
+    line-height: 1.45;
+  }
+
+  #footer-credit {
+    position: fixed;
+    bottom: 8px;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 10px;
+    color: rgba(163, 174, 224, 0.35);
+    z-index: 15;
+    pointer-events: none;
   }
 </style>
 </head>
 <body>
 
-<div id="gameContainer">
-  <canvas id="gameCanvas"></canvas>
+<div id="sky"></div>
+<canvas id="game"></canvas>
 
-  <!-- HUD -->
-  <div id="titleBanner">
-    <h1>🐰 Bun's 7th Monthsary Adventure 🥕❤️</h1>
-  </div>
-
+<div id="ui-top">
+  <div id="names">Bun &amp; Plu</div>
+  <div id="months-label"><span id="months-count">0</span> months, one constellation</div>
   <div id="hud">
-    <div class="hud-pill">🥕 <span id="carrotCount">0</span> left</div>
-    <div class="hud-pill">⭐ Score: <span id="scoreCount">0</span></div>
-    <div class="hud-pill" id="muteBtn">🔊</div>
+    <div id="progress-text">0 / 0 stars</div>
+    <div id="lives"></div>
   </div>
-
-  <div id="hint">Drag the carrot back, then let go to launch! 🐰</div>
-  <div id="skipLevelBtn">Having trouble? Tap here to skip to your letter 💌</div>
-
-  <!-- Floating hearts / confetti / sparkles layer -->
-  <div id="heartLayer"></div>
-
-  <!-- WIN MODAL -->
-  <div class="overlay" id="winOverlay">
-    <div id="winModal">
-      <span class="win-emoji">🥰🐰💕</span>
-      <h2>You fixed it all, Bun!</h2>
-      <p>Every grumpy bunny turned happy again — just like every misunderstanding we worked through together. There's a little something waiting for you...</p>
-      <button class="cute-btn" id="openMessageBtn">💌 Open This Message</button>
-    </div>
-  </div>
-
-  <!-- LETTER MODAL -->
-  <div class="overlay" id="letterOverlay">
-    <div id="letterModal">
-      <span class="letter-deco-corner tl">🐰</span>
-      <span class="letter-deco-corner tr">🥕</span>
-      <span class="letter-deco-corner bl">🌷</span>
-      <span class="letter-deco-corner br">🐻</span>
-      <div id="letterHeader">💌</div>
-      <div id="letterTitle">A Little Letter For You</div>
-      <div id="letterText"><span id="letterCursor"></span></div>
-      <button id="skipTypingBtn">Skip ⏩</button>
-      <div id="loveYouTooWrap">
-        <button class="cute-btn" id="loveYouTooBtn">🐰 I Love You Too</button>
-        <div id="musicNote">🎵 playing a little tune for you...</div>
-      </div>
-    </div>
-  </div>
-
 </div>
 
+<div id="milestone-toast">
+  <div class="m-star">✦</div>
+  <div class="m-text" id="milestone-text"></div>
+</div>
+
+<div id="start-overlay" class="overlay">
+  <div class="card">
+    <div class="eyebrow">Happy Monthsary</div>
+    <h1 class="title">Catch our stars,<br>complete our sky</h1>
+    <p class="msg-body">
+      Every star that falls is one month of us. Guide the little moon to
+      catch them all before the clouds catch you — and watch our
+      constellation take shape above.
+    </p>
+    <button class="btn" id="start-btn">Begin</button>
+    <p class="hint">Move the moon with your mouse, arrow keys, or finger</p>
+  </div>
+</div>
+
+<div id="win-overlay" class="overlay hidden">
+  <div class="card">
+    <div class="eyebrow">Constellation Complete</div>
+    <h1 class="title" id="win-title">Every month, accounted for</h1>
+    <p class="msg-body" id="win-body"></p>
+    <button class="btn" id="restart-btn-win">Catch it again</button>
+  </div>
+</div>
+
+<div id="lose-overlay" class="overlay hidden">
+  <div class="card">
+    <div class="eyebrow">The clouds won this round</div>
+    <h1 class="title">Not tonight's sky</h1>
+    <p class="msg-body" id="lose-body">
+      Some nights are cloudy. That's alright — we get to try again,
+      just like we always do.
+    </p>
+    <button class="btn" id="restart-btn-lose">Try again</button>
+  </div>
+</div>
+
+<div id="footer-credit">made with love, for us</div>
+
 <script>
-/* ====================================================================
-   BUN'S 7TH MONTHSARY ADVENTURE
-   A handmade Angry-Birds-style game where every "angry bunny" you turn
-   happy represents a misunderstanding healed together. <3
+/* =========================================================
+   EDIT ME — personalize your monthsary game here
+   ========================================================= */
+const COUPLE_NAMES = "Bun & Plu";               // shown at the top
+const START_DATE = "2025-10-24";                // the date you got together (YYYY-MM-DD) — edit this to your real start date
+const LIVES = 4;                                // how many clouds you can survive
+const WIN_TITLE = "Happy Monthsary, Bun 🐰🌙";
+const WIN_MESSAGE = `Happy Monthsary, bun. ❤️🐰<br><br>
+Thank you for staying with me. Alam kong hindi naman laging perfect yung mga araw natin, pero sobrang grateful ako na nandito ka pa rin. Ang dami na nating napagdaanan 🌙✨ like mga tawanan, kwentuhan, late-night calls, mga simpleng lambing, pati na rin yung mga tampuhan na lagi rin namang naaayos.<br><br>
+Honestly, yung mga simpleng moments na yun yung naging favorite memories ko 💫. Hindi man sila grand or special sa paningin ng iba, pero para sa'kin, sila yung dahilan kung bakit masaya ako.<br><br>
+Thank you sa pag-intindi sa'kin, sa patience mo, at sa effort na binibigay mo sa relationship natin. Thank you rin sa pagiging ikaw 🐇. Hindi ko man nasasabi palagi, pero sobrang naa-appreciate kita.<br><br>
+I'm really happy na ikaw yung kasama ko sa journey na 'to 🌕. Sana marami pa tayong memories na mabuo, maraming tawanan, maraming dates, at marami pang monthsary na sabay nating ice-celebrate 🎉.<br><br>
+Happy Monthsary ulit, bun. I love you. ❤️🐰🌙`;
 
-   Everything below is self-contained: no external assets, fonts,
-   images, or sound files — all visuals are drawn on canvas, and all
-   sound is synthesized live with the Web Audio API.
-   ==================================================================== */
+// Optional custom captions shown when specific stars are caught.
+// Key = which star number (1st star, 2nd star, ...), value = the message.
+// Anything not listed here gets a default gentle line.
+const MILESTONE_MESSAGES = {
+  1: "The night we met.",
+  3: "The first time you made me laugh until it hurt.",
+  6: "Half a year, and still my favorite person.",
+  12: "A whole year of choosing each other.",
+};
 
-(function () {
-  'use strict';
+const DEFAULT_MILESTONE_LINES = [
+  "A quiet Tuesday, made brighter by you.",
+  "Another month, another reason.",
+  "Still here. Still us.",
+  "A little light for a little memory.",
+  "This one's for a good day we had.",
+];
 
-  /* ------------------------------------------------------------------
-     0. CANVAS + RESPONSIVE SETUP
-     ------------------------------------------------------------------ */
-  const canvas = document.getElementById('gameCanvas');
-  const ctx = canvas.getContext('2d');
+/* ========================================================= */
 
-  let DPR = Math.min(window.devicePixelRatio || 1, 2);
-  let W = 0, H = 0; // logical (CSS pixel) size
+document.getElementById('names').textContent = COUPLE_NAMES;
 
-  function resizeCanvas() {
-    W = window.innerWidth;
-    H = window.innerHeight;
-    DPR = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.floor(W * DPR);
-    canvas.height = Math.floor(H * DPR);
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+function monthsSince(dateStr) {
+  const start = new Date(dateStr + "T00:00:00");
+  const now = new Date();
+  let months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+  if (now.getDate() < start.getDate()) months -= 1;
+  return Math.max(1, months);
+}
+
+const TOTAL_STARS = monthsSince(START_DATE);
+document.getElementById('months-count').textContent = TOTAL_STARS;
+document.getElementById('progress-text').textContent = `0 / ${TOTAL_STARS} stars`;
+
+// lives display
+const livesEl = document.getElementById('lives');
+function renderLives(n) {
+  livesEl.innerHTML = '';
+  for (let i = 0; i < LIVES; i++) {
+    const s = document.createElement('span');
+    s.textContent = i < n ? '🐰' : '🤍';
+    livesEl.appendChild(s);
   }
-  resizeCanvas();
+}
+renderLives(LIVES);
 
-  /* ------------------------------------------------------------------
-     1. SOUND ENGINE (Web Audio API — fully synthesized, no files)
-     ------------------------------------------------------------------ */
-  const SoundEngine = (function () {
-    let actx = null;
-    let muted = false;
-    let musicNodes = null;
+// background twinkle field
+const sky = document.getElementById('sky');
+function buildTwinkles() {
+  const count = Math.min(90, Math.floor((window.innerWidth * window.innerHeight) / 9000));
+  for (let i = 0; i < count; i++) {
+    const t = document.createElement('div');
+    t.className = 'twinkle';
+    const size = Math.random() * 2 + 1;
+    t.style.width = size + 'px';
+    t.style.height = size + 'px';
+    t.style.left = Math.random() * 100 + '%';
+    t.style.top = Math.random() * 70 + '%';
+    t.style.animationDuration = (2 + Math.random() * 3) + 's';
+    t.style.animationDelay = (Math.random() * 3) + 's';
+    sky.appendChild(t);
+  }
+}
+buildTwinkles();
 
-    function ensureCtx() {
-      if (!actx) {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        actx = new AC();
-      }
-      if (actx.state === 'suspended') actx.resume();
-      return actx;
-    }
+/* ============== GAME ============== */
 
-    // Generic tone helper: frequency sweep + envelope
-    function tone(freqStart, freqEnd, duration, type, volume, delay) {
-      if (muted) return;
-      try {
-        const ac = ensureCtx();
-        const t0 = ac.currentTime + (delay || 0);
-        const osc = ac.createOscillator();
-        const gain = ac.createGain();
-        osc.type = type || 'sine';
-        osc.frequency.setValueAtTime(freqStart, t0);
-        osc.frequency.exponentialRampToValueAtTime(Math.max(freqEnd, 1), t0 + duration);
-        gain.gain.setValueAtTime(0.0001, t0);
-        gain.gain.exponentialRampToValueAtTime(volume, t0 + duration * 0.15);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
-        osc.connect(gain);
-        gain.connect(ac.destination);
-        osc.start(t0);
-        osc.stop(t0 + duration + 0.05);
-      } catch (e) { /* audio not available, fail silently */ }
-    }
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let W, H, DPR;
 
-    // Launch "twang" sound
-    function playLaunch() {
-      tone(180, 520, 0.18, 'triangle', 0.18, 0);
-      tone(90, 260, 0.18, 'sine', 0.12, 0.02);
-    }
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = W * DPR;
+  canvas.height = H * DPR;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+window.addEventListener('resize', resize);
+resize();
 
-    // Soft "boing" impact sound
-    function playHit() {
-      tone(260, 90, 0.18, 'square', 0.14, 0);
-    }
+// --- constellation target shape (heart), scaled to TOTAL_STARS points ---
+function heartPoint(t) {
+  // parametric heart curve, t in [0, 2*PI]
+  const x = 16 * Math.pow(Math.sin(t), 3);
+  const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+  return { x, y };
+}
 
-    // Cute upward "sparkle" chime when a bunny turns happy
-    function playTransform() {
-      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 E5 G5 C6
-      notes.forEach((f, i) => tone(f, f * 1.02, 0.32, 'sine', 0.13, i * 0.07));
-    }
+let constellationPoints = [];
+function buildConstellation() {
+  constellationPoints = [];
+  const n = TOTAL_STARS;
+  const topY = 92;
+  const areaW = Math.min(W * 0.62, 260);
+  const areaH = 78;
+  const cx = W / 2;
+  for (let i = 0; i < n; i++) {
+    const t = (i / Math.max(1, n - 1)) * Math.PI * 2;
+    const p = heartPoint(t);
+    constellationPoints.push({
+      x: cx + (p.x / 18) * (areaW / 2),
+      y: topY + (p.y / 17) * (areaH / 2),
+      lit: false
+    });
+  }
+}
+buildConstellation();
+window.addEventListener('resize', buildConstellation);
 
-    // Whoosh for trajectory feedback (very soft, optional flourish)
-    function playPop() {
-      tone(700, 1400, 0.08, 'sine', 0.06, 0);
-    }
+// --- entities ---
+const player = { x: 0, y: 0, r: 26, targetX: 0 };
+let fallers = []; // stars (good) and clouds (bad)
+let caught = 0;
+let lives = LIVES;
+let running = false;
+let spawnTimer = 0;
+let spawnInterval = 1500;
+let fallSpeedBase = 1.3;
+let elapsed = 0;
+let lastTime = 0;
 
-    // Big fanfare for winning the whole level
-    function playWinFanfare() {
-      const melody = [523.25, 587.33, 659.25, 783.99, 880, 1046.5];
-      melody.forEach((f, i) => tone(f, f, 0.4, 'triangle', 0.16, i * 0.13));
-    }
+function resetGame() {
+  caught = 0;
+  lives = LIVES;
+  fallers = [];
+  spawnTimer = 0;
+  spawnInterval = 1500;
+  fallSpeedBase = 1.3;
+  elapsed = 0;
+  player.x = W / 2;
+  player.targetX = W / 2;
+  player.y = H - 70;
+  renderLives(lives);
+  document.getElementById('progress-text').textContent = `0 / ${TOTAL_STARS} stars`;
+  buildConstellation();
+}
 
-    // Gentle wood-block "thud" for structure collapse
-    function playThud() {
-      tone(150, 60, 0.12, 'square', 0.08, 0);
-    }
-
-    // ---- Background romantic music (simple generative loop) ----
-    function startMusic() {
-      if (muted) return;
-      stopMusic();
-      try {
-        const ac = ensureCtx();
-        const master = ac.createGain();
-        master.gain.value = 0.08;
-        master.connect(ac.destination);
-
-        // A gentle, slow arpeggio loop in a major scale — like a music box.
-        const scale = [523.25, 587.33, 659.25, 698.46, 783.99, 880, 987.77, 1046.5];
-        const pattern = [0, 2, 4, 2, 1, 3, 5, 3, 0, 4, 2, 0]; // indices into scale
-        let step = 0;
-        const stepDur = 0.45;
-
-        function scheduleStep() {
-          if (!musicNodes || musicNodes.stopped) return;
-          const ac2 = ensureCtx();
-          const t0 = ac2.currentTime + 0.05;
-          const idx = pattern[step % pattern.length];
-          const freq = scale[idx];
-
-          const osc = ac2.createOscillator();
-          const gain = ac2.createGain();
-          osc.type = 'sine';
-          osc.frequency.value = freq;
-          gain.gain.setValueAtTime(0.0001, t0);
-          gain.gain.exponentialRampToValueAtTime(0.22, t0 + 0.08);
-          gain.gain.exponentialRampToValueAtTime(0.0001, t0 + stepDur * 0.95);
-          osc.connect(gain);
-          gain.connect(master);
-          osc.start(t0);
-          osc.stop(t0 + stepDur);
-
-          // soft underlying pad every 4 steps
-          if (step % 4 === 0) {
-            const padOsc = ac2.createOscillator();
-            const padGain = ac2.createGain();
-            padOsc.type = 'triangle';
-            padOsc.frequency.value = freq / 2;
-            padGain.gain.setValueAtTime(0.0001, t0);
-            padGain.gain.exponentialRampToValueAtTime(0.06, t0 + 0.3);
-            padGain.gain.exponentialRampToValueAtTime(0.0001, t0 + stepDur * 4 * 0.9);
-            padOsc.connect(padGain);
-            padGain.connect(master);
-            padOsc.start(t0);
-            padOsc.stop(t0 + stepDur * 4);
-          }
-
-          step++;
-        }
-
-        const intervalId = setInterval(scheduleStep, stepDur * 1000);
-        scheduleStep();
-        musicNodes = { master, intervalId, stopped: false };
-      } catch (e) { /* ignore */ }
-    }
-
-    function stopMusic() {
-      if (musicNodes) {
-        clearInterval(musicNodes.intervalId);
-        musicNodes.stopped = true;
-        try { musicNodes.master.disconnect(); } catch (e) {}
-        musicNodes = null;
-      }
-    }
-
-    function setMuted(m) {
-      muted = m;
-      if (muted) stopMusic();
-    }
-
-    return {
-      playLaunch, playHit, playTransform, playPop, playWinFanfare, playThud,
-      startMusic, stopMusic, setMuted,
-      isMuted: () => muted,
-      unlock: ensureCtx
-    };
-  })();
-
-  // Mute button wiring
-  const muteBtn = document.getElementById('muteBtn');
-  muteBtn.addEventListener('click', () => {
-    const newMuted = !SoundEngine.isMuted();
-    SoundEngine.setMuted(newMuted);
-    muteBtn.textContent = newMuted ? '🔇' : '🔊';
+function spawnFaller() {
+  const isCloud = Math.random() < 0.16;
+  const r = isCloud ? (16 + Math.random() * 10) : (9 + Math.random() * 4);
+  fallers.push({
+    type: isCloud ? 'cloud' : 'star',
+    x: 24 + Math.random() * (W - 48),
+    y: -30,
+    r,
+    speed: fallSpeedBase + Math.random() * 1.2,
+    drift: (Math.random() - 0.5) * 0.6,
+    twinklePhase: Math.random() * Math.PI * 2,
   });
+}
 
-  // Unlock audio context on first user interaction (mobile requirement)
-  function unlockAudioOnce() {
-    SoundEngine.unlock();
-    window.removeEventListener('pointerdown', unlockAudioOnce);
+function showMilestone(starIndex) {
+  const text = MILESTONE_MESSAGES[starIndex] ||
+    DEFAULT_MILESTONE_LINES[(starIndex - 1) % DEFAULT_MILESTONE_LINES.length];
+  const toast = document.getElementById('milestone-toast');
+  document.getElementById('milestone-text').textContent = text;
+  toast.classList.add('show');
+  clearTimeout(showMilestone._t);
+  showMilestone._t = setTimeout(() => toast.classList.remove('show'), 1600);
+}
+
+function catchStar() {
+  caught++;
+  if (constellationPoints[caught - 1]) constellationPoints[caught - 1].lit = true;
+  document.getElementById('progress-text').textContent = `${caught} / ${TOTAL_STARS} stars`;
+  showMilestone(caught);
+  if (caught >= TOTAL_STARS) {
+    endGame(true);
   }
-  window.addEventListener('pointerdown', unlockAudioOnce);
+}
 
-  /* ------------------------------------------------------------------
-     2. WORLD / PHYSICS CONSTANTS
-     ------------------------------------------------------------------ */
-  const GRAVITY = 1400;          // px/s^2
-  const GROUND_FRICTION = 0.985; // velocity damping per physics tick when rolling
-  const RESTITUTION = 0.42;      // bounciness on ground impact
-  const AIR_DRAG = 0.9994;
-  const FIXED_DT = 1 / 120;      // physics substep
-  const MAX_SUBSTEPS = 8;
-
-  function groundY() { return H - Math.max(60, H * 0.10); }
-
-  /* Slingshot anchor position — fixed in WORLD space, near the left edge
-     of the level. Stays put no matter how wide the screen is. */
-  function slingPos() {
-    return { x: 140, y: groundY() - Math.min(150, H * 0.22) };
+function hitCloud() {
+  lives--;
+  renderLives(lives);
+  if (lives <= 0) {
+    endGame(false);
   }
+}
 
-  /* ------------------------------------------------------------------
-     CAMERA SYSTEM
-     The level is built in a "world" coordinate space that's wider than
-     any single screen (so structures always have room to breathe, even
-     on narrow phones). The camera is just a horizontal scroll offset:
-     worldX - camera.x = screenX. It eases toward whatever it's
-     "following" (the carrot mid-flight, or the slingshot otherwise) so
-     the player can always see where the carrot is headed.
-     ------------------------------------------------------------------ */
-  const WORLD_PADDING_RIGHT = 160; // breathing room past the last structure
-  let WORLD_WIDTH = 1600; // recomputed once the level is built
-
-  const camera = {
-    x: 0,           // current scroll offset (world units)
-    targetX: 0,     // where we're easing toward
-    follow: null,   // null = look at slingshot; otherwise an object with .x/.y
-    locked: false   // true while user is aiming, to keep the sling steady on screen
-  };
-
-  function clampCameraX(x) {
-    const maxX = Math.max(0, WORLD_WIDTH - W);
-    return Math.max(0, Math.min(maxX, x));
+function endGame(won) {
+  running = false;
+  if (won) {
+    const body = WIN_MESSAGE
+      .replace('{months}', TOTAL_STARS)
+      .replace('{names}', COUPLE_NAMES);
+    document.getElementById('win-title').textContent = WIN_TITLE;
+    document.getElementById('win-body').innerHTML = body;
+    document.getElementById('win-overlay').classList.remove('hidden');
+  } else {
+    document.getElementById('lose-overlay').classList.remove('hidden');
   }
+}
 
-  // Decide what the camera should be centering on right now, and ease toward it.
-  function updateCamera(dt) {
-    if (gameWon) return; // freeze the view once we've won — let the celebration breathe
-    let desired;
-    if (camera.locked) {
-      // While aiming, keep the slingshot comfortably on the left third of the screen.
-      desired = slingPos().x - W * 0.28;
-    } else if (camera.follow && camera.follow.alive !== false) {
-      // Follow the flying carrot, keeping it a little left-of-center so the
-      // player can see what's ahead of it.
-      desired = camera.follow.x - W * 0.42;
-    } else {
-      // Idle: ease back to showing the slingshot at rest.
-      desired = slingPos().x - W * 0.28;
-    }
-    camera.targetX = clampCameraX(desired);
-    // Smooth easing (frame-rate independent-ish)
-    const ease = 1 - Math.pow(0.0035, dt);
-    camera.x += (camera.targetX - camera.x) * Math.min(1, ease * 6);
+/* ---- input ---- */
+function setTargetFromClientX(clientX) {
+  const rect = canvas.getBoundingClientRect();
+  player.targetX = clientX - rect.left;
+}
+canvas.addEventListener('mousemove', e => setTargetFromClientX(e.clientX));
+canvas.addEventListener('touchmove', e => {
+  if (e.touches[0]) setTargetFromClientX(e.touches[0].clientX);
+  e.preventDefault();
+}, { passive: false });
+canvas.addEventListener('touchstart', e => {
+  if (e.touches[0]) setTargetFromClientX(e.touches[0].clientX);
+}, { passive: false });
+
+const keys = {};
+window.addEventListener('keydown', e => { keys[e.key] = true; });
+window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+/* ---- draw helpers ---- */
+function drawMoon(x, y, r) {
+  ctx.save();
+  ctx.translate(x, y);
+  const grad = ctx.createRadialGradient(0, 0, 1, 0, 0, r * 1.8);
+  grad.addColorStop(0, 'rgba(253, 251, 247, 0.55)');
+  grad.addColorStop(1, 'rgba(253, 251, 247, 0)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 1.8, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#fdfbf7';
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#0a0e27';
+  ctx.globalAlpha = 0.9;
+  ctx.beginPath();
+  ctx.arc(r * 0.42, -r * 0.12, r * 0.82, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+function drawStar(x, y, r, phase) {
+  const glow = 0.6 + 0.4 * Math.sin(phase);
+  ctx.save();
+  ctx.translate(x, y);
+  const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 2.4);
+  grad.addColorStop(0, `rgba(244, 201, 93, ${0.55 * glow})`);
+  grad.addColorStop(1, 'rgba(244, 201, 93, 0)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(0, 0, r * 2.4, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#fff6da';
+  ctx.beginPath();
+  const spikes = 4;
+  for (let i = 0; i < spikes * 2; i++) {
+    const rad = i % 2 === 0 ? r : r * 0.4;
+    const ang = (Math.PI / spikes) * i - Math.PI / 2;
+    const px = Math.cos(ang) * rad;
+    const py = Math.sin(ang) * rad;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
   }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
 
-  // Convert a screen-space pointer position into world-space coordinates.
-  function screenToWorld(pos) {
-    return { x: pos.x + camera.x, y: pos.y };
+function drawCloud(x, y, r) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.fillStyle = 'rgba(163, 174, 224, 0.5)';
+  ctx.beginPath();
+  ctx.arc(-r * 0.5, 0, r * 0.55, 0, Math.PI * 2);
+  ctx.arc(r * 0.3, -r * 0.15, r * 0.6, 0, Math.PI * 2);
+  ctx.arc(r * 0.6, r * 0.15, r * 0.45, 0, Math.PI * 2);
+  ctx.arc(0, r * 0.1, r * 0.6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawConstellation() {
+  if (constellationPoints.length < 2) return;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(244, 201, 93, 0.35)';
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  let started = false;
+  for (const p of constellationPoints) {
+    if (!p.lit) continue;
+    if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+    else ctx.lineTo(p.x, p.y);
   }
+  ctx.stroke();
 
-  /* ------------------------------------------------------------------
-     3. BACKGROUND DECOR (clouds, sun, flowers) — drawn once per frame,
-        cheap procedural shapes, no images required.
-     ------------------------------------------------------------------ */
-  const clouds = [];
-  function initClouds() {
-    clouds.length = 0;
-    const count = 6;
-    for (let i = 0; i < count; i++) {
-      clouds.push({
-        x: Math.random() * W,
-        y: 40 + Math.random() * (H * 0.35),
-        scale: 0.6 + Math.random() * 0.9,
-        speed: 6 + Math.random() * 10
-      });
-    }
-  }
-  initClouds();
-
-  function drawCloud(c) {
-    ctx.save();
-    ctx.translate(c.x, c.y);
-    ctx.scale(c.scale, c.scale);
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  for (const p of constellationPoints) {
     ctx.beginPath();
-    ctx.ellipse(0, 0, 30, 18, 0, 0, Math.PI * 2);
-    ctx.ellipse(24, -6, 22, 16, 0, 0, Math.PI * 2);
-    ctx.ellipse(-24, -4, 20, 15, 0, 0, Math.PI * 2);
-    ctx.ellipse(8, -16, 18, 14, 0, 0, Math.PI * 2);
+    ctx.fillStyle = p.lit ? '#f4c95d' : 'rgba(163, 174, 224, 0.28)';
+    const rr = p.lit ? 3 : 1.8;
+    ctx.arc(p.x, p.y, rr, 0, Math.PI * 2);
     ctx.fill();
-    ctx.restore();
-  }
-
-  // Screen-fixed layer: sky, sun, clouds. Drawn WITHOUT camera translation,
-  // so it behaves like a distant backdrop that doesn't scroll with the world
-  // (this also reads as gentle parallax depth as the camera pans).
-  function drawSky(dt) {
-    const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, '#FFE3EE');
-    grad.addColorStop(0.45, '#FFD6E8');
-    grad.addColorStop(1, '#FFF1DC');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
-
-    // Sun (soft glow)
-    const sunX = W * 0.85, sunY = H * 0.16, sunR = Math.min(W, H) * 0.07;
-    const sunGrad = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR * 2.4);
-    sunGrad.addColorStop(0, 'rgba(255, 244, 200, 0.95)');
-    sunGrad.addColorStop(1, 'rgba(255, 244, 200, 0)');
-    ctx.fillStyle = sunGrad;
-    ctx.beginPath();
-    ctx.arc(sunX, sunY, sunR * 2.4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#FFF6DC';
-    ctx.beginPath();
-    ctx.arc(sunX, sunY, sunR, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Clouds drift slowly
-    clouds.forEach(c => {
-      c.x += c.speed * dt;
-      if (c.x > W + 60) c.x = -60;
-      drawCloud(c);
-    });
-  }
-
-  // World-space layer: hills, ground, grass, flowers. Drawn INSIDE the
-  // camera translation, sized across the whole WORLD_WIDTH so it scrolls
-  // naturally as the camera pans to follow the carrot.
-  function drawGroundLayer(dt) {
-    const gY = groundY();
-    const worldL = camera.x - 40;
-    const worldR = camera.x + W + 40;
-
-    // Distant hills (gentle repeating bumps across the visible span)
-    ctx.fillStyle = 'rgba(255, 182, 217, 0.35)';
-    ctx.beginPath();
-    ctx.moveTo(worldL, gY);
-    const hillStep = (worldR - worldL) / 4;
-    for (let i = 0; i <= 4; i++) {
-      const x = worldL + hillStep * i;
-      const bump = (i % 2 === 0) ? -10 : -65;
-      ctx.quadraticCurveTo(x - hillStep / 2, gY + bump, x, gY - 10);
-    }
-    ctx.lineTo(worldR, gY + 200);
-    ctx.lineTo(worldL, gY + 200);
-    ctx.closePath();
-    ctx.fill();
-
-    // Ground (grass strip)
-    const grassGrad = ctx.createLinearGradient(0, gY, 0, H);
-    grassGrad.addColorStop(0, '#BFEAA5');
-    grassGrad.addColorStop(1, '#8FCB7A');
-    ctx.fillStyle = grassGrad;
-    ctx.fillRect(worldL, gY, worldR - worldL, H - gY);
-
-    // Little grass tufts along the ground line, spanning the visible world range
-    ctx.save();
-    ctx.strokeStyle = '#7AB867';
-    ctx.lineWidth = 2;
-    const tuftStart = Math.floor(worldL / 26) * 26;
-    for (let x = tuftStart; x < worldR; x += 26) {
-      const h = 6 + (Math.sin(x * 0.13) + 1) * 4;
-      ctx.beginPath();
-      ctx.moveTo(x, gY);
-      ctx.lineTo(x - 3, gY - h);
-      ctx.moveTo(x, gY);
-      ctx.lineTo(x + 3, gY - h);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    // tiny flowers scattered on the grass, deterministic by world position
-    const flowerStart = Math.floor(worldL / 97) * 97;
-    for (let x = flowerStart; x < worldR; x += 97) {
-      const seed = Math.floor(x / 97);
-      const fy = gY + 14 + (Math.abs(Math.sin(seed * 12.9898)) * Math.max(20, (H - gY - 30)));
-      const colorPick = seed % 3;
-      drawTinyFlower(x + 40, fy, colorPick === 0 ? '#FF8FB1' : (colorPick === 1 ? '#A8D8FF' : '#FFE08A'));
-    }
-  }
-
-  function drawTinyFlower(x, y, color) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.fillStyle = color;
-    for (let p = 0; p < 5; p++) {
+    if (p.lit) {
       ctx.save();
-      ctx.rotate((p / 5) * Math.PI * 2);
+      ctx.globalAlpha = 0.35;
       ctx.beginPath();
-      ctx.ellipse(0, -4, 2.6, 4, 0, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = '#f4c95d';
       ctx.fill();
       ctx.restore();
     }
-    ctx.fillStyle = '#FFD86B';
-    ctx.beginPath();
-    ctx.arc(0, 0, 2.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
   }
+  ctx.restore();
+}
 
-  /* ------------------------------------------------------------------
-     4. PARTICLE SYSTEM (hearts, sparkles, dust, confetti on canvas)
-     ------------------------------------------------------------------ */
-  let particles = [];
+/* ---- main loop ---- */
+function update(dt) {
+  elapsed += dt;
+  spawnTimer += dt;
+  const curInterval = Math.max(650, spawnInterval - elapsed * 0.007);
+  if (spawnTimer > curInterval) {
+    spawnTimer = 0;
+    spawnFaller();
+  }
+  fallSpeedBase = 1.3 + elapsed * 0.00022;
 
-  function spawnHeartBurst(x, y, count) {
-    for (let i = 0; i < (count || 10); i++) {
-      const ang = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.1;
-      const speed = 60 + Math.random() * 120;
-      particles.push({
-        type: 'heart',
-        x, y,
-        vx: Math.cos(ang) * speed,
-        vy: Math.sin(ang) * speed - 40,
-        life: 0, maxLife: 1.1 + Math.random() * 0.6,
-        size: 10 + Math.random() * 14,
-        color: Math.random() < 0.5 ? '#FF6F9E' : '#FFB6D9',
-        spin: (Math.random() - 0.5) * 4
-      });
+  player.x += (player.targetX - player.x) * 0.18;
+  if (keys['ArrowLeft']) player.targetX -= 9;
+  if (keys['ArrowRight']) player.targetX += 9;
+  player.targetX = Math.max(24, Math.min(W - 24, player.targetX));
+
+  for (let i = fallers.length - 1; i >= 0; i--) {
+    const f = fallers[i];
+    f.y += f.speed * (dt / 16.67);
+    f.x += f.drift * (dt / 16.67);
+    f.twinklePhase += 0.08;
+
+    const dx = f.x - player.x;
+    const dy = f.y - player.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < f.r + player.r * 0.8) {
+      if (f.type === 'star') catchStar(); else hitCloud();
+      fallers.splice(i, 1);
+      continue;
+    }
+    if (f.y - f.r > H + 20) {
+      fallers.splice(i, 1);
     }
   }
+}
 
-  function spawnSparkleBurst(x, y, count) {
-    for (let i = 0; i < (count || 8); i++) {
-      const ang = Math.random() * Math.PI * 2;
-      const speed = 40 + Math.random() * 90;
-      particles.push({
-        type: 'sparkle',
-        x, y,
-        vx: Math.cos(ang) * speed,
-        vy: Math.sin(ang) * speed,
-        life: 0, maxLife: 0.6 + Math.random() * 0.5,
-        size: 6 + Math.random() * 8,
-        color: '#FFF1B8'
-      });
-    }
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  drawConstellation();
+  for (const f of fallers) {
+    if (f.type === 'star') drawStar(f.x, f.y, f.r, f.twinklePhase);
+    else drawCloud(f.x, f.y, f.r);
   }
-
-  function spawnDust(x, y, count) {
-    for (let i = 0; i < (count || 6); i++) {
-      const ang = Math.random() * Math.PI * 2;
-      const speed = 20 + Math.random() * 50;
-      particles.push({
-        type: 'dust',
-        x, y,
-        vx: Math.cos(ang) * speed,
-        vy: Math.sin(ang) * speed - 20,
-        life: 0, maxLife: 0.5 + Math.random() * 0.3,
-        size: 4 + Math.random() * 6,
-        color: 'rgba(180,140,110,0.5)'
-      });
-    }
-  }
-
-  function updateAndDrawParticles(dt) {
-    particles.forEach(p => {
-      p.life += dt;
-      p.x += p.vx * dt;
-      p.y += p.vy * dt;
-      p.vy += (p.type === 'dust' ? 60 : 90) * dt;
-      p.vx *= 0.98;
-    });
-    particles = particles.filter(p => p.life < p.maxLife);
-
-    particles.forEach(p => {
-      const t = p.life / p.maxLife;
-      const alpha = 1 - t;
-      ctx.save();
-      ctx.globalAlpha = Math.max(0, alpha);
-      ctx.translate(p.x, p.y);
-      if (p.type === 'heart') {
-        ctx.rotate((p.spin || 0) * t);
-        const s = p.size * (0.7 + 0.3 * (1 - t));
-        drawHeartShape(0, 0, s, p.color);
-      } else if (p.type === 'sparkle') {
-        ctx.rotate(t * Math.PI);
-        drawSparkleShape(0, 0, p.size * (1 - t * 0.3), p.color);
-      } else { // dust
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(0, 0, p.size * (1 - t * 0.5), 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.restore();
-    });
-  }
-
-  function drawHeartShape(x, y, size, color) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    const s = size / 2;
-    ctx.moveTo(0, s * 0.6);
-    ctx.bezierCurveTo(-s, -s * 0.4, -s * 1.6, s * 0.9, 0, s * 1.8);
-    ctx.bezierCurveTo(s * 1.6, s * 0.9, s, -s * 0.4, 0, s * 0.6);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function drawSparkleShape(x, y, size, color) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    for (let i = 0; i < 4; i++) {
-      ctx.save();
-      ctx.rotate((i / 4) * Math.PI * 2);
-      ctx.moveTo(0, 0);
-      ctx.quadraticCurveTo(size * 0.15, size * 0.15, 0, size);
-      ctx.quadraticCurveTo(-size * 0.15, size * 0.15, 0, 0);
-      ctx.restore();
-    }
-    ctx.fill();
-    ctx.restore();
-  }
-
-  /* ------------------------------------------------------------------
-     5. BLOCKS (obstacles / structure pieces that bunnies sit on)
-     ------------------------------------------------------------------ */
-  class Block {
-    constructor(x, y, w, h, material) {
-      this.x = x; this.y = y; // center position
-      this.w = w; this.h = h;
-      this.material = material || 'wood'; // 'wood' | 'cloud' | 'crate'
-      this.vy = 0; this.vx = 0;
-      this.angle = 0;
-      this.angVel = 0;
-      this.settled = false;
-      this.health = material === 'cloud' ? 1 : 2; // clouds break in one hit
-      this.alive = true;
-      this.shakeT = 0;
-    }
-    get top() { return this.y - this.h / 2; }
-    get bottom() { return this.y + this.h / 2; }
-    get left() { return this.x - this.w / 2; }
-    get right() { return this.x + this.w / 2; }
-
-    update(dt) {
-      if (this.shakeT > 0) this.shakeT -= dt;
-      if (this.settled) return;
-      this.vy += GRAVITY * dt;
-      this.y += this.vy * dt;
-      this.x += this.vx * dt;
-      this.angle += this.angVel * dt;
-      // land on ground
-      const gy = groundY();
-      if (this.bottom > gy) {
-        this.y = gy - this.h / 2;
-        this.vy *= -RESTITUTION * 0.3;
-        this.vx *= GROUND_FRICTION;
-        this.angVel *= 0.8;
-        if (Math.abs(this.vy) < 18) { this.vy = 0; this.settled = true; this.angle = 0; }
-      }
-    }
-
-    draw() {
-      ctx.save();
-      ctx.translate(this.x, this.y + (this.shakeT > 0 ? Math.sin(this.shakeT * 60) * 2 : 0));
-      ctx.rotate(this.angle);
-      const w = this.w, h = this.h;
-      if (this.material === 'cloud') {
-        // Fluffy pastel cloud platform
-        ctx.fillStyle = '#FFFFFF';
-        ctx.strokeStyle = '#D8C7F2';
-        ctx.lineWidth = 2;
-        roundedRectPath(-w/2, -h/2, w, h, h/2.2);
-        ctx.fill(); ctx.stroke();
-      } else if (this.material === 'crate') {
-        // Pastel blue crate with carrot-cross pattern
-        const grad = ctx.createLinearGradient(-w/2, -h/2, w/2, h/2);
-        grad.addColorStop(0, '#BFE3FF');
-        grad.addColorStop(1, '#8FCBF0');
-        ctx.fillStyle = grad;
-        roundedRectPath(-w/2, -h/2, w, h, 6);
-        ctx.fill();
-        ctx.strokeStyle = '#6FAEDB';
-        ctx.lineWidth = 2.5;
-        ctx.strokeRect(-w/2 + 4, -h/2 + 4, w - 8, h - 8);
-        ctx.beginPath();
-        ctx.moveTo(-w/2 + 4, -h/2 + 4); ctx.lineTo(w/2 - 4, h/2 - 4);
-        ctx.moveTo(w/2 - 4, -h/2 + 4); ctx.lineTo(-w/2 + 4, h/2 - 4);
-        ctx.stroke();
-      } else {
-        // Pastel wood plank
-        const grad = ctx.createLinearGradient(-w/2, -h/2, w/2, h/2);
-        grad.addColorStop(0, '#FFD9A0');
-        grad.addColorStop(1, '#F3B873');
-        ctx.fillStyle = grad;
-        roundedRectPath(-w/2, -h/2, w, h, 5);
-        ctx.fill();
-        ctx.strokeStyle = '#D89752';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        // wood grain lines
-        ctx.strokeStyle = 'rgba(216,151,82,0.5)';
-        ctx.lineWidth = 1.5;
-        for (let i = 1; i < 3; i++) {
-          ctx.beginPath();
-          ctx.moveTo(-w/2 + 4, -h/2 + (h/3) * i);
-          ctx.lineTo(w/2 - 4, -h/2 + (h/3) * i);
-          ctx.stroke();
-        }
-      }
-      ctx.restore();
-    }
-  }
-
-  function roundedRectPath(x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.arcTo(x + w, y, x + w, y + h, r);
-    ctx.arcTo(x + w, y + h, x, y + h, r);
-    ctx.arcTo(x, y + h, x, y, r);
-    ctx.arcTo(x, y, x + w, y, r);
-    ctx.closePath();
-  }
-
-  /* ------------------------------------------------------------------
-     6. BUNNIES (the targets — start angry/sad, become happy when hit)
-     ------------------------------------------------------------------ */
-  let bunnyIdCounter = 0;
-
-  class Bunny {
-    constructor(x, y, restingOn) {
-      this.id = bunnyIdCounter++;
-      this.x = x; this.y = y;
-      this.r = 22; // body radius
-      this.vy = 0; this.vx = 0;
-      this.angle = 0; this.angVel = 0;
-      this.happy = false;
-      this.alive = true;
-      this.settled = restingOn !== undefined;
-      this.restingOn = restingOn; // Block reference, or null = ground
-      this.hopT = Math.random() * 10; // for idle bob animation, randomized phase
-      this.blink = Math.random() * 5;
-      this.hitFlash = 0;
-      this.popScale = 1;
-      this.transformT = -1; // >=0 while playing the transform animation
-      this.earWiggle = Math.random() * 10;
-      this.fallen = false;
-    }
-
-    get top() { return this.y - this.r; }
-    get bottom() { return this.y + this.r; }
-    get left() { return this.x - this.r; }
-    get right() { return this.x + this.r; }
-
-    takeHit() {
-      if (this.happy) return;
-      this.happy = true;
-      this.transformT = 0;
-      this.hitFlash = 0.25;
-      this.fallen = false;
-      // little upward pop of joy
-      this.vy = -160;
-      this.settled = false;
-    }
-
-    update(dt) {
-      this.hopT += dt;
-      this.blink += dt;
-      this.earWiggle += dt;
-      if (this.hitFlash > 0) this.hitFlash -= dt;
-      if (this.transformT >= 0) this.transformT += dt;
-
-      if (!this.settled) {
-        this.vy += GRAVITY * 0.7 * dt;
-        this.y += this.vy * dt;
-        this.x += this.vx * dt;
-        this.vx *= 0.99;
-        const gy = groundY();
-        if (this.bottom > gy) {
-          this.y = gy - this.r;
-          this.vy *= -0.3;
-          if (Math.abs(this.vy) < 30) { this.vy = 0; this.settled = true; }
-          this.fallen = true;
-        }
-        // if resting block was destroyed/moved, check we still rest on it
-      } else if (this.restingOn && this.restingOn.alive) {
-        // follow the block we sit on (if it moves/settles)
-        this.x = this.restingOn._bunnyAnchorX !== undefined ? this.restingOn._bunnyAnchorX : this.x;
-      }
-    }
-
-    draw() {
-      const bob = this.settled ? Math.sin(this.hopT * 2.2) * 2 : 0;
-      const earWiggleAmt = Math.sin(this.earWiggle * 3) * 0.08;
-      ctx.save();
-      ctx.translate(this.x, this.y + bob);
-
-      // pop scale animation right after transform starts
-      let scale = 1;
-      if (this.transformT >= 0 && this.transformT < 0.35) {
-        const t = this.transformT / 0.35;
-        scale = 1 + Math.sin(t * Math.PI) * 0.35;
-      }
-      ctx.scale(scale, scale);
-
-      const bodyColor = this.happy ? '#FFFFFF' : '#F4E9E2';
-      const earInner = this.happy ? '#FFC2D9' : '#E8A8B8';
-      const cheek = this.happy ? '#FFB6CE' : '#E59CAE';
-
-      // shadow
-      ctx.save();
-      ctx.globalAlpha = 0.18;
-      ctx.fillStyle = '#000';
-      ctx.beginPath();
-      ctx.ellipse(0, this.r + 6, this.r * 0.85, this.r * 0.28, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-
-      // ears
-      ['left', 'right'].forEach(side => {
-        const dir = side === 'left' ? -1 : 1;
-        ctx.save();
-        ctx.translate(dir * this.r * 0.55, -this.r * 0.95);
-        ctx.rotate(dir * (0.25 + earWiggleAmt) * (this.happy ? 1 : 0.6));
-        ctx.fillStyle = bodyColor;
-        ctx.beginPath();
-        ctx.ellipse(0, -this.r * 0.55, this.r * 0.32, this.r * 0.85, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = earInner;
-        ctx.beginPath();
-        ctx.ellipse(0, -this.r * 0.5, this.r * 0.16, this.r * 0.55, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      });
-
-      // body
-      ctx.fillStyle = bodyColor;
-      ctx.beginPath();
-      ctx.ellipse(0, this.r * 0.15, this.r * 0.92, this.r * 0.8, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // head
-      ctx.beginPath();
-      ctx.arc(0, -this.r * 0.25, this.r * 0.72, 0, Math.PI * 2);
-      ctx.fill();
-
-      // cheeks
-      ctx.fillStyle = cheek;
-      ctx.globalAlpha = 0.7;
-      ctx.beginPath();
-      ctx.ellipse(-this.r * 0.42, -this.r * 0.05, this.r * 0.18, this.r * 0.13, 0, 0, Math.PI * 2);
-      ctx.ellipse(this.r * 0.42, -this.r * 0.05, this.r * 0.18, this.r * 0.13, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-
-      // hit flash (white overlay flash)
-      if (this.hitFlash > 0) {
-        ctx.save();
-        ctx.globalAlpha = Math.min(1, this.hitFlash * 4);
-        ctx.fillStyle = '#FFFFFF';
-        ctx.beginPath();
-        ctx.arc(0, -this.r * 0.25, this.r * 0.78, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      this.drawFace();
-
-      // little carrot-shaped paws (front feet)
-      ctx.fillStyle = bodyColor;
-      ctx.beginPath();
-      ctx.ellipse(-this.r * 0.4, this.r * 0.75, this.r * 0.22, this.r * 0.18, 0, 0, Math.PI * 2);
-      ctx.ellipse(this.r * 0.4, this.r * 0.75, this.r * 0.22, this.r * 0.18, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.restore();
-
-      // heart sparkle aura for happy bunnies (gentle floating hearts above head)
-      if (this.happy) {
-        const auraT = this.hopT;
-        ctx.save();
-        ctx.globalAlpha = 0.85;
-        const hx = Math.sin(auraT * 1.3) * this.r * 0.5;
-        const hy = -this.r * 1.7 + Math.sin(auraT * 2) * 3 + bob;
-        drawHeartShape(this.x + hx, this.y + hy, 10, '#FF8FB1');
-        ctx.restore();
-      }
-    }
-
-    drawFace() {
-      const r = this.r;
-      ctx.save();
-      const eyeY = -r * 0.32;
-      const blinking = (this.blink % 4) > 3.85;
-
-      if (this.happy) {
-        // ===== HAPPY FACE =====
-        ctx.strokeStyle = '#5B3A45';
-        ctx.lineWidth = 2.4;
-        ctx.lineCap = 'round';
-        // curved happy eyes (^ ^)
-        [-1, 1].forEach(dir => {
-          ctx.beginPath();
-          ctx.arc(dir * r * 0.28, eyeY + 2, r * 0.16, Math.PI * 1.15, Math.PI * 1.85, false);
-          ctx.stroke();
-        });
-        // smiling mouth
-        ctx.beginPath();
-        ctx.arc(0, r * 0.02, r * 0.32, 0.15 * Math.PI, 0.85 * Math.PI, false);
-        ctx.stroke();
-        // tiny nose
-        ctx.fillStyle = '#E8889E';
-        ctx.beginPath();
-        ctx.ellipse(0, -r * 0.08, r * 0.07, r * 0.05, 0, 0, Math.PI * 2);
-        ctx.fill();
-      } else {
-        // ===== ANGRY / SAD FACE =====
-        ctx.strokeStyle = '#4A2E36';
-        ctx.lineWidth = 2.6;
-        ctx.lineCap = 'round';
-
-        if (!blinking) {
-          // angled angry eyebrows
-          [-1, 1].forEach(dir => {
-            ctx.beginPath();
-            ctx.moveTo(dir * r * 0.16, eyeY - r * 0.22);
-            ctx.lineTo(dir * r * 0.46, eyeY - r * 0.34 * dir * -1 + r * 0.05);
-            ctx.stroke();
-          });
-          // eyes (small, slightly narrowed)
-          ctx.fillStyle = '#3A2228';
-          [-1, 1].forEach(dir => {
-            ctx.beginPath();
-            ctx.ellipse(dir * r * 0.28, eyeY + 4, r * 0.085, r * 0.11, 0, 0, Math.PI * 2);
-            ctx.fill();
-          });
-        } else {
-          [-1, 1].forEach(dir => {
-            ctx.beginPath();
-            ctx.moveTo(dir * r * 0.2, eyeY + 4);
-            ctx.lineTo(dir * r * 0.38, eyeY + 4);
-            ctx.stroke();
-          });
-        }
-
-        // down-turned grumpy/sad mouth
-        ctx.beginPath();
-        ctx.arc(0, r * 0.32, r * 0.26, Math.PI * 1.15, Math.PI * 1.85, true);
-        ctx.stroke();
-
-        // tiny furrow between brows
-        ctx.beginPath();
-        ctx.moveTo(0, eyeY - r * 0.1);
-        ctx.lineTo(0, eyeY + r * 0.02);
-        ctx.stroke();
-
-        // a little sad tear sometimes (every other bunny, decorative, deterministic on id)
-        if (this.id % 2 === 0) {
-          ctx.fillStyle = '#A8D8FF';
-          ctx.globalAlpha = 0.8;
-          ctx.beginPath();
-          ctx.moveTo(r * 0.3, eyeY + 10);
-          ctx.quadraticCurveTo(r * 0.38, eyeY + 22, r * 0.3, eyeY + 26);
-          ctx.quadraticCurveTo(r * 0.22, eyeY + 22, r * 0.3, eyeY + 10);
-          ctx.fill();
-          ctx.globalAlpha = 1;
-        }
-      }
-      ctx.restore();
-    }
-  }
-
-  /* ------------------------------------------------------------------
-     7. CARROT (projectile)
-     ------------------------------------------------------------------ */
-  class Carrot {
-    constructor(x, y) {
-      this.x = x; this.y = y;
-      this.vx = 0; this.vy = 0;
-      this.r = 14;
-      this.angle = 0;
-      this.launched = false;
-      this.alive = true;
-      this.trail = [];
-      this.restTimer = 0; // time spent nearly-still after landing, to despawn
-      this.bounces = 0;
-    }
-
-    launch(vx, vy) {
-      this.vx = vx; this.vy = vy;
-      this.launched = true;
-      SoundEngine.playLaunch();
-    }
-
-    update(dt) {
-      if (!this.launched) return;
-      this.trail.push({ x: this.x, y: this.y });
-      if (this.trail.length > 14) this.trail.shift();
-
-      this.vy += GRAVITY * dt;
-      this.vx *= AIR_DRAG;
-      this.x += this.vx * dt;
-      this.y += this.vy * dt;
-      this.angle = Math.atan2(this.vy, this.vx);
-
-      const gy = groundY();
-      if (this.y + this.r > gy) {
-        this.y = gy - this.r;
-        this.vy *= -RESTITUTION;
-        this.vx *= 0.7;
-        this.bounces++;
-        spawnDust(this.x, gy, 5);
-        if (Math.abs(this.vy) < 40) this.vy = 0;
-      }
-
-      const speed = Math.hypot(this.vx, this.vy);
-      if (speed < 12) this.restTimer += dt; else this.restTimer = 0;
-
-      // off-world or fully at rest too long => despawn (bounds now refer to the
-      // whole WORLD, not just the visible screen, since the camera can scroll)
-      if (this.x > WORLD_WIDTH + 100 || this.x < -100 || this.restTimer > 1.6) {
-        this.alive = false;
-      }
-    }
-
-    draw() {
-      // motion trail (little fading carrot-orange dots)
-      this.trail.forEach((t, i) => {
-        const a = (i / this.trail.length) * 0.35;
-        ctx.save();
-        ctx.globalAlpha = a;
-        ctx.fillStyle = '#FF9F4A';
-        ctx.beginPath();
-        ctx.arc(t.x, t.y, this.r * 0.5 * (i / this.trail.length), 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      });
-
-      ctx.save();
-      ctx.translate(this.x, this.y);
-      ctx.rotate(this.angle + Math.PI / 2);
-
-      // carrot body (cone)
-      const grad = ctx.createLinearGradient(0, -this.r * 1.4, 0, this.r * 1.1);
-      grad.addColorStop(0, '#FFB066');
-      grad.addColorStop(1, '#FF8A3D');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.moveTo(0, this.r * 1.3);
-      ctx.quadraticCurveTo(this.r * 0.95, -this.r * 0.2, 0, -this.r * 1.4);
-      ctx.quadraticCurveTo(-this.r * 0.95, -this.r * 0.2, 0, this.r * 1.3);
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle = '#E06B1F';
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
-
-      // texture lines
-      ctx.strokeStyle = 'rgba(224,107,31,0.5)';
-      ctx.lineWidth = 1;
-      for (let i = -2; i <= 2; i++) {
-        ctx.beginPath();
-        ctx.moveTo(i * 2.4, -this.r * 0.6);
-        ctx.lineTo(i * 1.2, this.r * 0.9);
-        ctx.stroke();
-      }
-
-      // green carrot top (leaves)
-      ctx.fillStyle = '#7FCB6B';
-      [-1, 0, 1].forEach(dir => {
-        ctx.save();
-        ctx.translate(dir * 3, -this.r * 1.3);
-        ctx.rotate(dir * 0.5);
-        ctx.beginPath();
-        ctx.ellipse(0, -5, 2.4, 7, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      });
-
-      ctx.restore();
-    }
-  }
-
-  /* ------------------------------------------------------------------
-     8. LEVEL LAYOUT — 15+ angry bunnies across multiple structures
-     ------------------------------------------------------------------ */
-  let blocks = [];
-  let bunnies = [];
-  let carrots = [];
-  let activeCarrot = null;
-  let carrotsRemaining = 0;
-  let score = 0;
-  let gameWon = false;
-  let shotsFired = 0;
-  const SKIP_BUTTON_THRESHOLD = 10; // shots fired before offering the safety-net skip
-
-  function buildLevel() {
-    blocks = [];
-    bunnies = [];
-    carrots = [];
-    activeCarrot = null;
-    score = 0;
-    gameWon = false;
-    bunnyIdCounter = 0;
-
-    const gy = groundY();
-    // Lay structures across a fixed WORLD span (not the live screen width!) so the
-    // level always has consistent room to breathe, however narrow the phone is.
-    // We use a generous "design width" baseline (like designing for a tablet),
-    // and the camera handles scrolling to show it all on smaller screens.
-    const designWidth = Math.max(W, 900);
-    const baseX = slingPos().x + 220;
-    const spanX = Math.max(620, designWidth * 0.75);
-
-    // Helper to place a tower: a stack of crates with a bunny on top,
-    // plus sometimes a bunny tucked beside it.
-    function tower(cx, levels, material) {
-      let curBottom = gy;
-      const w = 56, h = 34;
-      for (let i = 0; i < levels; i++) {
-        const b = new Block(cx, curBottom - h / 2, w, h, material || 'crate');
-        b.settled = true;
-        blocks.push(b);
-        curBottom -= h;
-      }
-      return curBottom; // top Y available for a bunny to sit on
-    }
-
-    function bunnyOn(cx, topY) {
-      const bun = new Bunny(cx, topY - 22, true);
-      bunnies.push(bun);
-      return bun;
-    }
-
-    function bunnyOnGround(cx) {
-      const bun = new Bunny(cx, gy - 22, true);
-      bunnies.push(bun);
-      return bun;
-    }
-
-    // Layout plan: several "groups" spread across the available span.
-    // Group 1: simple twin towers with a bunny atop each + one ground bunny between
-    const g1 = baseX;
-    let topY = tower(g1, 2, 'crate');
-    bunnyOn(g1, topY);
-    let topY2 = tower(g1 + 80, 2, 'crate');
-    bunnyOn(g1 + 80, topY2);
-    bunnyOnGround(g1 + 40);
-
-    // Group 2: a pyramid of crates with bunnies nestled in gaps (wood planks as roof)
-    const g2 = baseX + spanX * 0.27;
-    {
-      const w = 50, h = 32;
-      // bottom row (3 crates)
-      const bottomY = gy - h / 2;
-      [g2 - 60, g2, g2 + 60].forEach(x => {
-        const b = new Block(x, bottomY, w, h, 'crate'); b.settled = true; blocks.push(b);
-      });
-      // bunnies sitting in the two gaps of bottom row
-      bunnyOn(g2 - 30, bottomY - h / 2);
-      bunnyOn(g2 + 30, bottomY - h / 2);
-      // middle row (2 crates) resting on bottom row
-      const midY = bottomY - h;
-      [g2 - 30, g2 + 30].forEach(x => {
-        const b = new Block(x, midY, w, h, 'crate'); b.settled = true; blocks.push(b);
-      });
-      // top bunny crowning the pyramid
-      bunnyOn(g2, midY - h / 2);
-      // a wood plank roof leaning, with a bunny sheltering beside it
-      bunnyOnGround(g2 - 100);
-    }
-
-    // Group 3: a tall single tower (3 crates) with cloud platforms jutting out, each with a bunny
-    const g3 = baseX + spanX * 0.52;
-    {
-      const w = 50, h = 30;
-      let by = gy;
-      const blocksHere = [];
-      for (let i = 0; i < 3; i++) {
-        const b = new Block(g3, by - h / 2, w, h, 'crate'); b.settled = true; blocks.push(b); blocksHere.push(b);
-        by -= h;
-      }
-      bunnyOn(g3, by); // bunny on very top
-      // cloud platform sticking out to the left at mid height, with a bunny
-      const cloudY = gy - h * 2;
-      const cloud = new Block(g3 - 70, cloudY, 70, 22, 'cloud'); cloud.settled = true; blocks.push(cloud);
-      bunnyOn(g3 - 70, cloudY - 11);
-      // wood plank to the right at low height with a bunny
-      const plankY = gy - h * 1;
-      const plank = new Block(g3 + 75, plankY, 70, 20, 'wood'); plank.settled = true; blocks.push(plank);
-      bunnyOn(g3 + 75, plankY - 10);
-    }
-
-    // Group 4: wide low wall of crates with 3 bunnies peeking over the top + 1 hiding behind
-    const g4 = baseX + spanX * 0.80;
-    {
-      const w = 54, h = 30;
-      const wallY = gy - h / 2;
-      [g4 - 60, g4, g4 + 60].forEach(x => {
-        const b = new Block(x, wallY, w, h, 'wood'); b.settled = true; blocks.push(b);
-      });
-      bunnyOn(g4 - 60, wallY - h / 2);
-      bunnyOn(g4, wallY - h / 2);
-      bunnyOn(g4 + 60, wallY - h / 2);
-      bunnyOnGround(g4 + 120); // hiding behind, on the ground
-    }
-
-    // A couple of lone bunnies scattered near the very end for good measure
-    bunnyOnGround(baseX + spanX * 0.97);
-
-    // Total bunny count should be >= 15. Let's verify and pad if needed.
-    while (bunnies.filter(b => true).length < 15) {
-      const extraX = baseX + Math.random() * spanX;
-      bunnyOnGround(extraX);
-    }
-
-    // The world extends a bit past the last structure, plus padding for breathing room.
-    WORLD_WIDTH = Math.max(W, baseX + spanX + WORLD_PADDING_RIGHT);
-
-    // Reset camera to rest on the slingshot at the start of the level.
-    camera.follow = null;
-    camera.locked = false;
-    camera.x = clampCameraX(slingPos().x - W * 0.28);
-    camera.targetX = camera.x;
-
-    carrotsRemaining = bunnies.length + 3; // a little generous buffer of carrots
-    shotsFired = 0;
-    const skipBtnEl = document.getElementById('skipLevelBtn');
-    if (skipBtnEl) skipBtnEl.classList.remove('show');
-    updateHUD();
-  }
-
-  /* ------------------------------------------------------------------
-     9. SLINGSHOT — drawing + aiming/launch input handling
-     ------------------------------------------------------------------ */
-  const MAX_STRETCH = 150;     // max pixels the carrot can be pulled back
-  const LAUNCH_POWER = 12.5;   // velocity multiplier from pull distance
-
-  let aiming = false;
-  let aimDX = 0, aimDY = 0; // current pull vector from sling anchor
-  let pointerId = null;
-
-  function spawnCarrotOnSling() {
-    const sp = slingPos();
-    activeCarrot = new Carrot(sp.x, sp.y);
-    carrots.push(activeCarrot);
-    camera.follow = null; // new turn — ease the camera back to the slingshot
-  }
-
-  function drawSlingshot() {
-    const sp = slingPos();
-    const forkTopL = { x: sp.x - 16, y: sp.y - 70 };
-    const forkTopR = { x: sp.x + 16, y: sp.y - 70 };
-    const baseY = groundY() + 6;
-
-    ctx.save();
-    ctx.strokeStyle = '#C98A4B';
-    ctx.lineCap = 'round';
-
-    // Pouch/band drawn BEHIND the carrot when pulled back, in front otherwise.
-    const carrotPos = activeCarrot && !activeCarrot.launched
-      ? { x: activeCarrot.x, y: activeCarrot.y }
-      : { x: sp.x, y: sp.y };
-
-    // back leg of slingshot (drawn first, slightly behind)
-    ctx.lineWidth = 10;
-    ctx.beginPath();
-    ctx.moveTo(forkTopL.x - 4, forkTopL.y);
-    ctx.lineTo(sp.x - 4, baseY);
-    ctx.stroke();
-
-    // elastic bands (two strands from each fork tip to the carrot)
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = '#E8A8B8';
-    ctx.beginPath();
-    ctx.moveTo(forkTopL.x, forkTopL.y);
-    ctx.lineTo(carrotPos.x, carrotPos.y);
-    ctx.moveTo(forkTopR.x, forkTopR.y);
-    ctx.lineTo(carrotPos.x, carrotPos.y);
-    ctx.stroke();
-
-    // front leg + fork (drawn on top)
-    ctx.lineWidth = 11;
-    ctx.strokeStyle = '#D89752';
-    ctx.beginPath();
-    ctx.moveTo(forkTopL.x, forkTopL.y);
-    ctx.lineTo(sp.x, baseY);
-    ctx.moveTo(forkTopR.x, forkTopR.y);
-    ctx.lineTo(sp.x, baseY);
-    ctx.stroke();
-
-    // little pink heart decoration at the base of the slingshot <3
-    drawHeartShape(sp.x, baseY - 4, 12, '#FF8FB1');
-
-    ctx.restore();
-  }
-
-  // Trajectory preview dots while aiming
-  function drawTrajectoryPreview() {
-    if (!aiming || !activeCarrot) return;
-    const vx = -aimDX * LAUNCH_POWER;
-    const vy = -aimDY * LAUNCH_POWER;
-    let px = activeCarrot.x, py = activeCarrot.y;
-    let pvx = vx, pvy = vy;
-    const dt = 0.05;
-    ctx.save();
-    for (let i = 0; i < 18; i++) {
-      pvy += GRAVITY * dt;
-      px += pvx * dt;
-      py += pvy * dt;
-      if (py > groundY()) break;
-      ctx.globalAlpha = Math.max(0.12, 0.5 - i * 0.025);
-      ctx.fillStyle = '#FF6F9E';
-      ctx.beginPath();
-      ctx.arc(px, py, 4.5 - i * 0.12, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
-  }
-
-  function getPointerPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    // Convert screen position into WORLD space by adding the camera offset,
-    // since the whole scene is drawn shifted left by camera.x.
-    return { x: (clientX - rect.left) + camera.x, y: clientY - rect.top };
-  }
-
-  function onPointerDown(e) {
-    if (gameWon) return;
-    if (!activeCarrot || activeCarrot.launched) return;
-    const pos = getPointerPos(e);
-    // generous grab radius so it's easy on mobile
-    const dist = Math.hypot(pos.x - activeCarrot.x, pos.y - activeCarrot.y);
-    if (dist < 70) {
-      aiming = true;
-      camera.locked = true; // hold the camera steady on the slingshot while aiming
-      pointerId = e.pointerId !== undefined ? e.pointerId : 'touch';
-      document.getElementById('hint').style.opacity = '0';
-    }
-  }
-
-  function onPointerMove(e) {
-    if (!aiming || !activeCarrot) return;
-    const pos = getPointerPos(e);
-    const sp = slingPos();
-    let dx = pos.x - sp.x;
-    let dy = pos.y - sp.y;
-    const dist = Math.hypot(dx, dy);
-    if (dist > MAX_STRETCH) {
-      dx = (dx / dist) * MAX_STRETCH;
-      dy = (dy / dist) * MAX_STRETCH;
-    }
-    // only allow pulling backward/downward-ish (toward player), mostly free though for fun aiming
-    activeCarrot.x = sp.x + dx;
-    activeCarrot.y = sp.y + dy;
-    aimDX = dx; aimDY = dy;
-  }
-
-  function onPointerUp(e) {
-    if (!aiming || !activeCarrot) return;
-    aiming = false;
-    camera.locked = false;
-    const pullDist = Math.hypot(aimDX, aimDY);
-    if (pullDist < 12) {
-      // too small a pull — snap back, don't launch
-      const sp = slingPos();
-      activeCarrot.x = sp.x; activeCarrot.y = sp.y;
-      aimDX = 0; aimDY = 0;
-      return;
-    }
-    const vx = -aimDX * LAUNCH_POWER;
-    const vy = -aimDY * LAUNCH_POWER;
-    activeCarrot.launch(vx, vy);
-    camera.follow = activeCarrot; // camera now tracks the carrot mid-flight
-    carrotsRemaining--;
-    shotsFired++;
-    maybeRevealSkipButton();
-    updateHUD();
-    aimDX = 0; aimDY = 0;
-  }
-
-  canvas.addEventListener('pointerdown', onPointerDown);
-  window.addEventListener('pointermove', onPointerMove);
-  window.addEventListener('pointerup', onPointerUp);
-  // touch fallbacks for broader compatibility
-  canvas.addEventListener('touchstart', onPointerDown, { passive: true });
-  window.addEventListener('touchmove', onPointerMove, { passive: true });
-  window.addEventListener('touchend', onPointerUp, { passive: true });
-
-  /* ------------------------------------------------------------------
-     10. COLLISIONS
-     ------------------------------------------------------------------ */
-  function circleRectOverlap(cx, cy, cr, rect) {
-    const closestX = Math.max(rect.left, Math.min(cx, rect.right));
-    const closestY = Math.max(rect.top, Math.min(cy, rect.bottom));
-    const dx = cx - closestX, dy = cy - closestY;
-    return (dx * dx + dy * dy) < (cr * cr);
-  }
-
-  function handleCollisions(dt) {
-    carrots.forEach(carrot => {
-      if (!carrot.launched || !carrot.alive) return;
-
-      // Carrot vs Bunny
-      bunnies.forEach(bun => {
-        if (bun.happy) return; // already transformed, can't re-hit meaningfully
-        const dist = Math.hypot(carrot.x - bun.x, carrot.y - bun.y);
-        if (dist < carrot.r + bun.r * 1.15) {
-          transformBunny(bun, carrot);
-          // slow the carrot a bit on impact (soft, not a hard stop, for nice chain hits)
-          carrot.vx *= 0.7; carrot.vy *= 0.6;
-        }
-      });
-
-      // Carrot vs Block
-      blocks.forEach(block => {
-        if (!block.alive) return;
-        if (circleRectOverlap(carrot.x, carrot.y, carrot.r, block)) {
-          const speed = Math.hypot(carrot.vx, carrot.vy);
-          if (speed > 80) {
-            block.health -= 1;
-            block.vx += carrot.vx * 0.12;
-            block.vy -= 60;
-            block.angVel += (Math.random() - 0.5) * 4;
-            block.settled = false;
-            block.shakeT = 0.2;
-            SoundEngine.playThud();
-            spawnDust(carrot.x, carrot.y, 6);
-            // bounce carrot off the block softly
-            const nx = carrot.x - block.x, ny = carrot.y - block.y;
-            const nlen = Math.hypot(nx, ny) || 1;
-            carrot.vx = (nx / nlen) * speed * 0.4;
-            carrot.vy = (ny / nlen) * speed * 0.4 - 60;
-            if (block.health <= 0) {
-              block.alive = false;
-              spawnDust(block.x, block.y, 14);
-            }
-          }
-        }
-      });
-    });
-
-    // Remove destroyed blocks
-    blocks = blocks.filter(b => b.alive);
-
-    // Unsettle any bunny whose supporting block was destroyed (simple support check:
-    // if no block exists close beneath the bunny anymore, let it fall)
-    bunnies.forEach(bun => {
-      if (!bun.settled || bun.happy) return;
-      const supported = bun.bottom >= groundY() - 4 || blocks.some(b =>
-        Math.abs((b.top) - bun.bottom) < 10 &&
-        bun.x > b.left - 10 && bun.x < b.right + 10
-      );
-      if (!supported) {
-        bun.settled = false;
-      }
-    });
-  }
-
-  function transformBunny(bun, carrot) {
-    bun.takeHit();
-    score += 100;
-    SoundEngine.playHit();
-    setTimeout(() => SoundEngine.playTransform(), 120);
-    spawnHeartBurst(bun.x, bun.y, 14);
-    spawnSparkleBurst(bun.x, bun.y, 10);
-    showScorePopup(bun.x - camera.x, bun.y, '+100 💕');
-    updateHUD();
-    checkWinCondition();
-  }
-
-  /* ------------------------------------------------------------------
-     11. HUD + SCORE POPUPS (DOM-based, layered above canvas)
-     ------------------------------------------------------------------ */
-  const carrotCountEl = document.getElementById('carrotCount');
-  const scoreCountEl = document.getElementById('scoreCount');
-
-  function updateHUD() {
-    const happyCount = bunnies.filter(b => b.happy).length;
-    carrotCountEl.textContent = Math.max(0, carrotsRemaining);
-    scoreCountEl.textContent = score;
-  }
-
-  function showScorePopup(x, y, text) {
-    const el = document.createElement('div');
-    el.className = 'score-popup';
-    el.textContent = text;
-    el.style.left = x + 'px';
-    el.style.top = y + 'px';
-    document.getElementById('gameContainer').appendChild(el);
-    setTimeout(() => el.remove(), 1000);
-  }
-
-  /* ------------------------------------------------------------------
-     11b. SAFETY NET — guarantees the game can always be finished.
-     If someone's taken a generous number of shots and still hasn't
-     cleared every bunny (e.g. they're stuck, on a tricky device, or
-     just want to skip ahead), a gentle "skip" link fades in so they're
-     never stuck before reaching the letter.
-     ------------------------------------------------------------------ */
-  function maybeRevealSkipButton() {
-    if (gameWon) return;
-    if (shotsFired >= SKIP_BUTTON_THRESHOLD) {
-      const btn = document.getElementById('skipLevelBtn');
-      if (btn) btn.classList.add('show');
-    }
-  }
-
-  function instantlyHappifyAllBunnies() {
-    if (gameWon) return;
-    bunnies.forEach((bun, i) => {
-      if (bun.happy) return;
-      setTimeout(() => {
-        if (!bun.happy) {
-          transformBunny(bun, null);
-        }
-      }, i * 90);
-    });
-    const btn = document.getElementById('skipLevelBtn');
-    if (btn) btn.classList.remove('show');
-  }
-
-  /* ------------------------------------------------------------------
-     12. WIN CONDITION + CELEBRATION
-     ------------------------------------------------------------------ */
-  function checkWinCondition() {
-    if (gameWon) return;
-    const allHappy = bunnies.length > 0 && bunnies.every(b => b.happy);
-    if (allHappy) {
-      gameWon = true;
-      SoundEngine.playWinFanfare();
-      launchCelebration();
-      setTimeout(() => {
-        document.getElementById('winOverlay').classList.add('show');
-        document.getElementById('winModal').classList.add('show');
-      }, 900);
-    }
-  }
-
-  const heartLayer = document.getElementById('heartLayer');
-  const CONFETTI_COLORS = ['#FF8FB1', '#A8D8FF', '#FFE08A', '#C9A8FF', '#FFFFFF'];
-
-  function launchCelebration() {
-    // Big burst of confetti + hearts + sparkles across the screen
-    for (let i = 0; i < 60; i++) {
-      setTimeout(() => spawnDomConfetti(), i * 25);
-    }
-    for (let i = 0; i < 30; i++) {
-      setTimeout(() => spawnDomHeart(), i * 60);
-    }
-    for (let i = 0; i < 20; i++) {
-      setTimeout(() => spawnDomSparkle(), i * 90);
-    }
-    // also a canvas-side burst centered on screen for extra flourish
-    // (convert screen-center to world-space since particles render inside
-    // the camera-translated draw pass)
-    spawnHeartBurst(camera.x + W / 2, H * 0.4, 40);
-    spawnSparkleBurst(camera.x + W / 2, H * 0.4, 30);
-  }
-
-  function spawnDomConfetti() {
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    const color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
-    el.style.background = color;
-    el.style.left = Math.random() * 100 + 'vw';
-    el.style.borderRadius = Math.random() < 0.5 ? '50%' : '2px';
-    const duration = 2.5 + Math.random() * 2;
-    el.style.animationDuration = duration + 's';
-    heartLayer.appendChild(el);
-    setTimeout(() => el.remove(), duration * 1000 + 100);
-  }
-
-  function spawnDomHeart() {
-    const el = document.createElement('div');
-    el.className = 'floaty-heart';
-    el.textContent = ['❤️', '💕', '💖', '🥰', '💗'][Math.floor(Math.random() * 5)];
-    el.style.left = Math.random() * 100 + 'vw';
-    el.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
-    el.style.setProperty('--spin', (Math.random() * 50 - 25) + 'deg');
-    const duration = 4 + Math.random() * 3;
-    el.style.animationDuration = duration + 's';
-    heartLayer.appendChild(el);
-    setTimeout(() => el.remove(), duration * 1000 + 100);
-  }
-
-  function spawnDomSparkle() {
-    const el = document.createElement('div');
-    el.className = 'sparkle-piece';
-    el.textContent = ['✨', '⭐', '🌟'][Math.floor(Math.random() * 3)];
-    el.style.left = Math.random() * 100 + 'vw';
-    el.style.top = Math.random() * 100 + 'vh';
-    const duration = 1.2 + Math.random() * 0.8;
-    el.style.animationDuration = duration + 's';
-    heartLayer.appendChild(el);
-    setTimeout(() => el.remove(), duration * 1000 + 100);
-  }
-
-  // Endless heart rain (used after "I Love You Too" is clicked)
-  let endlessHeartsInterval = null;
-  function startEndlessHearts() {
-    if (endlessHeartsInterval) return;
-    endlessHeartsInterval = setInterval(() => {
-      spawnDomHeart();
-      if (Math.random() < 0.4) spawnDomSparkle();
-    }, 180);
-  }
-
-  /* ------------------------------------------------------------------
-     12b. OFFSCREEN BUNNY HINT ARROWS
-     A small screen-fixed indicator on the left/right edge that points
-     toward the nearest remaining angry bunny when it's off-camera, so
-     the player always knows which way the action is happening.
-     ------------------------------------------------------------------ */
-  function drawOffscreenBunnyHints() {
-    const remaining = bunnies.filter(b => !b.happy);
-    if (remaining.length === 0) return;
-
-    const visibleL = camera.x;
-    const visibleR = camera.x + W;
-
-    // Find the nearest off-screen bunny to the left and to the right.
-    let nearestLeft = null, nearestRight = null;
-    remaining.forEach(b => {
-      if (b.x < visibleL - 10) {
-        if (!nearestLeft || b.x > nearestLeft.x) nearestLeft = b;
-      } else if (b.x > visibleR + 10) {
-        if (!nearestRight || b.x < nearestRight.x) nearestRight = b;
-      }
-    });
-
-    const midY = H * 0.42;
-    if (nearestLeft) drawEdgeArrow('left', midY);
-    if (nearestRight) drawEdgeArrow('right', midY);
-  }
-
-  function drawEdgeArrow(side, y) {
-    const margin = 26;
-    const x = side === 'left' ? margin : W - margin;
-    const dir = side === 'left' ? -1 : 1;
-    const pulse = 0.85 + Math.sin(performance.now() / 260) * 0.15;
-
-    ctx.save();
-    ctx.globalAlpha = pulse;
-    ctx.translate(x, y);
-    ctx.fillStyle = '#FF6F9E';
-    ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(dir * 12, 0);
-    ctx.lineTo(dir * -10, -12);
-    ctx.lineTo(dir * -10, 12);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-
-    // tiny bunny emoji-ish dot label above the arrow (drawn as a soft circle + ear hint)
-    ctx.save();
-    ctx.globalAlpha = pulse;
-    ctx.translate(x, y - 26);
-    ctx.fillStyle = '#FFFFFF';
-    ctx.beginPath();
-    ctx.arc(0, 0, 10, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#FF6F9E';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    ctx.fillStyle = '#E59CAE';
-    ctx.beginPath();
-    ctx.ellipse(-4, -8, 2.4, 6, -0.3, 0, Math.PI * 2);
-    ctx.ellipse(4, -8, 2.4, 6, 0.3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  /* ------------------------------------------------------------------
-     13. MAIN GAME LOOP
-     ------------------------------------------------------------------ */
-  let lastT = performance.now();
-
-  function update(dt) {
-    // clamp dt to avoid huge jumps (e.g. tab was inactive)
-    dt = Math.min(dt, 1 / 30);
-
-    blocks.forEach(b => b.update(dt));
-    bunnies.forEach(b => b.update(dt));
-    carrots.forEach(c => c.update(dt));
-    carrots = carrots.filter(c => c.alive || c === activeCarrot);
-
-    handleCollisions(dt);
-    updateCamera(dt);
-
-    // If the active carrot has finished its flight (landed/despawned), prep the next one
-    if (activeCarrot && activeCarrot.launched && !activeCarrot.alive) {
-      if (camera.follow === activeCarrot) camera.follow = null;
-      activeCarrot = null;
-      if (!gameWon) {
-        if (carrotsRemaining > 0 || bunnies.some(b => !b.happy)) {
-          // Always give a fresh carrot if bunnies remain (forgiving, gift-like difficulty)
-          if (bunnies.some(b => !b.happy)) {
-            spawnCarrotOnSling();
-          }
-        }
-      }
-    }
-  }
-
-  function render(dt) {
-    // Screen-fixed backdrop (sky, sun, clouds) — no camera shift.
-    drawSky(dt);
-
-    // Everything below this point lives in WORLD space, so we shift the
-    // whole canvas left by the camera offset. This is what makes the
-    // slingshot, structures, bunnies, and the flying carrot all scroll
-    // together as the camera pans to follow the action.
-    ctx.save();
-    ctx.translate(-camera.x, 0);
-
-    drawGroundLayer(dt);
-    drawSlingshot();
-    blocks.forEach(b => b.draw());
-    bunnies.forEach(b => b.draw());
-    drawTrajectoryPreview();
-    carrots.forEach(c => c.draw());
-    updateAndDrawParticles(dt);
-
-    ctx.restore();
-
-    // Screen-fixed UI overlay: a little arrow pointing toward any remaining
-    // bunnies that are currently off-screen, so the player always knows
-    // which way to look.
-    drawOffscreenBunnyHints();
-  }
-
-  function frame(now) {
-    const dt = (now - lastT) / 1000;
-    lastT = now;
-    update(dt);
-    render(dt);
-    requestAnimationFrame(frame);
-  }
-
-  /* ------------------------------------------------------------------
-     14. RESET / RESIZE
-     ------------------------------------------------------------------ */
-  function resetGame() {
-    document.getElementById('winOverlay').classList.remove('show');
-    document.getElementById('winModal').classList.remove('show');
-    document.getElementById('letterOverlay').classList.remove('show');
-    document.getElementById('letterModal').classList.remove('show');
-    document.getElementById('hint').style.opacity = '1';
-    SoundEngine.stopMusic();
-    buildLevel();
-    spawnCarrotOnSling();
-  }
-
-  window.addEventListener('resize', () => {
-    resizeCanvas();
-    initClouds();
-    camera.x = clampCameraX(camera.x);
-    camera.targetX = clampCameraX(camera.targetX);
-  });
-
-  /* ------------------------------------------------------------------
-     15. LOVE LETTER — typewriter effect + modal interactions
-     ------------------------------------------------------------------ */
-  const LETTER_TEXT = `Happy 7th Monthsary, Bun. ❤️🥺
-
-Grabe, 7 months na pala tayo. Ang dami na nating pinagdaanan, at alam nmn natin pareho na hindi laging madali. Madalas tayong mag-away, magtampo, at minsan pareho tayong napapagod. 😔🤍
-
-Pero kahit ganun, andito pa rin tayo. Kahit ilang beses tayong nagkaroon ng misunderstandings, lagi pa rin nating sinusubukang ayusin. Hindi perfect ung rs natin, pero thankful ako kasi hindi tayo basta sumusuko sa isa't isa. 🫶✨
-
-Thank you, Bun, sa patience mo, sa pag-intindi sakin kahit mahirap minsan, at sa lahat ng effort mo para satin. 🥺💖 Sorry din sa mga pagkakataong naging dahilan ako ng lungkot o sakit mo. 😔🤍
-
-Sana habang tumatagal, mas matuto pa tayong intindihin ang isa't isa at mas dumami ung masasayang araw kesa sa mga away. 🌷💕
-
-Happy 7th Monthsary, Bun. ❤️ Kahit marami tayong ups and downs, thankful pa rin ako na ikaw ung kasama ko sa journey na to. 🥰🫶✨
-
-I love you. ❤️🐻🌷`;
-
-  const letterTextEl = document.getElementById('letterText');
-  const letterCursorEl = document.getElementById('letterCursor');
-  let typeTimer = null;
-  let typeIndex = 0;
-  let typingDone = false;
-
-  function startTypewriter() {
-    typeIndex = 0;
-    typingDone = false;
-    letterTextEl.textContent = '';
-    letterTextEl.appendChild(letterCursorEl);
-    clearInterval(typeTimer);
-
-    typeTimer = setInterval(() => {
-      if (typeIndex >= LETTER_TEXT.length) {
-        finishTyping();
-        return;
-      }
-      // Insert text before the cursor span
-      const chunk = LETTER_TEXT[typeIndex];
-      const textNode = document.createTextNode(chunk);
-      letterTextEl.insertBefore(textNode, letterCursorEl);
-      typeIndex++;
-
-      // small canvas-coupled "tick" sound only occasionally to feel gentle, not noisy
-      if (typeIndex % 6 === 0) SoundEngine.playPop();
-
-      // auto-scroll the letter box as text grows
-      const modal = document.getElementById('letterModal');
-      modal.scrollTop = modal.scrollHeight;
-    }, 28); // typing speed
-  }
-
-  function finishTyping() {
-    clearInterval(typeTimer);
-    if (!typingDone) {
-      typingDone = true;
-      // Make sure full text is shown (in case of skip)
-      letterTextEl.textContent = '';
-      letterTextEl.appendChild(document.createTextNode(LETTER_TEXT));
-      letterTextEl.appendChild(letterCursorEl);
-      document.getElementById('skipTypingBtn').style.display = 'none';
-      document.getElementById('loveYouTooWrap').style.display = 'flex';
-      // gentle little heart confetti as the letter finishes
-      spawnHeartBurst(W / 2, H * 0.3, 16);
-      for (let i = 0; i < 10; i++) setTimeout(() => spawnDomHeart(), i * 120);
-    }
-  }
-
-  document.getElementById('skipTypingBtn').addEventListener('click', finishTyping);
-  document.getElementById('skipLevelBtn').addEventListener('click', instantlyHappifyAllBunnies);
-
-  /* ------------------------------------------------------------------
-     16. MODAL BUTTON WIRING
-     ------------------------------------------------------------------ */
-  document.getElementById('openMessageBtn').addEventListener('click', () => {
-    document.getElementById('winOverlay').classList.remove('show');
-    const letterOverlay = document.getElementById('letterOverlay');
-    const letterModal = document.getElementById('letterModal');
-    letterOverlay.classList.add('show');
-    requestAnimationFrame(() => letterModal.classList.add('show'));
-    SoundEngine.startMusic();
-    startTypewriter();
-  });
-
-  document.getElementById('loveYouTooBtn').addEventListener('click', () => {
-    startEndlessHearts();
-    spawnHeartBurst(W / 2, H / 2, 30);
-    document.getElementById('loveYouTooBtn').textContent = '💖 Forever & Always 💖';
-    document.getElementById('loveYouTooBtn').disabled = true;
-    document.getElementById('loveYouTooBtn').style.opacity = '0.85';
-    document.getElementById('musicNote').textContent = '🎵 ...and the hearts keep coming, just like my love for you 🐰❤️';
-  });
-
-  /* ------------------------------------------------------------------
-     17. INITIALIZE
-     ------------------------------------------------------------------ */
-  buildLevel();
-  spawnCarrotOnSling();
-  requestAnimationFrame((t) => { lastT = t; requestAnimationFrame(frame); });
-
-})();
+  drawMoon(player.x, player.y, player.r);
+}
+
+function loop(ts) {
+  if (!running) return;
+  if (!lastTime) lastTime = ts;
+  const dt = Math.min(40, ts - lastTime);
+  lastTime = ts;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+
+function startGame() {
+  document.getElementById('start-overlay').classList.add('hidden');
+  document.getElementById('win-overlay').classList.add('hidden');
+  document.getElementById('lose-overlay').classList.add('hidden');
+  resetGame();
+  running = true;
+  lastTime = 0;
+  requestAnimationFrame(loop);
+}
+
+document.getElementById('start-btn').addEventListener('click', startGame);
+document.getElementById('restart-btn-win').addEventListener('click', startGame);
+document.getElementById('restart-btn-lose').addEventListener('click', startGame);
+
+// idle draw before start
+player.x = W / 2;
+player.y = H - 70;
+draw();
 </script>
 </body>
 </html>

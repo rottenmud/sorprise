@@ -1,707 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-<title>Our Constellation</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Who Stole Our Monthsary?</title>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  /* =========================================================
-     EDIT ME — quick customization
-     ========================================================= */
-  :root {
-    --navy-deep: #0a0e27;
-    --navy-mid: #131a3a;
-    --navy-light: #1f2a5c;
-    --gold: #f4c95d;
-    --gold-soft: #f9dfa0;
-    --pink: #ff8fa3;
-    --pink-soft: #ffc2cc;
-    --lavender: #a3aee0;
-    --white: #fdfbf7;
-  }
-
-  * { box-sizing: border-box; }
-
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden;
-    background: var(--navy-deep);
-    font-family: 'Quicksand', sans-serif;
-    color: var(--white);
-    -webkit-tap-highlight-color: transparent;
-    touch-action: none;
-  }
-
-  #sky {
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse at 20% 10%, rgba(255,143,163,0.10), transparent 45%),
-      radial-gradient(ellipse at 85% 85%, rgba(163,174,224,0.12), transparent 50%),
-      linear-gradient(180deg, var(--navy-deep) 0%, var(--navy-mid) 55%, var(--navy-light) 100%);
-    overflow: hidden;
-  }
-
-  .twinkle {
-    position: absolute;
-    background: var(--white);
-    border-radius: 50%;
-    opacity: 0.6;
-    animation: twinkle-anim ease-in-out infinite;
-  }
-
-  @keyframes twinkle-anim {
-    0%, 100% { opacity: 0.15; transform: scale(1); }
-    50% { opacity: 0.9; transform: scale(1.4); }
-  }
-
-  #ui-top {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    padding: 14px 18px 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 20;
-    pointer-events: none;
-  }
-
-  #names {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-weight: 500;
-    font-size: clamp(15px, 4vw, 20px);
-    color: var(--gold-soft);
-    letter-spacing: 0.5px;
-    margin-bottom: 2px;
-    text-align: center;
-  }
-
-  #months-label {
-    font-size: clamp(11px, 3vw, 13px);
-    color: var(--lavender);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-
-  #hud {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    background: rgba(19, 26, 58, 0.55);
-    border: 1px solid rgba(244, 201, 93, 0.25);
-    backdrop-filter: blur(6px);
-    padding: 8px 18px;
-    border-radius: 999px;
-  }
-
-  #progress-text {
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--gold);
-    letter-spacing: 0.5px;
-  }
-
-  #lives { display: flex; gap: 4px; }
-  #lives span { font-size: 15px; filter: drop-shadow(0 0 4px rgba(255,143,163,0.6)); }
-
-  /* constellation canvas sits above the HUD, drawn on the game canvas itself */
-
-  canvas#game {
-    position: fixed;
-    inset: 0;
-    display: block;
-    z-index: 10;
-  }
-
-  .overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 30;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    padding: 32px;
-    background: rgba(10, 14, 39, 0.72);
-    backdrop-filter: blur(3px);
-  }
-
-  .hidden { display: none !important; }
-
-  .card {
-    max-width: 440px;
-    animation: rise 0.5s ease;
-  }
-
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .eyebrow {
-    font-size: 12px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--pink-soft);
-    margin-bottom: 10px;
-  }
-
-  h1.title {
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
-    font-size: clamp(26px, 7vw, 40px);
-    margin: 0 0 14px;
-    color: var(--white);
-    line-height: 1.15;
-  }
-
-  .msg-body {
-    font-size: 15px;
-    line-height: 1.6;
-    color: var(--lavender);
-    margin: 0 0 26px;
-  }
-
-  .msg-body em {
-    color: var(--gold-soft);
-    font-style: normal;
-    font-weight: 700;
-  }
-
-  button.btn {
-    font-family: 'Quicksand', sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 0.5px;
-    color: var(--navy-deep);
-    background: linear-gradient(135deg, var(--gold), var(--pink-soft));
-    border: none;
-    padding: 13px 34px;
-    border-radius: 999px;
-    cursor: pointer;
-    box-shadow: 0 8px 24px rgba(244, 201, 93, 0.25);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  button.btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(244, 201, 93, 0.35); }
-  button.btn:active { transform: translateY(0px) scale(0.98); }
-
-  .hint {
-    margin-top: 16px;
-    font-size: 12px;
-    color: rgba(163, 174, 224, 0.7);
-  }
-
-  #milestone-toast {
-    position: fixed;
-    top: 38%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
-    z-index: 25;
-    background: rgba(19, 26, 58, 0.9);
-    border: 1px solid rgba(244, 201, 93, 0.35);
-    padding: 18px 26px;
-    border-radius: 16px;
-    max-width: 320px;
-    text-align: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.35s ease, transform 0.35s ease;
-  }
-
-  #milestone-toast.show {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-
-  #milestone-toast .m-star { font-size: 20px; margin-bottom: 6px; }
-  #milestone-toast .m-text {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 15px;
-    color: var(--gold-soft);
-    line-height: 1.45;
-  }
-
-  #footer-credit {
-    position: fixed;
-    bottom: 8px;
-    left: 0; right: 0;
-    text-align: center;
-    font-size: 10px;
-    color: rgba(163, 174, 224, 0.35);
-    z-index: 15;
-    pointer-events: none;
-  }
+:root{--ink:#1b1f3b;--ink2:#272c52;--paper:#fdf6f0;--pink:#ff8fa3;--tape:#ffd23f;--text:#2a2340;--muted:#6d6785;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:auto}
+body{margin:0;background:var(--ink);color:var(--paper);font-family:'Special Elite','Courier New',monospace;font-size:17px;line-height:1.55;min-height:100dvh;overflow-x:hidden;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+main{max-width:640px;margin:0 auto;padding:18px 16px 64px}
+h1,h2{font-family:'Caveat','Comic Sans MS',cursive;font-weight:700;margin:0}
+h1{font-size:clamp(2.4rem,12vw,3.6rem);overflow-wrap:break-word;line-height:1;color:var(--pink)}
+h2{font-size:1.9rem;color:var(--tape)}
+.tape{background:var(--tape);color:var(--ink);padding:4px 12px;display:inline-block;transform:rotate(-2deg);font-size:.85rem;margin-bottom:14px}
+.card{background:var(--paper);color:var(--text);padding:18px 20px;border-radius:3px;margin:16px 0;box-shadow:4px 5px 0 rgba(0,0,0,.35);transform:rotate(-.3deg);overflow-wrap:anywhere}
+.card p{margin:0}
+button{font:inherit;font-size:1rem;min-height:50px;flex:1 1 calc(50% - 10px);cursor:pointer;border:2px solid var(--pink);background:transparent;color:var(--paper);padding:10px 16px;border-radius:2px;transition:background .15s,color .15s}
+button:active,button:focus-visible{background:var(--pink);color:var(--ink);outline:none}
+@media (hover:hover){button:hover:not(:disabled){background:var(--pink);color:var(--ink)}}
+button.done:active{background:transparent;color:#9aa0cf}
+.row .wide,.row .primary:only-child{flex-basis:100%}
+button:disabled{opacity:.4;cursor:not-allowed;background:transparent;color:var(--paper)}
+button.done{border-color:#5d6394;color:#9aa0cf}
+.primary{background:var(--pink);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.9rem;color:#b9bde0;margin-bottom:6px}
+.big{font-size:3rem;line-height:1.1}
+.snd{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;z-index:9;flex:none;width:46px;min-height:46px;height:46px;padding:0;border-radius:50%;background:var(--ink2);font-size:1.2rem;line-height:1}
+.msg p{margin:0 0 1em;font-family:'Caveat','Comic Sans MS',cursive;font-size:1.45rem;line-height:1.4;opacity:0;transform:translateY(8px);animation:in .8s forwards}
+@keyframes in{to{opacity:1;transform:none}}
+.stamp{font-size:1.5rem;color:var(--pink);border:3px solid var(--pink);display:inline-block;padding:2px 12px;transform:rotate(-6deg);margin:6px 0}
+@media (prefers-reduced-motion:reduce){.msg p{animation:none;opacity:1;transform:none}}
 </style>
 </head>
 <body>
-
-<div id="sky"></div>
-<canvas id="game"></canvas>
-
-<div id="ui-top">
-  <div id="names">Bun &amp; Plu</div>
-  <div id="months-label"><span id="months-count">0</span> months, one constellation</div>
-  <div id="hud">
-    <div id="progress-text">0 / 0 stars</div>
-    <div id="lives"></div>
-  </div>
-</div>
-
-<div id="milestone-toast">
-  <div class="m-star">✦</div>
-  <div class="m-text" id="milestone-text"></div>
-</div>
-
-<div id="start-overlay" class="overlay">
-  <div class="card">
-    <div class="eyebrow">Happy Monthsary</div>
-    <h1 class="title">Catch our stars,<br>complete our sky</h1>
-    <p class="msg-body">
-      Every star that falls is one month of us. Guide the little moon to
-      catch them all before the clouds catch you — and watch our
-      constellation take shape above.
-    </p>
-    <button class="btn" id="start-btn">Begin</button>
-    <p class="hint">Move the moon with your mouse, arrow keys, or finger</p>
-  </div>
-</div>
-
-<div id="win-overlay" class="overlay hidden">
-  <div class="card">
-    <div class="eyebrow">Constellation Complete</div>
-    <h1 class="title" id="win-title">Every month, accounted for</h1>
-    <p class="msg-body" id="win-body"></p>
-    <button class="btn" id="restart-btn-win">Catch it again</button>
-  </div>
-</div>
-
-<div id="lose-overlay" class="overlay hidden">
-  <div class="card">
-    <div class="eyebrow">The clouds won this round</div>
-    <h1 class="title">Not tonight's sky</h1>
-    <p class="msg-body" id="lose-body">
-      Some nights are cloudy. That's alright — we get to try again,
-      just like we always do.
-    </p>
-    <button class="btn" id="restart-btn-lose">Try again</button>
-  </div>
-</div>
-
-<div id="footer-credit">made with love, for us</div>
-
+<button class="snd" id="snd" aria-label="Toggle sound" onclick="toggleSound()">🔊</button>
+<main id="app"></main>
 <script>
-/* =========================================================
-   EDIT ME — personalize your monthsary game here
-   ========================================================= */
-const COUPLE_NAMES = "Bun & Plu";               // shown at the top
-const START_DATE = "2025-10-24";                // the date you got together (YYYY-MM-DD) — edit this to your real start date
-const LIVES = 4;                                // how many clouds you can survive
-const WIN_TITLE = "Happy Monthsary, Bun 🐰🌙";
-const WIN_MESSAGE = `Happy Monthsary, bun. ❤️🐰<br><br>
-Thank you for staying with me. Alam kong hindi naman laging perfect yung mga araw natin, pero sobrang grateful ako na nandito ka pa rin. Ang dami na nating napagdaanan 🌙✨ like mga tawanan, kwentuhan, late-night calls, mga simpleng lambing, pati na rin yung mga tampuhan na lagi rin namang naaayos.<br><br>
-Honestly, yung mga simpleng moments na yun yung naging favorite memories ko 💫. Hindi man sila grand or special sa paningin ng iba, pero para sa'kin, sila yung dahilan kung bakit masaya ako.<br><br>
-Thank you sa pag-intindi sa'kin, sa patience mo, at sa effort na binibigay mo sa relationship natin. Thank you rin sa pagiging ikaw 🐇. Hindi ko man nasasabi palagi, pero sobrang naa-appreciate kita.<br><br>
-I'm really happy na ikaw yung kasama ko sa journey na 'to 🌕. Sana marami pa tayong memories na mabuo, maraming tawanan, maraming dates, at marami pang monthsary na sabay nating ice-celebrate 🎉.<br><br>
-Happy Monthsary ulit, bun. I love you. ❤️🐰🌙`;
-
-// Optional custom captions shown when specific stars are caught.
-// Key = which star number (1st star, 2nd star, ...), value = the message.
-// Anything not listed here gets a default gentle line.
-const MILESTONE_MESSAGES = {
-  1: "The night we met.",
-  3: "The first time you made me laugh until it hurt.",
-  6: "Half a year, and still my favorite person.",
-  12: "A whole year of choosing each other.",
+const rooms = {
+  "Living Room": [
+    ["Sofa cushion", "Cat hair everywhere. Suspicious! But the cat was asleep for 16 hours straight. Solid alibi."],
+    ["Wall calendar", "The date is still there. Nothing was skipped. It's a calendar. It just sits there."]
+  ],
+  "Kitchen": [
+    ["Fridge", "A half-eaten snack with mysterious bite marks. Evidence points to 'that one friend'. Unrelated to the case, but rude."],
+    ["Coffee mug", "Still warm. Whoever was here needed caffeine, not a crime."]
+  ],
+  "Bedroom": [
+    ["Phone", "'Happy monthsary' typed and deleted four times. Nothing stolen. Just nervous thumbs."],
+    ["Pillow", "A small heart-shaped dent. An unused arrow nearby. Cupid was on his lunch break."]
+  ],
+  "Balcony": [
+    ["Footprints", "Size: yours. Destination: the kitchen, for snacks. Case still open."],
+    ["Night sky", "Nothing missing up there. Still pretty. Still there. Just like someone."]
+  ]
 };
-
-const DEFAULT_MILESTONE_LINES = [
-  "A quiet Tuesday, made brighter by you.",
-  "Another month, another reason.",
-  "Still here. Still us.",
-  "A little light for a little memory.",
-  "This one's for a good day we had.",
+const suspects = {
+  "You": "Tempting to blame myself. But I'm right here, making a silly game for you. Guilty of being late sometimes, not guilty of theft.",
+  "Her": "Busy passing things, trying to get better, and still cute while doing it. Not a thief. Case notes say: needs rest.",
+  "The cat": "Alibi: asleep. Also asleep. And also asleep. Released with a treat.",
+  "The calendar": "It only shows the days. It doesn't steal them. Released without charge.",
+  "Cupid": "Arrow unused, on break. Says he's still rooting for you both.",
+  "That one friend": "Ate the snacks, yes. But that's another case entirely."
+};
+const message = [
+  "Happy monthsary Bun❤️",
+  "Ang dami nang nangyari nitong August hanggang ngayon, and alam ko rin na marami akong naging pagkukulang at mga nagawa na nakasakit sau. I’m really sorry, bun. Sorry sa mga pagkakataon na hindi kita naintindihan at nde inintindi, sa mga nagawa ko na nakadagdag sa bigat na nararamdaman mo, at sa mga pagkakamali ko. Hindi ko man mababawi agad lahat, gusto kong matuto at ayusin yung mga mali ko.",
+  "Ngayong monthsary natin, wish ko lang na mapasa mo lahat ng kailangan mong ipasa at gumaling ka na rin. Alam kong marami ka ring pinagdadaanan ngayon, kaya sana maging okay ka and please take care of yourself palagi.",
+  "Sa relationship natin, sana maging okay tayo. Alam kong hindi naman laging smooth, pero ayoko rin sumuko sa atin. Gusto ko pa rin ayusin kung ano man yung kailangan ayusin, and sana magpatuloy pa rin tayo kahit may mga pagkakamali at misunderstandings.",
+  "Happy monthsary ulit, bun. Thank you sa lahat, and I’m sorry sa mga pagkukulang ko. I love you. ❤️"
 ];
 
-/* ========================================================= */
-
-document.getElementById('names').textContent = COUPLE_NAMES;
-
-function monthsSince(dateStr) {
-  const start = new Date(dateStr + "T00:00:00");
-  const now = new Date();
-  let months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
-  if (now.getDate() < start.getDate()) months -= 1;
-  return Math.max(1, months);
+let ctx, muted = false;
+function ac() {
+  if (!ctx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; ctx = new C(); }
+  if (ctx.state === "suspended") ctx.resume();
+  return ctx;
+}
+function tone(f, t = 0, d = .2, type = "sine", v = .12) {
+  if (muted) return;
+  const c = ac(); if (!c) return;
+  const o = c.createOscillator(), g = c.createGain(), st = c.currentTime + t;
+  o.type = type; o.frequency.setValueAtTime(f, st);
+  g.gain.setValueAtTime(0.0001, st); g.gain.linearRampToValueAtTime(v, st + .01); g.gain.exponentialRampToValueAtTime(.0001, st + d);
+  o.connect(g); g.connect(c.destination); o.start(st); o.stop(st + d + .05);
+}
+const sfx = {
+  tap() { tone(520, 0, .08, "triangle", .1); },
+  room() { tone(400, 0, .07, "square", .04); },
+  clue() { tone(660, 0, .15, "triangle"); tone(990, .1, .25, "triangle"); },
+  unlock() { [523, 659, 784].forEach((f, i) => tone(f, i * .1, .25, "triangle", .12)); },
+  clear() { tone(330, 0, .15, "sawtooth", .05); tone(247, .13, .3, "sawtooth", .05); },
+  reveal() { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .12, .45, "triangle", .14)); },
+  melody() { [659, 784, 880, 988, 1175].forEach((f, i) => { tone(f, i * 1.2, 1.1, "sine", .09); tone(f / 2, i * 1.2, 1.1, "sine", .05); }); }
+};
+function toggleSound() {
+  muted = !muted;
+  document.getElementById("snd").textContent = muted ? "🔇" : "🔊";
+  if (!muted) sfx.tap();
 }
 
-const TOTAL_STARS = monthsSince(START_DATE);
-document.getElementById('months-count').textContent = TOTAL_STARS;
-document.getElementById('progress-text').textContent = `0 / ${TOTAL_STARS} stars`;
+const total = Object.values(rooms).reduce((n, r) => n + r.length, 0);
+let s = { view: "intro", room: "Living Room", found: {}, cleared: {}, note: "" };
+const app = document.getElementById("app");
+const esc = t => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+const count = o => Object.keys(o).length;
 
-// lives display
-const livesEl = document.getElementById('lives');
-function renderLives(n) {
-  livesEl.innerHTML = '';
-  for (let i = 0; i < LIVES; i++) {
-    const s = document.createElement('span');
-    s.textContent = i < n ? '🐰' : '🤍';
-    livesEl.appendChild(s);
-  }
-}
-renderLives(LIVES);
-
-// background twinkle field
-const sky = document.getElementById('sky');
-function buildTwinkles() {
-  const count = Math.min(90, Math.floor((window.innerWidth * window.innerHeight) / 9000));
-  for (let i = 0; i < count; i++) {
-    const t = document.createElement('div');
-    t.className = 'twinkle';
-    const size = Math.random() * 2 + 1;
-    t.style.width = size + 'px';
-    t.style.height = size + 'px';
-    t.style.left = Math.random() * 100 + '%';
-    t.style.top = Math.random() * 70 + '%';
-    t.style.animationDuration = (2 + Math.random() * 3) + 's';
-    t.style.animationDelay = (Math.random() * 3) + 's';
-    sky.appendChild(t);
-  }
-}
-buildTwinkles();
-
-/* ============== GAME ============== */
-
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
-let W, H, DPR;
-
-function resize() {
-  DPR = Math.min(window.devicePixelRatio || 1, 2);
-  W = window.innerWidth;
-  H = window.innerHeight;
-  canvas.width = W * DPR;
-  canvas.height = H * DPR;
-  canvas.style.width = W + 'px';
-  canvas.style.height = H + 'px';
-  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-}
-window.addEventListener('resize', resize);
-resize();
-
-// --- constellation target shape (heart), scaled to TOTAL_STARS points ---
-function heartPoint(t) {
-  // parametric heart curve, t in [0, 2*PI]
-  const x = 16 * Math.pow(Math.sin(t), 3);
-  const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
-  return { x, y };
-}
-
-let constellationPoints = [];
-function buildConstellation() {
-  constellationPoints = [];
-  const n = TOTAL_STARS;
-  const topY = 92;
-  const areaW = Math.min(W * 0.62, 260);
-  const areaH = 78;
-  const cx = W / 2;
-  for (let i = 0; i < n; i++) {
-    const t = (i / Math.max(1, n - 1)) * Math.PI * 2;
-    const p = heartPoint(t);
-    constellationPoints.push({
-      x: cx + (p.x / 18) * (areaW / 2),
-      y: topY + (p.y / 17) * (areaH / 2),
-      lit: false
-    });
-  }
-}
-buildConstellation();
-window.addEventListener('resize', buildConstellation);
-
-// --- entities ---
-const player = { x: 0, y: 0, r: 26, targetX: 0 };
-let fallers = []; // stars (good) and clouds (bad)
-let caught = 0;
-let lives = LIVES;
-let running = false;
-let spawnTimer = 0;
-let spawnInterval = 1500;
-let fallSpeedBase = 1.3;
-let elapsed = 0;
-let lastTime = 0;
-
-function resetGame() {
-  caught = 0;
-  lives = LIVES;
-  fallers = [];
-  spawnTimer = 0;
-  spawnInterval = 1500;
-  fallSpeedBase = 1.3;
-  elapsed = 0;
-  player.x = W / 2;
-  player.targetX = W / 2;
-  player.y = H - 70;
-  renderLives(lives);
-  document.getElementById('progress-text').textContent = `0 / ${TOTAL_STARS} stars`;
-  buildConstellation();
-}
-
-function spawnFaller() {
-  const isCloud = Math.random() < 0.16;
-  const r = isCloud ? (16 + Math.random() * 10) : (9 + Math.random() * 4);
-  fallers.push({
-    type: isCloud ? 'cloud' : 'star',
-    x: 24 + Math.random() * (W - 48),
-    y: -30,
-    r,
-    speed: fallSpeedBase + Math.random() * 1.2,
-    drift: (Math.random() - 0.5) * 0.6,
-    twinklePhase: Math.random() * Math.PI * 2,
-  });
-}
-
-function showMilestone(starIndex) {
-  const text = MILESTONE_MESSAGES[starIndex] ||
-    DEFAULT_MILESTONE_LINES[(starIndex - 1) % DEFAULT_MILESTONE_LINES.length];
-  const toast = document.getElementById('milestone-toast');
-  document.getElementById('milestone-text').textContent = text;
-  toast.classList.add('show');
-  clearTimeout(showMilestone._t);
-  showMilestone._t = setTimeout(() => toast.classList.remove('show'), 1600);
-}
-
-function catchStar() {
-  caught++;
-  if (constellationPoints[caught - 1]) constellationPoints[caught - 1].lit = true;
-  document.getElementById('progress-text').textContent = `${caught} / ${TOTAL_STARS} stars`;
-  showMilestone(caught);
-  if (caught >= TOTAL_STARS) {
-    endGame(true);
-  }
-}
-
-function hitCloud() {
-  lives--;
-  renderLives(lives);
-  if (lives <= 0) {
-    endGame(false);
-  }
-}
-
-function endGame(won) {
-  running = false;
-  if (won) {
-    const body = WIN_MESSAGE
-      .replace('{months}', TOTAL_STARS)
-      .replace('{names}', COUPLE_NAMES);
-    document.getElementById('win-title').textContent = WIN_TITLE;
-    document.getElementById('win-body').innerHTML = body;
-    document.getElementById('win-overlay').classList.remove('hidden');
+function render() {
+  if (s.view === "intro") {
+    app.innerHTML = `<span class="tape">CASE #001 · OPEN</span>
+      <h1>Who Stole Our Monthsary?</h1>
+      <div class="card"><p>Breaking news: the monthsary celebration has vanished without a trace. No cake. No candles. No confetti.</p>
+      <p style="margin-top:10px">Only one person can crack this case. Detective Bun, please report for duty.</p></div>
+      <div class="row"><button class="primary" onclick="go('search')">Accept the case</button></div>`;
+  } else if (s.view === "search") {
+    const list = rooms[s.room];
+    const tabs = Object.keys(rooms).map(r => `<button class="${r === s.room ? 'primary' : ''}" onclick="room('${r}')">${r}</button>`).join("");
+    const items = list.map((it, i) => {
+      const k = s.room + i;
+      return `<button class="${s.found[k] ? 'done' : ''}" onclick="inspect('${s.room}',${i})">${it[0]}${s.found[k] ? ' ✓' : ''}</button>`;
+    }).join("");
+    app.innerHTML = `<div class="bar"><span>Clues found: ${count(s.found)}/${total}</span></div>
+      <div class="row">${tabs}</div>
+      <h2>${s.room}</h2>
+      <p>Tap to inspect the room:</p>
+      <div class="row">${items}</div>
+      <div class="card" id="note" style="min-height:90px"><p>${s.note ? esc(s.note) : "Tap something. Anything. You're the detective."}</p></div>
+      <div class="row"><button class="primary" ${count(s.found) < total ? 'disabled' : ''} onclick="go('accuse')">Name the culprit</button></div>
+      ${count(s.found) < total ? '<p style="color:#b9bde0;font-size:.85rem">Find every clue to unlock the accusation.</p>' : ''}`;
+  } else if (s.view === "accuse") {
+    const names = Object.keys(suspects);
+    const allClear = count(s.cleared) === names.length;
+    const btns = names.map(n => `<button class="${s.cleared[n] ? 'done' : ''}" ${s.cleared[n] ? 'disabled' : ''} onclick="accuse('${n}')">${n}</button>`).join("");
+    app.innerHTML = `<h2>The suspects</h2>
+      <p>Who stole the monthsary? Accuse carefully.</p>
+      <div class="row">${btns}</div>
+      <div class="card" id="note" style="min-height:90px"><p>${s.note ? esc(s.note) : "Tap a suspect."}</p></div>
+      ${allClear ? `<p>Everyone has an alibi. Which means...</p><div class="row"><button class="primary" onclick="reveal()">Nobody?</button></div>` : ''}`;
+  } else if (s.view === "reveal") {
+    app.innerHTML = `<span class="tape">CASE CLOSED</span>
+      <h1>WHO STOLE THE MONTHSARY?</h1>
+      <div class="stamp">NOBODY.</div>
+      <div class="card"><p class="big">💌</p><p>Because apparently we're still here.</p></div>
+      <div class="row"><button class="primary" onclick="go('msg')">Open the case file</button></div>`;
   } else {
-    document.getElementById('lose-overlay').classList.remove('hidden');
+    app.innerHTML = `<span class="tape">EVIDENCE: ONE LETTER</span>
+      <div class="msg">${message.map((p, i) => `<p style="animation-delay:${i * 1.2}s">${esc(p)}</p>`).join("")}</div>
+      <div class="row"><button onclick="restart()">Replay the case</button></div>`;
   }
 }
-
-/* ---- input ---- */
-function setTargetFromClientX(clientX) {
-  const rect = canvas.getBoundingClientRect();
-  player.targetX = clientX - rect.left;
-}
-canvas.addEventListener('mousemove', e => setTargetFromClientX(e.clientX));
-canvas.addEventListener('touchmove', e => {
-  if (e.touches[0]) setTargetFromClientX(e.touches[0].clientX);
-  e.preventDefault();
-}, { passive: false });
-canvas.addEventListener('touchstart', e => {
-  if (e.touches[0]) setTargetFromClientX(e.touches[0].clientX);
-}, { passive: false });
-
-const keys = {};
-window.addEventListener('keydown', e => { keys[e.key] = true; });
-window.addEventListener('keyup', e => { keys[e.key] = false; });
-
-/* ---- draw helpers ---- */
-function drawMoon(x, y, r) {
-  ctx.save();
-  ctx.translate(x, y);
-  const grad = ctx.createRadialGradient(0, 0, 1, 0, 0, r * 1.8);
-  grad.addColorStop(0, 'rgba(253, 251, 247, 0.55)');
-  grad.addColorStop(1, 'rgba(253, 251, 247, 0)');
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.arc(0, 0, r * 1.8, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = '#fdfbf7';
-  ctx.beginPath();
-  ctx.arc(0, 0, r, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = '#0a0e27';
-  ctx.globalAlpha = 0.9;
-  ctx.beginPath();
-  ctx.arc(r * 0.42, -r * 0.12, r * 0.82, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.globalAlpha = 1;
-  ctx.restore();
-}
-
-function drawStar(x, y, r, phase) {
-  const glow = 0.6 + 0.4 * Math.sin(phase);
-  ctx.save();
-  ctx.translate(x, y);
-  const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 2.4);
-  grad.addColorStop(0, `rgba(244, 201, 93, ${0.55 * glow})`);
-  grad.addColorStop(1, 'rgba(244, 201, 93, 0)');
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.arc(0, 0, r * 2.4, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = '#fff6da';
-  ctx.beginPath();
-  const spikes = 4;
-  for (let i = 0; i < spikes * 2; i++) {
-    const rad = i % 2 === 0 ? r : r * 0.4;
-    const ang = (Math.PI / spikes) * i - Math.PI / 2;
-    const px = Math.cos(ang) * rad;
-    const py = Math.sin(ang) * rad;
-    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-  }
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-}
-
-function drawCloud(x, y, r) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.fillStyle = 'rgba(163, 174, 224, 0.5)';
-  ctx.beginPath();
-  ctx.arc(-r * 0.5, 0, r * 0.55, 0, Math.PI * 2);
-  ctx.arc(r * 0.3, -r * 0.15, r * 0.6, 0, Math.PI * 2);
-  ctx.arc(r * 0.6, r * 0.15, r * 0.45, 0, Math.PI * 2);
-  ctx.arc(0, r * 0.1, r * 0.6, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-}
-
-function drawConstellation() {
-  if (constellationPoints.length < 2) return;
-  ctx.save();
-  ctx.strokeStyle = 'rgba(244, 201, 93, 0.35)';
-  ctx.lineWidth = 1.4;
-  ctx.beginPath();
-  let started = false;
-  for (const p of constellationPoints) {
-    if (!p.lit) continue;
-    if (!started) { ctx.moveTo(p.x, p.y); started = true; }
-    else ctx.lineTo(p.x, p.y);
-  }
-  ctx.stroke();
-
-  for (const p of constellationPoints) {
-    ctx.beginPath();
-    ctx.fillStyle = p.lit ? '#f4c95d' : 'rgba(163, 174, 224, 0.28)';
-    const rr = p.lit ? 3 : 1.8;
-    ctx.arc(p.x, p.y, rr, 0, Math.PI * 2);
-    ctx.fill();
-    if (p.lit) {
-      ctx.save();
-      ctx.globalAlpha = 0.35;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
-      ctx.fillStyle = '#f4c95d';
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-  ctx.restore();
-}
-
-/* ---- main loop ---- */
-function update(dt) {
-  elapsed += dt;
-  spawnTimer += dt;
-  const curInterval = Math.max(650, spawnInterval - elapsed * 0.007);
-  if (spawnTimer > curInterval) {
-    spawnTimer = 0;
-    spawnFaller();
-  }
-  fallSpeedBase = 1.3 + elapsed * 0.00022;
-
-  player.x += (player.targetX - player.x) * 0.18;
-  if (keys['ArrowLeft']) player.targetX -= 9;
-  if (keys['ArrowRight']) player.targetX += 9;
-  player.targetX = Math.max(24, Math.min(W - 24, player.targetX));
-
-  for (let i = fallers.length - 1; i >= 0; i--) {
-    const f = fallers[i];
-    f.y += f.speed * (dt / 16.67);
-    f.x += f.drift * (dt / 16.67);
-    f.twinklePhase += 0.08;
-
-    const dx = f.x - player.x;
-    const dy = f.y - player.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist < f.r + player.r * 0.8) {
-      if (f.type === 'star') catchStar(); else hitCloud();
-      fallers.splice(i, 1);
-      continue;
-    }
-    if (f.y - f.r > H + 20) {
-      fallers.splice(i, 1);
-    }
-  }
-}
-
-function draw() {
-  ctx.clearRect(0, 0, W, H);
-  drawConstellation();
-  for (const f of fallers) {
-    if (f.type === 'star') drawStar(f.x, f.y, f.r, f.twinklePhase);
-    else drawCloud(f.x, f.y, f.r);
-  }
-  drawMoon(player.x, player.y, player.r);
-}
-
-function loop(ts) {
-  if (!running) return;
-  if (!lastTime) lastTime = ts;
-  const dt = Math.min(40, ts - lastTime);
-  lastTime = ts;
-  update(dt);
-  draw();
-  requestAnimationFrame(loop);
-}
-
-function startGame() {
-  document.getElementById('start-overlay').classList.add('hidden');
-  document.getElementById('win-overlay').classList.add('hidden');
-  document.getElementById('lose-overlay').classList.add('hidden');
-  resetGame();
-  running = true;
-  lastTime = 0;
-  requestAnimationFrame(loop);
-}
-
-document.getElementById('start-btn').addEventListener('click', startGame);
-document.getElementById('restart-btn-win').addEventListener('click', startGame);
-document.getElementById('restart-btn-lose').addEventListener('click', startGame);
-
-// idle draw before start
-player.x = W / 2;
-player.y = H - 70;
-draw();
+function go(v) { s.view = v; s.note = ""; render(); window.scrollTo(0, 0); if (v === "reveal") sfx.reveal(); else if (v === "msg") sfx.melody(); else sfx.tap(); }
+function showNote() { const n = document.getElementById('note'); if (n) n.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+function room(r) { sfx.room(); s.room = r; s.note = ""; render(); }
+function inspect(r, i) { const was = count(s.found); s.found[r + i] = true; (count(s.found) === total && was < total) ? sfx.unlock() : sfx.clue(); s.note = rooms[r][i][1]; render(); showNote(); }
+function accuse(n) { sfx.clear(); s.cleared[n] = true; s.note = n + ": " + suspects[n]; render(); showNote(); }
+function reveal() { go("reveal"); }
+function restart() { s = { view: "intro", room: "Living Room", found: {}, cleared: {}, note: "" }; render(); window.scrollTo(0, 0); }
+render();
 </script>
 </body>
 </html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bun Simulator: Relationship Edition</title>
+<style>
+:root{--bg:#fff1e8;--card:#fffaf5;--ink:#4a2c3a;--soft:#9a7385;--pink:#ff7aa2;--pink2:#ffd3e0;--wall:#ffe0d6;--floor:#e9b79a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#2a1822;--card:#3a2230;--ink:#ffe8ef;--soft:#c9a0b2;--pink2:#5a2c40;--wall:#4a2a3a;--floor:#6b4150}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Baloo 2","Trebuchet MS",system-ui,sans-serif}
+body{min-height:100%;display:flex;justify-content:center}
+#app{width:100%;max-width:480px;padding:12px}
+h1,h2,h3{margin:0}
+.card{background:var(--card);border-radius:22px;padding:14px;margin-bottom:12px;border:3px solid var(--pink2)}
+button{font:inherit;color:var(--ink);background:var(--pink2);border:0;border-radius:14px;padding:10px 14px;cursor:pointer;font-weight:700;transition:transform .1s}
+button:active{transform:scale(.94)}
+button:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+button.main{background:var(--pink);color:#fff}
+button:disabled{opacity:.45;cursor:default}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hearts{font-size:1.3rem;font-weight:800}
+.bars{display:grid;grid-template-columns:auto 1fr;gap:4px 8px;align-items:center;margin-top:8px}
+.bar{height:10px;border-radius:6px;background:var(--pink2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--pink);transition:width .4s}
+#room{position:relative;height:270px;border-radius:18px;overflow:hidden;background:linear-gradient(var(--wall) 0 58%,var(--floor) 58% 100%);border:3px solid var(--pink2)}
+.slot{position:absolute;font-size:2.1rem;line-height:1;user-select:none;transform:translate(-50%,-50%)}
+#bubble{position:absolute;left:8px;right:8px;top:8px;z-index:3;background:var(--card);border-radius:14px;padding:8px 10px;font-size:.88rem;border:2px solid var(--pink2);min-height:2.4em}
+.spot{position:absolute;font-size:1.2rem;opacity:.25;cursor:pointer;background:none;padding:2px;border-radius:50%;z-index:1}
+.spot:hover,.spot:focus-visible,.spot.found{opacity:1}
+#bunw{position:absolute;width:86px;z-index:2;transform:translateX(-50%);transition:left 1.8s ease-in-out,bottom 1.8s ease-in-out;cursor:pointer}
+#bunw svg{display:block;width:100%;transition:transform .3s;overflow:visible}
+#bunw.walk .bb{animation:hop .36s infinite}
+#bunw.pet .bb{animation:hop .25s 2}
+@keyframes hop{50%{transform:translateY(-14px)}}
+.bb{transform-box:fill-box}
+.ear{transform-box:fill-box;transform-origin:50% 100%;animation:ear 3.4s infinite}
+.ear.r{animation-delay:.6s}
+@keyframes ear{0%,80%,100%{transform:rotate(0)}88%{transform:rotate(-14deg)}94%{transform:rotate(8deg)}}
+.eye{transform-box:fill-box;transform-origin:center;animation:blink 4s infinite}
+@keyframes blink{94%,100%{transform:scaleY(.1)}}
+@media (prefers-reduced-motion:reduce){.ear,.eye,#bunw.walk .bb{animation:none}}
+.q{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px}
+.q.done span{text-decoration:line-through;color:var(--soft)}
+.shop{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.shop button{display:flex;flex-direction:column;align-items:center;font-size:.72rem;padding:8px 2px}
+.shop button b{font-size:1.5rem}
+.modal{position:fixed;inset:0;background:rgba(40,10,25,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:5}
+.modal .card{max-width:440px;width:100%;max-height:92%;overflow:auto;margin:0}
+.opts{display:grid;gap:8px;margin-top:10px}
+.opts button{text-align:left;font-weight:600}
+.small{font-size:.8rem;color:var(--soft)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.title{text-align:center;padding:24px 8px}
+.title h1{font-size:2.2rem;line-height:1.1;margin:8px 0}
+.arena{position:relative;height:250px;background:var(--wall);border-radius:16px;overflow:hidden;margin-top:10px;touch-action:manipulation}
+.fall{position:absolute;top:-40px;font-size:2.1rem;animation:fall 3s linear forwards;background:none;padding:0}
+@keyframes fall{to{top:260px}}
+.simon{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.simon button{font-size:2.4rem;padding:18px;background:var(--wall)}
+.simon button.lit{background:var(--pink);transform:scale(1.06)}
+.mess{position:absolute;font-size:2rem;background:none;padding:0}
+.track{position:relative;height:34px;background:var(--pink2);border-radius:10px;margin:18px 0 10px;overflow:hidden}
+.zone{position:absolute;top:0;bottom:0;background:#7fd6a4;opacity:.85}
+.mark{position:absolute;top:0;bottom:0;width:8px;background:var(--ink);border-radius:4px}
+.fin{text-align:center}
+.fin h2{font-size:2rem;line-height:1.1;color:var(--pink);margin:6px 0 10px}
+.fin p{white-space:pre-wrap;text-align:left;line-height:1.5;margin:8px 0}
+.conf{position:fixed;bottom:-30px;font-size:1.6rem;z-index:9;pointer-events:none;animation:up 4s linear forwards}
+@keyframes up{to{bottom:110%;transform:rotate(30deg)}}
+.mute{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);right:8px;z-index:20;width:42px;height:42px;border-radius:50%;padding:0;font-size:1.2rem;border:2px solid var(--pink)}
+</style>
+</head>
+<body>
+<button id="mute" class="mute" aria-label="Toggle sound">🔊</button>
+<div id="app"></div>
+<script>
+/* ============ EDIT ME ============ */
+const CONFIG = {
+  her: "Bunn",
+  me: "Your Love",
+  late: "October 24",
+  jokes: [
+    {e:"🍟", t:"Fries incident of the century. Bun still owes you half a fry."},
+    {e:"🧦", t:"Bun found a single sock. Nobody knows where the other one is. (We know.)"},
+    {e:"📱", t:"Bun says “omw” from the couch. Bun is not omw."},
+    {e:"🌙", t:"Bun fell asleep during the movie again. 10 out of 10 consistency."},
+    {e:"🐸", t:"A frog showed up. Bun refuses to explain the frog."}
+  ],
+  finale: "Happy Monthsary, {her}! 🐰💗\n\nGood work this hell week! 🥹 Nalagpasan mo, and you did your best. Deserve mo lahat ng pahinga buong week, syempre. 😴🛌✨\n\nSorry kung nakalimutan ko 2 days ago, at ngayon lang ako nakabati. 🥺🙏 Hindi ko man lang nasabi sa mismong araw. Ang bad ko, alam ko. Parang si Bun, nakalimot tapos may excuse pa. 🐰💦\n\nPero hindi excuse yun, kaya heto, sorry talaga. Mali ko yun, at aayusin ko next time. Promise, may reminder na ako sa phone. ⏰📱\n\nThank you sa pagiging patient sa akin, kahit minsan makalimutin at antukin ako. 🥹 Thank you sa pag-intindi, sa pagod mo na kinakaya mo pa rin, at sa pagiging ikaw. 💕\n\nPahinga ka muna, kain ka nang masarap, at alagaan mo sarili mo. Kahit malayo ako, nandito lang ako lagi. 📞💞 Pag nagkita na tayo, babawi ako ng sobrang higpit na yakap. 🤗💐\n\nMahal na mahal kita, Bunn. Hindi lang tuwing monthsary, kundi araw-araw. 💗🥕✨\n\n— {me} 🐰\n\nP.S. Late man ako, hindi kailanman late ang pagmamahal ko sa’yo. 😘"
+};
+/* ================================= */
+
+const GOAL = 80;
+const QUESTS = [
+ {id:"feed",t:"🥕 Feed Bun: catch the carrots",stat:"fed",
+  ex:["I wasn’t hungry, so I assumed you weren’t either.","The carrots looked at me funny. I panicked.","I thought you were bringing snacks. You always bring snacks."],
+  ap:[{q:"Bun forgot to buy carrots. Best apology?",g:"“I messed up, and I’m sorry. I’ll go get some right now, and your favorite too.”",b:["“Technically you never texted me the grocery list.”","“Can we just order food and pretend this never happened?”"]},
+      {q:"Bun ate the last snack. What should Bun say?",g:"“That was selfish of me. I’m sorry. Let me make it up to you.”",b:["“It was just one snack. Why is it a whole thing?”","“Sorry, but it was so tasty.”"]}]},
+ {id:"play",t:"🐾 Play with Bun: copy the paws",stat:"fun",
+  ex:["I did show up. Just emotionally, a little late.","I was napping. For research purposes.","I said ‘omw’. I just never said I’d leave."],
+  ap:[{q:"Bun cancelled playtime last minute. Best apology?",g:"“I’m sorry I cancelled. You matter more than my nap. Can we reschedule tonight?”",b:["“You’re not mad, right? Say you’re not mad.”","“Sorry, but you could’ve reminded me.”"]},
+      {q:"Bun was on its phone the whole playdate. Best apology?",g:"“You deserved my full attention. I’m sorry. Phone is away now.”",b:["“I was listening! Probably.”","“Okay, sorry. Can we move on?”"]}]},
+ {id:"tidy",t:"🧹 Tidy up: find the clutter",stat:"tidy",
+  ex:["It’s not a mess, it’s an arrangement.","I was going to clean. Then the floor became a floor-shaped idea.","Those socks are decorative."],
+  ap:[{q:"Bun left a mountain of laundry. Best apology?",g:"“I’m sorry I left it all to you. I’ll sort it now, and I’ll own the laundry this week.”",b:["“It’s only a few clothes. You’re exaggerating.”","“Sorry you’re upset about the mess.”"]},
+      {q:"Bun said “I’ll do it later” again. What now?",g:"“I keep saying later, and that isn’t fair to you. I’m doing it now.”",b:["“Later means later! Why do you rush me?”","*sweeps one sock under the bed*"]}]},
+ {id:"dishes",t:"🍽️ Dishes: wash on the beat",stat:"tidy",chore:1,
+  ex:["The dishes were fine. They’re vibing in the sink.","I’m letting them soak. For three days.","I was waiting for the dishes to wash themselves. It’s a legit strategy."],
+  ap:[{q:"The dishes are still dirty… again. Best apology?",g:"“I said I’d do them and I didn’t. I’m sorry. Doing them now, and I’ll set a reminder.”",b:["“Why are you so focused on the dishes?”","“Sorry, but I had a long day too.”"]},
+      {q:"Bun broke a plate and hid it. What’s the proper move?",g:"“I broke it and I hid it. I’m sorry, I should have told you. I’ll replace it.”",b:["“It was already cracked. Probably.”","“What plate? I don’t know of any plate.”"]}]}
+];
+const ITEMS = [
+ {id:"rug",e:"🧶",n:"Rug",c:10,x:20,y:80},{id:"plant",e:"🪴",n:"Plant",c:10,x:88,y:50},
+ {id:"lamp",e:"🏮",n:"Lantern",c:15,x:78,y:24},{id:"pic",e:"🖼️",n:"Our photo",c:15,x:14,y:24},
+ {id:"bed",e:"🛏️",n:"Nap bed",c:20,x:80,y:78},{id:"tv",e:"📺",n:"Tiny TV",c:20,x:50,y:40},
+ {id:"cake",e:"🍰",n:"Cake",c:25,x:36,y:88},{id:"bouquet",e:"💐",n:"Flowers",c:25,x:30,y:52}
+];
+const SPOTS = [[8,66],[92,90],[62,18],[44,92],[94,36]];
+const S = {hearts:0,total:0,fed:60,fun:60,tidy:60,day:1,done:{},owned:{},found:{},apo:0,won:0,bx:50,by:14,face:1};
+const $ = id => document.getElementById(id);
+const app = $("app");
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const shuf = a => a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+const clamp = n => Math.max(0,Math.min(100,n));
+const fill = s => s.replace(/\{her\}/g,CONFIG.her).replace(/\{me\}/g,CONFIG.me).replace(/\{late\}/g,CONFIG.late);
+let msg = "";
+const say = t => { msg=t; const b=$("bubble"); if(b) b.textContent=t; };
+const gain = n => { S.hearts+=n; S.total+=n; };
+
+/* ===== SOUND (all synthesized, no files needed) ===== */
+const AU={ctx:null,on:true,next:0,step:0};
+const NT=[523.25,587.33,659.25,783.99,880,1046.5];
+const MEL=[2,-1,3,-1,4,-1,3,-1, 4,-1,3,-1,2,-1,0,-1, 0,-1,2,-1,4,-1,3,-1, 2,-1,1,-1,0,-1,-1,-1];
+const CH=[[261.63,329.63,392],[220,261.63,329.63],[174.61,220,261.63],[196,246.94,293.66]];
+function audioInit(){
+  if(AU.ctx){ if(AU.ctx.state==="suspended") AU.ctx.resume(); return; }
+  try{
+    const C=window.AudioContext||window.webkitAudioContext; AU.ctx=new C();
+    AU.master=AU.ctx.createGain(); AU.master.gain.value=AU.on?1:0; AU.master.connect(AU.ctx.destination);
+    AU.mus=AU.ctx.createGain(); AU.mus.gain.value=.45; AU.mus.connect(AU.master);
+    AU.fx=AU.ctx.createGain(); AU.fx.gain.value=.8; AU.fx.connect(AU.master);
+    AU.next=AU.ctx.currentTime+.1; setInterval(sched,120);
+  }catch(e){}
+}
+function tone(f,t0,d,type,vol,dest){
+  const c=AU.ctx,o=c.createOscillator(),g=c.createGain(); o.type=type||"sine"; o.frequency.value=f;
+  g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(vol,t0+.02); g.gain.exponentialRampToValueAtTime(.0001,t0+d);
+  o.connect(g); g.connect(dest||AU.fx); o.start(t0); o.stop(t0+d+.05);
+}
+function slide(f1,f2,d,type,vol){
+  const c=AU.ctx,t=c.currentTime,o=c.createOscillator(),g=c.createGain(); o.type=type||"sine";
+  o.frequency.setValueAtTime(f1,t); o.frequency.exponentialRampToValueAtTime(f2,t+d);
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g); g.connect(AU.fx); o.start(t); o.stop(t+d+.05);
+}
+function noise(d,vol,freq){
+  const c=AU.ctx,n=Math.floor(c.sampleRate*d),buf=c.createBuffer(1,n,c.sampleRate),a=buf.getChannelData(0);
+  for(let i=0;i<n;i++) a[i]=(Math.random()*2-1)*(1-i/n);
+  const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain(); s.buffer=buf; f.type="bandpass"; f.frequency.value=freq; g.gain.value=vol;
+  s.connect(f); f.connect(g); g.connect(AU.fx); s.start();
+}
+function sched(){
+  const c=AU.ctx; if(!c) return;
+  if(!AU.on){ AU.next=Math.max(AU.next,c.currentTime); return; }
+  while(AU.next<c.currentTime+.4){
+    const s=AU.step%32, ch=CH[Math.floor(s/8)%4], t=AU.next;
+    if(s%2===0) tone(ch[(s/2|0)%3],t,.7,"triangle",.1,AU.mus);
+    const m=MEL[s]; if(m>=0){ tone(NT[m],t,.9,"sine",.14,AU.mus); tone(NT[m]*2,t,.35,"sine",.03,AU.mus); }
+    AU.next+=.36; AU.step++;
+  }
+}
+function sfx(n,k){
+  if(!AU.ctx||!AU.on) return; const t=AU.ctx.currentTime;
+  if(n==="click") tone(700,t,.06,"sine",.08);
+  else if(n==="pet") slide(380,820,.16,"sine",.25);
+  else if(n==="blip") tone(300+Math.random()*120,t,.08,"sine",.05);
+  else if(n==="pop"){ tone(880,t,.1,"sine",.25); tone(1320,t+.05,.12,"sine",.2); }
+  else if(n==="tap") tone(620,t,.08,"triangle",.22);
+  else if(n==="bad") slide(220,110,.28,"sawtooth",.12);
+  else if(n==="paw") tone([330,392,494,587][k],t,.3,"triangle",.28);
+  else if(n==="splash"){ noise(.25,.5,1800); tone(900,t,.1,"sine",.12); }
+  else if(n==="buy"){ tone(988,t,.1,"square",.07); tone(1319,t+.09,.18,"square",.07); }
+  else if(n==="secret") [1047,1319,1568,2093].forEach((f,i)=>tone(f,t+i*.08,.3,"sine",.14));
+  else if(n==="good") [523,659,784,1047].forEach((f,i)=>tone(f,t+i*.09,.28,"triangle",.22));
+  else if(n==="win") [523,659,784,1047,784,1047,1319,1568].forEach((f,i)=>tone(f,t+i*.14,.45,"triangle",.24));
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest&&e.target.closest("button"); if(!b) return;
+  if(b.id==="mute"){ audioInit(); AU.on=!AU.on; if(AU.master) AU.master.gain.value=AU.on?1:0; b.textContent=AU.on?"🔊":"🔇"; return; }
+  if(b.matches(".fall,.mess,.simon button,.spot,#wash,#start")) return;
+  sfx("click");
+});
+
+const BUN = `<svg viewBox="0 0 100 120"><ellipse cx="50" cy="114" rx="26" ry="5" fill="rgba(0,0,0,.15)"/>
+<g class="bb"><ellipse class="ear" cx="36" cy="26" rx="9" ry="26" fill="#fff"/><ellipse class="ear" cx="36" cy="28" rx="4" ry="18" fill="#ffb8cc"/>
+<ellipse class="ear r" cx="64" cy="26" rx="9" ry="26" fill="#fff"/><ellipse class="ear r" cx="64" cy="28" rx="4" ry="18" fill="#ffb8cc"/>
+<circle cx="80" cy="96" r="9" fill="#fff"/><ellipse cx="50" cy="88" rx="30" ry="24" fill="#fff"/>
+<ellipse cx="50" cy="62" rx="27" ry="23" fill="#fff"/>
+<ellipse class="eye" cx="40" cy="60" rx="3.5" ry="4.5" fill="#4a2c3a"/><ellipse class="eye" cx="60" cy="60" rx="3.5" ry="4.5" fill="#4a2c3a"/>
+<circle cx="31" cy="70" r="5" fill="#ffb8cc" opacity=".8"/><circle cx="69" cy="70" r="5" fill="#ffb8cc" opacity=".8"/>
+<path d="M46 70 Q50 75 54 70" stroke="#4a2c3a" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="50" cy="67" rx="3" ry="2" fill="#ff7aa2"/>
+${S.apo>=5?'<path d="M50 40 l-12 -8 v16z M50 40 l12 -8 v16z" fill="#ff7aa2"/><circle cx="50" cy="40" r="3" fill="#e8527c"/>':''}</g></svg>`;
+
+function title(){
+  app.innerHTML = `<div class="card title"><div style="width:130px;margin:0 auto">${BUN}</div>
+  <h1>Bun Simulator<br>Relationship Edition</h1>
+  <p>Look after Bun, play the daily quests, decorate the room and collect hearts.</p>
+  <p class="small">Warning: Bun may remind you of someone.</p>
+  <button class="main" id="start">Start</button></div>`;
+  $("start").onclick = () => { audioInit(); say(`Hi ${CONFIG.her}! I’m Bun. I’m new here. Please be gentle.`); game(); setInterval(wander,3600); };
+}
+function wander(){
+  const w=$("bunw"); if(!w || document.querySelector(".modal")) return;
+  const nx=12+Math.random()*72, ny=4+Math.random()*30;
+  S.face = nx<S.bx?-1:1; S.bx=nx; S.by=ny;
+  w.firstElementChild.style.transform=`scaleX(${S.face})`;
+  w.style.left=nx+"%"; w.style.bottom=ny+"%";
+  w.classList.add("walk"); sfx("blip"); setTimeout(()=>w.classList.remove("walk"),1800);
+}
+function game(){
+  const allDone = QUESTS.every(q=>S.done[q.id]);
+  app.innerHTML = `
+  <div class="card"><div class="top"><div class="hearts">💗 ${S.hearts}</div><div>Day ${S.day}</div><div class="small">Sorry skill ${S.apo}/5</div></div>
+  <div class="bars">🥕<div class="bar"><i style="width:${S.fed}%"></i></div>🐾<div class="bar"><i style="width:${S.fun}%"></i></div>✨<div class="bar"><i style="width:${S.tidy}%"></i></div></div>
+  <div class="bar" style="margin-top:10px"><i style="width:${Math.min(100,S.total/GOAL*100)}%"></i></div><div class="small">Monthsary meter ${Math.min(S.total,GOAL)}/${GOAL}</div></div>
+  <div id="room"><div id="bubble"></div>
+    ${ITEMS.filter(i=>S.owned[i.id]).map(i=>`<div class="slot" style="left:${i.x}%;top:${i.y}%">${i.e}</div>`).join("")}
+    ${SPOTS.map((p,k)=>`<button class="spot ${S.found[k]?"found":""}" data-k="${k}" style="left:${p[0]}%;top:${p[1]}%" aria-label="Something is hiding here">${CONFIG.jokes[k]?CONFIG.jokes[k].e:"❔"}</button>`).join("")}
+    <div id="bunw" role="button" tabindex="0" aria-label="Pet Bun" style="left:${S.bx}%;bottom:${S.by}%">${BUN}</div>
+  </div>
+  <p class="small" style="text-align:center;margin:6px 0 12px">Tap Bun to pet. Some things in the room are hiding. 👀</p>
+  <div class="card"><h3>Today’s quests</h3>
+  ${QUESTS.map(q=>`<div class="q ${S.done[q.id]?"done":""}"><span>${q.t}</span><button data-q="${q.id}" ${S.done[q.id]?"disabled":""}>${S.done[q.id]?"Done":"Play"}</button></div>`).join("")}
+  <div class="row"><button class="main" id="next" ${allDone?"":"disabled"}>Next day ➜</button>${S.won?`<button class="main" id="again">💌 Read the message</button>`:""}</div></div>
+  <div class="card"><h3>Decor shop</h3><div class="shop">
+  ${ITEMS.map(i=>`<button data-i="${i.id}" ${S.owned[i.id]||S.hearts<i.c?"disabled":""}><b>${i.e}</b>${i.n}<span>${S.owned[i.id]?"Placed":i.c+" 💗"}</span></button>`).join("")}
+  </div></div>
+  <div class="card small">Secrets found: ${Object.keys(S.found).length}/${SPOTS.length}</div>`;
+  say(msg||"Hi!");
+  $("bunw").style.cursor="pointer";
+  $("bunw").firstElementChild.style.transform=`scaleX(${S.face})`;
+  $("bunw").onclick = pet;
+  app.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>startQuest(b.dataset.q));
+  app.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>buy(b.dataset.i));
+  app.querySelectorAll(".spot").forEach(b=>b.onclick=()=>spot(+b.dataset.k));
+  $("next").onclick = nextDay;
+  if($("again")) $("again").onclick = finale;
+  if(S.total>=GOAL && !S.won){ S.won=1; setTimeout(finale,500); }
+}
+function modal(html){ const m=document.createElement("div"); m.className="modal"; m.innerHTML=`<div class="card">${html}</div>`; document.body.appendChild(m); return m; }
+function pet(){
+  const w=$("bunw"); w.classList.add("pet"); sfx("pet"); setTimeout(()=>w.classList.remove("pet"),520);
+  say(pick(["*happy wiggle*","Pets accepted. Please continue.","I love you. Also, what was I doing?","Bun is trying its best. Bun is a work in progress."]));
+}
+function startQuest(id){
+  const q = QUESTS.find(x=>x.id===id);
+  const flake = q.chore ? S.apo<5 : Math.random() < Math.max(0.12, 0.6-S.apo*0.1);
+  flake ? flakeScene(q) : play(q);
+}
+function flakeScene(q){
+  const ex=pick(q.ex), a=pick(q.ap); say(ex);
+  const opts = shuf([[a.g,1],[a.b[0],0],[a.b[1],0]]);
+  const m = modal(`<h3>😳 Bun dropped the ball</h3><p><i>“${ex}”</i></p><p>${a.q}</p>
+  <div class="opts">${opts.map((o,k)=>`<button data-k="${k}">${o[0]}</button>`).join("")}</div><p id="fb" class="small"></p>`);
+  m.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{
+    if(opts[+b.dataset.k][1]){ sfx("good"); S.apo=Math.min(5,S.apo+1); gain(6); m.remove(); say(S.apo>=5?"Sorry skill maxed! I even got a bow.":"Ohhh. THAT’S how sorry works. Thank you."); play(q); }
+    else{ sfx("bad"); $("fb").textContent=pick(["Bun tried that one. It made things worse.","Hmm, that sounded like an excuse. Try again.","Bun’s ears drooped. Not that one."]); b.disabled=true; }
+  });
+}
+function play(q){
+  const m = modal(`<h3>${q.t}</h3><div id="intro" class="small"></div><div id="stage"></div>`);
+  const st=$("stage"), end=()=>{ sfx("good"); m.remove(); S.done[q.id]=1; S[q.stat]=clamp(S[q.stat]+25); gain(12); say(pick(["We did it! Did I do good?","Look, a finished task! Bun is proud.","Task complete. I’d like a cookie."])); game(); };
+  ({feed:feedGame,play:pawGame,tidy:tidyGame,dishes:dishGame})[q.id](st,end,$("intro"));
+}
+function feedGame(st,end,intro){
+  intro.textContent="Tap 6 carrots. Don’t tap the socks!";
+  st.innerHTML=`<div class="arena" id="ar"></div><div class="small" id="sc">0/6</div>`;
+  let n=0, done=0; const ar=$("ar");
+  const t=setInterval(()=>{
+    if(!document.body.contains(ar)){clearInterval(t);return;}
+    const b=document.createElement("button"), sock=Math.random()<.28;
+    b.className="fall"; b.textContent=sock?"🧦":"🥕"; b.style.left=(Math.random()*80+5)+"%";
+    b.onclick=()=>{ if(done)return; if(sock){n=Math.max(0,n-1);sfx("bad");} else {n++;sfx("pop");} b.remove(); $("sc").textContent=n+"/6"; if(n>=6){done=1;clearInterval(t);setTimeout(end,300);} };
+    ar.appendChild(b); setTimeout(()=>b.remove(),3100);
+  },550);
+}
+function pawGame(st,end,intro){
+  intro.textContent="Watch the paws, then copy the order.";
+  const E=["🐾","🥕","💗","⭐"]; let seq=[],i=0,lock=true;
+  st.innerHTML=`<div class="simon">${E.map((e,k)=>`<button data-k="${k}">${e}</button>`).join("")}</div><p class="small" id="fb">Watch…</p>`;
+  const bs=[...st.querySelectorAll("button")];
+  const flash=k=>{sfx("paw",k);bs[k].classList.add("lit");setTimeout(()=>bs[k].classList.remove("lit"),350);};
+  const show=()=>{ seq=Array.from({length:4},()=>Math.floor(Math.random()*4)); i=0; lock=true; $("fb").textContent="Watch…";
+    seq.forEach((k,j)=>setTimeout(()=>flash(k),700+j*650)); setTimeout(()=>{lock=false;$("fb").textContent="Your turn!";},700+seq.length*650); };
+  bs.forEach((b,k)=>b.onclick=()=>{ if(lock)return; flash(k);
+    if(k!==seq[i]){ sfx("bad"); $("fb").textContent="Oops, Bun got confused too. Watch again."; setTimeout(show,900); return; }
+    if(++i>=seq.length){ lock=true; $("fb").textContent="Perfect!"; setTimeout(end,500); } });
+  show();
+}
+function tidyGame(st,end,intro){
+  intro.textContent="Find and tap all 7 pieces of clutter.";
+  const things=["🧦","🍟","📱","🧥","🥤","📦","🧦"];
+  st.innerHTML=`<div class="arena" id="ar"></div><div class="small" id="sc">7 left</div>`;
+  let left=7; const ar=$("ar");
+  things.forEach(e=>{ const b=document.createElement("button"); b.className="mess"; b.textContent=e;
+    b.style.left=(Math.random()*82+3)+"%"; b.style.top=(Math.random()*76+4)+"%"; b.style.transform=`rotate(${Math.random()*80-40}deg)`;
+    b.onclick=()=>{ sfx("tap"); b.remove(); left--; $("sc").textContent=left?left+" left":"Squeaky clean!"; if(!left) setTimeout(end,400); };
+    ar.appendChild(b); });
+}
+function dishGame(st,end,intro){
+  intro.textContent="Tap WASH when the line is inside the green zone. 3 plates.";
+  st.innerHTML=`<div class="track" id="tr"><div class="zone" id="zn"></div><div class="mark" id="mk"></div></div>
+  <div style="font-size:2rem" id="pl">🍽️🍽️🍽️</div><div class="row"><button class="main" id="wash">Wash!</button></div><p class="small" id="fb"></p>`;
+  const tr=$("tr"), mk=$("mk"), zn=$("zn"); let x=0,dir=1,left=3,run=true;
+  const zw=24; let zs=40; const setZ=()=>{zs=10+Math.random()*55; zn.style.left=zs+"%"; zn.style.width=zw+"%";}; setZ();
+  (function loop(){ if(!document.body.contains(tr)||!run) return; x+=dir*(1.3+(3-left)*.45); if(x>=100){x=100;dir=-1} if(x<=0){x=0;dir=1} mk.style.left=`calc(${x}% - ${x*.08}px)`; requestAnimationFrame(loop); })();
+  $("wash").onclick=()=>{
+    if(x>=zs && x<=zs+zw){ left--; $("pl").textContent="🍽️".repeat(left)+"✨".repeat(3-left); sfx("splash"); $("fb").textContent=pick(["Squeaky!","Nice scrub!","Sparkling!"]); setZ();
+      if(!left){ run=false; setTimeout(end,500);} }
+    else { sfx("bad"); $("fb").textContent="Splash! Missed it. Try again."; }
+  };
+}
+function buy(id){ const i=ITEMS.find(x=>x.id===id); if(S.hearts<i.c||S.owned[id])return; sfx("buy"); S.hearts-=i.c; S.owned[id]=1; say(`A new ${i.n.toLowerCase()}! Bun feels spoiled.`); game(); }
+function spot(k){
+  const j=CONFIG.jokes[k]; if(!j)return; sfx("secret"); if(!S.found[k]){S.found[k]=1;gain(5);}
+  const m=modal(`<h3>${j.e} Secret found!</h3><p>${j.t}</p><button class="main" id="ok">Aww, okay</button>`);
+  $("ok").onclick=()=>{m.remove();game();};
+}
+function nextDay(){
+  S.day++; S.done={}; S.fed=clamp(S.fed-30); S.fun=clamp(S.fun-30); S.tidy=clamp(S.tidy-30);
+  say(S.day%3===0?"Good morning! I definitely did not stay up watching videos.":"New day! Bun has a good feeling about this one."); game();
+}
+function finale(){
+  const all=Object.keys(S.found).length>=SPOTS.length;
+  sfx("win"); for(let i=0;i<28;i++){ const c=document.createElement("div"); c.className="conf"; c.textContent=pick(["💗","🐰","🥕","✨","🎀"]); c.style.left=Math.random()*95+"%"; c.style.animationDelay=Math.random()*2+"s"; document.body.appendChild(c); setTimeout(()=>c.remove(),6500); }
+  const m=modal(`<div class="fin"><div style="width:110px;margin:0 auto">${BUN}</div>${fill(CONFIG.finale).split("\n\n").map((p,k)=>k?`<p>${p}</p>`:`<h2>${p}</h2>`).join("")}
+  <p class="small" style="text-align:center">${all?"🏆 You found every secret. Of course you did.":"Psst… there are still secrets hiding in the room."}</p>
+  <button class="main" id="ok">Keep playing</button></div>`);
+  $("ok").onclick=()=>m.remove();
+}
+title();
+</script>
+</body>
+</html>
